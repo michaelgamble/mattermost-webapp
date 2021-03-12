@@ -5,21 +5,22 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import Constants from 'utils/constants.jsx';
-import LoadingScreen from 'components/loading_screen.jsx';
+import Constants from 'utils/constants';
+import LoadingScreen from 'components/loading_screen';
 
 import UserListRow from './user_list_row';
 
-export default class UserList extends React.Component {
+export default class UserList extends React.PureComponent {
     static propTypes = {
         users: PropTypes.arrayOf(PropTypes.object),
         extraInfo: PropTypes.object,
-        actions: PropTypes.arrayOf(PropTypes.func),
+        actions: PropTypes.arrayOf(PropTypes.node),
         actionProps: PropTypes.object,
         actionUserProps: PropTypes.object,
+        isDisabled: PropTypes.bool,
 
         // the type of user list row to render
-        rowComponentType: PropTypes.func,
+        rowComponentType: PropTypes.object,
     }
 
     static defaultProps = {
@@ -32,13 +33,12 @@ export default class UserList extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.scrollToTop = this.scrollToTop.bind(this);
+        this.containerRef = React.createRef();
     }
 
-    scrollToTop() {
-        if (this.refs.container) {
-            this.refs.container.scrollTop = 0;
+    scrollToTop = () => {
+        if (this.containerRef.current) {
+            this.containerRef.current.scrollTop = 0;
         }
     }
 
@@ -62,6 +62,7 @@ export default class UserList extends React.Component {
                         index={index}
                         totalUsers={users.length}
                         userCount={(index >= 0 && index < Constants.TEST_ID_COUNT) ? index : -1}
+                        isDisabled={this.props.isDisabled}
                     />
                 );
             });
@@ -70,6 +71,7 @@ export default class UserList extends React.Component {
                 <div
                     key='no-users-found'
                     className='more-modal__placeholder-row'
+                    data-testid='noUsersFound'
                 >
                     <p>
                         <FormattedMessage
@@ -82,7 +84,7 @@ export default class UserList extends React.Component {
         }
 
         return (
-            <div ref='container'>
+            <div ref={this.containerRef}>
                 {content}
             </div>
         );

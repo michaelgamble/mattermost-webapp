@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router-dom';
 import {FormattedMessage} from 'react-intl';
-import {OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Tooltip} from 'react-bootstrap';
 
 import * as UserUtils from 'mattermost-redux/utils/user_utils';
 import {General} from 'mattermost-redux/constants';
@@ -14,17 +14,18 @@ import BotDefaultIcon from 'images/bot_default_icon.png';
 
 import {browserHistory} from 'utils/browser_history';
 import BackstageHeader from 'components/backstage/components/backstage_header.jsx';
-import SpinnerButton from 'components/spinner_button.jsx';
+import OverlayTrigger from 'components/overlay_trigger';
+import SpinnerButton from 'components/spinner_button';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
-import FormError from 'components/form_error.jsx';
-import {AcceptedProfileImageTypes, OVERLAY_TIME_DELAY} from 'utils/constants.jsx';
+import FormError from 'components/form_error';
+import {AcceptedProfileImageTypes, Constants, ValidationErrors} from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 import * as FileUtils from 'utils/file_utils.jsx';
 
 const roleOptionSystemAdmin = 'System Admin';
 const roleOptionMember = 'Member';
 
-export default class AddBot extends React.Component {
+export default class AddBot extends React.PureComponent {
     static propTypes = {
 
         /**
@@ -36,6 +37,11 @@ export default class AddBot extends React.Component {
         *  Bot to edit (if editing)
         */
         bot: PropTypes.object,
+
+        /**
+        *  Bot user
+        */
+        user: PropTypes.object,
 
         /**
         *  Roles of the bot to edit (if editing)
@@ -243,7 +249,7 @@ export default class AddBot extends React.Component {
         });
 
         const bot = {
-            username: this.state.username.toLowerCase(),
+            username: this.state.username.toLowerCase().trim(),
             display_name: this.state.displayName,
             description: this.state.description,
         };
@@ -263,7 +269,7 @@ export default class AddBot extends React.Component {
                 if (this.state.pictureFile && this.state.pictureFile !== 'default') {
                     const imageResult = await this.props.actions.uploadProfileImage(data.user_id, this.state.pictureFile);
                     error = imageResult.error;
-                } else {
+                } else if (this.state.pictureFile && this.state.pictureFile === 'default') {
                     await this.props.actions.setDefaultProfileImage(data.user_id);
                 }
             }
@@ -277,12 +283,31 @@ export default class AddBot extends React.Component {
                 return;
             }
         } else {
-            const usernameError = Utils.isValidUsername(bot.username);
+            const usernameError = Utils.isValidBotUsername(bot.username);
             if (usernameError) {
-                this.setState({
-                    adding: false,
-                    error: usernameError,
-                });
+                let errObj;
+                if (usernameError.id === ValidationErrors.INVALID_LAST_CHARACTER) {
+                    errObj = {
+                        adding: false,
+                        error: (
+                            <FormattedMessage
+                                id='bots.manage.add.invalid_last_char'
+                                defaultMessage='Bot usernames cannot have a period as the last character'
+                            />
+                        ),
+                    };
+                } else {
+                    errObj = {
+                        adding: false,
+                        error: (
+                            <FormattedMessage
+                                id='bots.manage.add.invalid_username'
+                                defaultMessage='Usernames must begin with a lowercase letter and be 3-22 characters long. You can use lowercase letters, numbers, periods, dashes, and underscores.'
+                            />
+                        ),
+                    };
+                }
+                this.setState(errObj);
                 return;
             }
 
@@ -302,7 +327,7 @@ export default class AddBot extends React.Component {
                     await this.props.actions.setDefaultProfileImage(data.user_id);
                 }
                 const tokenResult = await this.props.actions.createUserAccessToken(data.user_id,
-                    Utils.localizeMessage('bot.token.default.description', 'Default Token')
+                    Utils.localizeMessage('bot.token.default.description', 'Default Token'),
                 );
 
                 // On error just skip the confirmation because we have a bot without a token.
@@ -380,7 +405,7 @@ export default class AddBot extends React.Component {
         let imageURL = '';
         let removeImageIcon = (
             <OverlayTrigger
-                delayShow={OVERLAY_TIME_DELAY}
+                delayShow={Constants.OVERLAY_TIME_DELAY}
                 placement='right'
                 overlay={(
                     <Tooltip id='removeIcon'>
@@ -401,7 +426,11 @@ export default class AddBot extends React.Component {
         );
         let imageStyles = null;
         if (this.props.bot && !this.state.pictureFile) {
-            imageURL = Utils.imageURLForUser(this.props.bot.user_id);
+            if (this.props.user) {
+                imageURL = Utils.imageURLForUser(this.props.user.id, this.props.user.last_picture_update);
+            } else {
+                imageURL = Utils.imageURLForUser(this.props.bot.user_id);
+            }
         } else {
             imageURL = this.state.image;
             imageStyles = this.state.orientationStyles;
@@ -478,7 +507,7 @@ export default class AddBot extends React.Component {
                                 >
                                     <FormattedMessage
                                         id='bots.image.upload'
-                                        defaultMessage='Upload an image'
+                                        defaultMessage='Upload Image'
                                     />
                                     <input
                                         accept='.jpg,.png,.bmp'
@@ -562,12 +591,12 @@ export default class AddBot extends React.Component {
                                     <option
                                         value={roleOptionMember}
                                     >
-                                        {roleOptionMember}
+                                        {Utils.localizeMessage('bot.add.role.member', 'Member')}
                                     </option>
                                     <option
                                         value={roleOptionSystemAdmin}
                                     >
-                                        {roleOptionSystemAdmin}
+                                        {Utils.localizeMessage('bot.add.role.admin', 'System Admin')}
                                     </option>
                                 </select>
                                 <div className='form__help'>

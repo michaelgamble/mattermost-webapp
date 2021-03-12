@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 
 import FileInfoPreview from 'components/file_info_preview';
@@ -28,34 +28,33 @@ export default class AudioVideoPreview extends React.PureComponent {
     constructor(props) {
         super(props);
 
-        this.handleFileInfoChanged = this.handleFileInfoChanged.bind(this);
-        this.handleLoadError = this.handleLoadError.bind(this);
-
-        this.stop = this.stop.bind(this);
-
         this.state = {
             canPlay: true,
         };
-    }
-
-    UNSAFE_componentWillMount() { // eslint-disable-line camelcase
-        this.handleFileInfoChanged(this.props.fileInfo);
+        this.videoRef = React.createRef();
+        this.sourceRef = React.createRef();
     }
 
     componentDidMount() {
-        if (this.refs.source) {
-            $(ReactDOM.findDOMNode(this.refs.source)).one('error', this.handleLoadError);
+        this.handleFileInfoChanged(this.props.fileInfo);
+
+        if (this.sourceRef.current) {
+            $(ReactDOM.findDOMNode(this.sourceRef.current)).one('error', this.handleLoadError);
         }
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
-        if (this.props.fileUrl !== nextProps.fileUrl) {
-            this.handleFileInfoChanged(nextProps.fileInfo);
+    componentDidUpdate(prevProps) {
+        if (this.props.fileUrl !== prevProps.fileUrl) {
+            this.handleFileInfoChanged(this.props.fileInfo);
+        }
+
+        if (this.sourceRef.current) {
+            $(ReactDOM.findDOMNode(this.sourceRef.current)).one('error', this.handleLoadError);
         }
     }
 
-    handleFileInfoChanged(fileInfo) {
-        let video = ReactDOM.findDOMNode(this.refs.video);
+    handleFileInfoChanged = (fileInfo) => {
+        let video = ReactDOM.findDOMNode(this.videoRef.current);
         if (!video) {
             video = document.createElement('video');
         }
@@ -67,21 +66,15 @@ export default class AudioVideoPreview extends React.PureComponent {
         });
     }
 
-    componentDidUpdate() {
-        if (this.refs.source) {
-            $(ReactDOM.findDOMNode(this.refs.source)).one('error', this.handleLoadError);
-        }
-    }
-
-    handleLoadError() {
+    handleLoadError = () => {
         this.setState({
             canPlay: false,
         });
     }
 
-    stop() {
-        if (this.refs.video) {
-            const video = ReactDOM.findDOMNode(this.refs.video);
+    stop = () => {
+        if (this.videoRef.current) {
+            const video = ReactDOM.findDOMNode(this.videoRef.current);
             video.pause();
             video.currentTime = 0;
         }
@@ -108,14 +101,14 @@ export default class AudioVideoPreview extends React.PureComponent {
         return (
             <video
                 key={this.props.fileInfo.id}
-                ref='video'
+                ref={this.videoRef}
                 data-setup='{}'
                 controls='controls'
                 width={width}
                 height={height}
             >
                 <source
-                    ref='source'
+                    ref={this.sourceRef}
                     src={this.props.fileUrl}
                 />
             </video>

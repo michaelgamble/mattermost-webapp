@@ -19,10 +19,10 @@ body {
         scrollbar-3dlight-color: #7D7E94;
         scrollbar-arrow-color: #C1C1D1;
         scrollbar-darkshadow-color: #2D2C4D;
-        scrollbar-face-color: rgba(0, 0, 0, .1);
+        scrollbar-face-color: rgba(var(--center-channel-bg-rgb), .1);
         scrollbar-highlight-color: #7D7E94;
         scrollbar-shadow-color: #2D2C4D;
-        scrollbar-track-color: rgba(0, 0, 0, .1);
+        scrollbar-track-color: rgba(var(--center-channel-bg-rgb), .1);
     }
 
     .ps {
@@ -45,35 +45,17 @@ body {
 .scrollbar--horizontal,
 .scrollbar--vertical {
     @include border-radius(2px);
-    @include alpha-property(background-color, $black, .5);
+    background-color: #999;
 }
 
 .scrollbar--view {
-    -ms-overflow-style: none;
-
     .browser--ie & {
         margin: 0 !important;
         overflow-x: hidden !important;
-    }
-}
+        -ms-overflow-style: none;
 
-
-.ps-container {
-    &:hover {
-        .ps-scrollbar-x-rail,
-        .ps-scrollbar-y-rail {
-            @include opacity(.3);
-        }
-    }
-
-    > .ps-scrollbar-y-rail {
-        width: 10px;
-
-        &:hover {
-            .ps-scrollbar-y {
-                @include opacity(.6);
-                width: 6px;
-            }
+        .scrollbar--vertical {
+            visibility: hidden;
         }
     }
 }

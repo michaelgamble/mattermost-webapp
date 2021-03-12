@@ -10,14 +10,14 @@ import {getEmojiMap, getRecentEmojis} from 'selectors/emojis';
 
 import store from 'stores/redux_store.jsx';
 
-import * as Emoticons from 'utils/emoticons.jsx';
-import {compareEmojis} from 'utils/emoji_utils.jsx';
+import * as Emoticons from 'utils/emoticons';
+import {compareEmojis} from 'utils/emoji_utils';
 
 import Suggestion from './suggestion.jsx';
 import Provider from './provider.jsx';
 
 export const MIN_EMOTICON_LENGTH = 2;
-export const EMOJI_CATEGORY_SUGGESTION_BLACKLIST = ['skintone'];
+export const EMOJI_CATEGORY_SUGGESTION_BLOCKLIST = ['skintone'];
 
 class EmoticonSuggestion extends Suggestion {
     render() {
@@ -33,6 +33,7 @@ class EmoticonSuggestion extends Suggestion {
             <div
                 className={className}
                 onClick={this.handleClick}
+                onMouseMove={this.handleMouseMove}
                 {...Suggestion.baseProps}
             >
                 <div className='pull-left'>
@@ -52,6 +53,11 @@ class EmoticonSuggestion extends Suggestion {
 }
 
 export default class EmoticonProvider extends Provider {
+    constructor() {
+        super();
+
+        this.triggerCharacter = ':';
+    }
     handlePretextChanged(pretext, resultsCallback) {
         // Look for the potential emoticons at the start of the text, after whitespace, and at the start of emoji reaction commands
         const captured = (/(^|\s|^\+|^-)(:([^:\s]*))$/g).exec(pretext);
@@ -90,6 +96,16 @@ export default class EmoticonProvider extends Provider {
         return emojis.map((item) => ':' + item.name + ':');
     }
 
+    // findAndSuggestEmojis uses the provided partialName to match anywhere inside an emoji name.
+    //
+    // For example, typing `:welc` would match both `:welcome:` and `:youre_welcome:` if those
+    // emojis are present in the local store. Note, however, that the server only does prefix
+    // matches, so a query to populate the local store for `:welc` would only return `:welcome:`.
+    // This results in surprising differences between a fresh load of the application, and the
+    // changes to the cache from expanding the cache with emojis found in existing posts.
+    //
+    // For now, this behaviour and difference is by design.
+    // See https://mattermost.atlassian.net/browse/MM-17320.
     findAndSuggestEmojis(text, partialName, resultsCallback) {
         const recentMatched = [];
         const matched = [];
@@ -99,7 +115,7 @@ export default class EmoticonProvider extends Provider {
 
         // Check for named emoji
         for (const [name, emoji] of emojiMap) {
-            if (EMOJI_CATEGORY_SUGGESTION_BLACKLIST.includes(emoji.category)) {
+            if (EMOJI_CATEGORY_SUGGESTION_BLOCKLIST.includes(emoji.category)) {
                 continue;
             }
 

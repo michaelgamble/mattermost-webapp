@@ -20,40 +20,38 @@ describe('component/PDFPreview', () => {
     const requiredProps = {
         fileInfo: {extension: 'pdf'},
         fileUrl: 'https://pre-release.mattermost.com/api/v4/files/ips59w4w9jnfbrs3o94m1dbdie',
+        scale: 1,
     };
 
     test('should match snapshot, loading', () => {
         const wrapper = shallow(
-            <PDFPreview {...requiredProps}/>
+            <PDFPreview {...requiredProps}/>,
         );
         expect(wrapper).toMatchSnapshot();
     });
 
     test('should match snapshot, not successful', () => {
         const wrapper = shallow(
-            <PDFPreview {...requiredProps}/>
+            <PDFPreview {...requiredProps}/>,
         );
         wrapper.setState({loading: false});
         expect(wrapper).toMatchSnapshot();
     });
 
-    test('should return correct state when updateStateFromProps is called', () => {
+    test('should update state with new value from props when prop changes', () => {
         const wrapper = shallow(
-            <PDFPreview {...requiredProps}/>
+            <PDFPreview {...requiredProps}/>,
         );
+        const newFileUrl = 'https://some-new-url';
 
-        wrapper.instance().updateStateFromProps(requiredProps);
-        expect(wrapper.state('pdf')).toBe(null);
-        expect(wrapper.state('pdfPages')).toEqual({});
-        expect(wrapper.state('pdfPagesLoaded')).toEqual({});
-        expect(wrapper.state('numPages')).toEqual(0);
-        expect(wrapper.state('loading')).toBe(true);
-        expect(wrapper.state('success')).toBe(false);
+        wrapper.setProps({fileUrl: newFileUrl});
+        const {prevFileUrl} = wrapper.instance().state;
+        expect(prevFileUrl).toEqual(newFileUrl);
     });
 
     test('should return correct state when onDocumentLoad is called', () => {
         const wrapper = shallow(
-            <PDFPreview {...requiredProps}/>
+            <PDFPreview {...requiredProps}/>,
         );
 
         let pdf = {numPages: 0};
@@ -61,13 +59,12 @@ describe('component/PDFPreview', () => {
         expect(wrapper.state('pdf')).toEqual(pdf);
         expect(wrapper.state('numPages')).toEqual(pdf.numPages);
 
-        const MAX_PDF_PAGES = 5;
         pdf = {
-            numPages: 6,
+            numPages: 100,
             getPage: (i) => Promise.resolve(i),
         };
         wrapper.instance().onDocumentLoad(pdf);
         expect(wrapper.state('pdf')).toEqual(pdf);
-        expect(wrapper.state('numPages')).toEqual(MAX_PDF_PAGES);
+        expect(wrapper.state('numPages')).toEqual(pdf.numPages);
     });
 });

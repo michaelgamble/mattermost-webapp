@@ -12,8 +12,8 @@ This project hosts the webapp client code. Please file issues at [/mattermost-se
 
 Try out Mattermost: 
 
-- [Join the Mattermost Contributor's server](https://pre-release.mattermost.com/) (latest nightly builds, unstable)
-- [Join the Mattermost Demo server](https://demo.mattermost.com) (latest stable version)
+- [Join the Mattermost Contributor's server](https://community.mattermost.com) to join community discussions about contributions, development and more
+- [Get started with Mattermost Cloud](https://customers.mattermost.com/cloud/signup) to try out Mattermost
 
 Deploy on Heroku 
 
@@ -31,8 +31,8 @@ Install on your own machine:
 Get Involved:
 
 - [Contribute Code](http://docs.mattermost.com/developer/contribution-guide.html)
-- [Find "Help Wanted" projects](https://mattermost.atlassian.net/issues/?filter=10101)
-- [Join Developer Discussion on a Mattermost Server for contributors](https://pre-release.mattermost.com/signup_user_complete/?id=f1924a8db44ff3bb41c96424cdc20676)
+- [Find "Help Wanted" projects](https://mattermost.com/pl/help-wanted)
+- [Join Developer Discussion on a Mattermost Server for contributors](https://community.mattermost.com/core/channels/tickets)
 - [File Bugs](http://www.mattermost.org/filing-issues/)
 - [Share Feature Ideas](http://www.mattermost.org/feature-requests/)
 - [Get Troubleshooting Help](https://forum.mattermost.org/t/how-to-use-the-troubleshooting-forum/150)
@@ -44,7 +44,7 @@ Learn More:
 
 Get the Latest News:
 
-- **Twitter** - Follow [MattermostHQ](https://twitter.com/mattermosthq)
+- **Twitter** - Follow [Mattermost](https://twitter.com/Mattermost)
 - **Email** - Subscribe to our [newsletter](http://mattermost.us11.list-manage.com/subscribe?u=6cdba22349ae374e188e7ab8e&id=2add1c8034) (1 or 2 per month)
 - **IRC** - Join the #matterbridge channel on [Freenode](https://freenode.net/) (thanks to [matterircd](https://github.com/42wim/matterircd))
 

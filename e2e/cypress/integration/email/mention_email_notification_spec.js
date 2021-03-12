@@ -2,63 +2,75 @@
 // See LICENSE.txt for license information.
 
 // ***************************************************************
-// - [#] indicates a test step (e.g. 1. Go to a page)
+// - [#] indicates a test step (e.g. # Go to a page)
 // - [*] indicates an assertion (e.g. * Check the title)
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-import users from '../../fixtures/users.json';
+// Stage: @prod
+// Group: @notification
+
 import * as TIMEOUTS from '../../fixtures/timeouts';
 
-import {getEmailUrl, getEmailMessageSeparator, reUrl} from '../../utils';
-
-let config;
+import {
+    Constants,
+    getEmailUrl,
+    reUrl,
+    splitEmailBodyText,
+} from '../../utils';
 
 describe('Email notification', () => {
+    let config;
+    let testUser;
     let mentionedUser;
+    let testTeam;
 
     before(() => {
-        cy.apiGetConfig().then((response) => {
-            config = response.body;
+        // # Do email test if setup properly
+        cy.apiEmailTest();
+
+        // # Get config
+        cy.apiGetConfig().then((data) => {
+            ({config} = data);
         });
 
-        cy.visit('/');
-        cy.url().should('include', '/channels/town-square');
+        cy.apiInitSetup().then(({team, user}) => {
+            testUser = user;
+            testTeam = team;
 
-        cy.getCurrentTeamId().then((teamId) => {
-            cy.createNewUser({}, [teamId]).then((user) => {
-                mentionedUser = user;
+            cy.apiCreateUser().then(({user: newUser}) => {
+                mentionedUser = newUser;
+                cy.apiAddUserToTeam(team.id, newUser.id);
             });
+
+            // # Login as test user and go to town square
+            cy.apiLogin(testUser);
+            cy.visit(`/${team.name}/channels/town-square`);
         });
     });
 
     it('post a message that mentions a user', () => {
-        // # Login as user-1 and visit town-square channel
-        cy.apiLogin('user-1');
-        cy.visit('/ad-1/channels/town-square');
-
         // # Post a message mentioning the new user
         const text = `Hello @${mentionedUser.username}`;
         cy.postMessage(text);
 
         // Wait for a while to ensure that email notification is sent.
-        cy.wait(TIMEOUTS.SMALL);
+        cy.wait(TIMEOUTS.FIVE_SEC);
 
         const baseUrl = Cypress.config('baseUrl');
         const mailUrl = getEmailUrl(baseUrl);
 
         cy.task('getRecentEmail', {username: mentionedUser.username, mailUrl}).then((response) => {
-            const messageSeparator = getEmailMessageSeparator(baseUrl);
-            const user1 = users['user-1'];
-            verifyEmailNotification(response, config.TeamSettings.SiteName, 'eligendi', 'Town Square', mentionedUser, user1, text, config.EmailSettings.FeedbackEmail, config.SupportSettings.SupportEmail, messageSeparator);
+            verifyEmailNotification(response, config.TeamSettings.SiteName, testTeam.display_name, 'Town Square', mentionedUser, testUser, text, config.EmailSettings.FeedbackEmail, config.SupportSettings.SupportEmail);
 
-            const bodyText = response.data.body.text.split('\n');
+            const bodyText = splitEmailBodyText(response.data.body.text);
 
             const permalink = bodyText[9].match(reUrl)[0];
-            const permalinkPostId = permalink.split('/')[5];
+            const permalinkPostId = permalink.split('/')[6];
 
-            // # Visit permalink (e.g. click on email link)
+            // # Visit permalink (e.g. click on email link), view in browser to proceed
             cy.visit(permalink);
+            cy.findByText('View in Browser').click();
 
             const postText = `#postMessageText_${permalinkPostId}`;
             cy.get(postText).should('have.text', text);
@@ -71,7 +83,7 @@ describe('Email notification', () => {
     });
 });
 
-function verifyEmailNotification(response, siteName, teamDisplayName, channelDisplayName, mentionedUser, byUser, message, feedbackEmail, supportEmail, messageSeparator) {
+function verifyEmailNotification(response, siteName, teamDisplayName, channelDisplayName, mentionedUser, byUser, message, feedbackEmail = Constants.FixedCloudConfig.EmailSettings.FEEDBACK_EMAIL, supportEmail) {
     const isoDate = new Date().toISOString().substring(0, 10);
     const {data, status} = response;
 
@@ -92,7 +104,7 @@ function verifyEmailNotification(response, siteName, teamDisplayName, channelDis
     expect(data.subject).to.contain(`[${siteName}] Notification in ${teamDisplayName}`);
 
     // * Verify that the email body is correct
-    const bodyText = data.body.text.split(messageSeparator);
+    const bodyText = splitEmailBodyText(data.body.text);
     expect(bodyText.length).to.equal(16);
     expect(bodyText[1]).to.equal('You have a new notification.');
     expect(bodyText[4]).to.equal(`Channel: ${channelDisplayName}`);

@@ -1,0 +1,319 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/search_bar/SearchBar should match snapshot with search 1`] = `
+<ContextProvider
+  value={
+    Object {
+      "defaultFormats": Object {},
+      "defaultLocale": "en",
+      "formatDate": [Function],
+      "formatDateToParts": [Function],
+      "formatDisplayName": [Function],
+      "formatList": [Function],
+      "formatMessage": [Function],
+      "formatNumber": [Function],
+      "formatNumberToParts": [Function],
+      "formatPlural": [Function],
+      "formatRelativeTime": [Function],
+      "formatTime": [Function],
+      "formatTimeToParts": [Function],
+      "formats": Object {},
+      "formatters": Object {
+        "getDateTimeFormat": [Function],
+        "getDisplayNames": [Function],
+        "getListFormat": [Function],
+        "getMessageFormat": [Function],
+        "getNumberFormat": [Function],
+        "getPluralRules": [Function],
+        "getRelativeTimeFormat": [Function],
+      },
+      "locale": "en",
+      "messages": Object {},
+      "onError": [Function],
+      "textComponent": Symbol(react.fragment),
+      "timeZone": undefined,
+      "wrapRichTextChunksInFragment": undefined,
+    }
+  }
+>
+  <SearchBar
+    getFocus={[Function]}
+    handleBlur={[MockFunction]}
+    handleChange={[MockFunction]}
+    handleClear={[MockFunction]}
+    handleEnterKey={[MockFunction]}
+    handleFocus={[MockFunction]}
+    handleSubmit={[MockFunction]}
+    isFocus={false}
+    isFocused={false}
+    isSearchingTerm={false}
+    isSideBarRight={false}
+    keepFocused={false}
+    searchTerms="test"
+    suggestionProviders={
+      Array [
+        SearchDateProvider {
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchChannelProvider {
+          "autocompleteChannelsForSearch": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchUserProvider {
+          "autocompleteUsersInTeam": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+      ]
+    }
+    updateHighlightedSearchHint={[MockFunction]}
+  />
+</ContextProvider>
+`;
+
+exports[`components/search_bar/SearchBar should match snapshot without search 1`] = `
+<ContextProvider
+  value={
+    Object {
+      "defaultFormats": Object {},
+      "defaultLocale": "en",
+      "formatDate": [Function],
+      "formatDateToParts": [Function],
+      "formatDisplayName": [Function],
+      "formatList": [Function],
+      "formatMessage": [Function],
+      "formatNumber": [Function],
+      "formatNumberToParts": [Function],
+      "formatPlural": [Function],
+      "formatRelativeTime": [Function],
+      "formatTime": [Function],
+      "formatTimeToParts": [Function],
+      "formats": Object {},
+      "formatters": Object {
+        "getDateTimeFormat": [Function],
+        "getDisplayNames": [Function],
+        "getListFormat": [Function],
+        "getMessageFormat": [Function],
+        "getNumberFormat": [Function],
+        "getPluralRules": [Function],
+        "getRelativeTimeFormat": [Function],
+      },
+      "locale": "en",
+      "messages": Object {},
+      "onError": [Function],
+      "textComponent": Symbol(react.fragment),
+      "timeZone": undefined,
+      "wrapRichTextChunksInFragment": undefined,
+    }
+  }
+>
+  <SearchBar
+    getFocus={[Function]}
+    handleBlur={[MockFunction]}
+    handleChange={[MockFunction]}
+    handleClear={[MockFunction]}
+    handleEnterKey={[MockFunction]}
+    handleFocus={[MockFunction]}
+    handleSubmit={[MockFunction]}
+    isFocus={false}
+    isFocused={false}
+    isSearchingTerm={false}
+    isSideBarRight={false}
+    keepFocused={false}
+    searchTerms=""
+    suggestionProviders={
+      Array [
+        SearchDateProvider {
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchChannelProvider {
+          "autocompleteChannelsForSearch": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchUserProvider {
+          "autocompleteUsersInTeam": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+      ]
+    }
+    updateHighlightedSearchHint={[MockFunction]}
+  />
+</ContextProvider>
+`;
+
+exports[`components/search_bar/SearchBar should match snapshot without search on focus 1`] = `
+<ContextProvider
+  value={
+    Object {
+      "defaultFormats": Object {},
+      "defaultLocale": "en",
+      "formatDate": [Function],
+      "formatDateToParts": [Function],
+      "formatDisplayName": [Function],
+      "formatList": [Function],
+      "formatMessage": [Function],
+      "formatNumber": [Function],
+      "formatNumberToParts": [Function],
+      "formatPlural": [Function],
+      "formatRelativeTime": [Function],
+      "formatTime": [Function],
+      "formatTimeToParts": [Function],
+      "formats": Object {},
+      "formatters": Object {
+        "getDateTimeFormat": [Function],
+        "getDisplayNames": [Function],
+        "getListFormat": [Function],
+        "getMessageFormat": [Function],
+        "getNumberFormat": [Function],
+        "getPluralRules": [Function],
+        "getRelativeTimeFormat": [Function],
+      },
+      "locale": "en",
+      "messages": Object {},
+      "onError": [Function],
+      "textComponent": Symbol(react.fragment),
+      "timeZone": undefined,
+      "wrapRichTextChunksInFragment": undefined,
+    }
+  }
+>
+  <SearchBar
+    getFocus={[Function]}
+    handleBlur={[MockFunction]}
+    handleChange={[MockFunction]}
+    handleClear={[MockFunction]}
+    handleEnterKey={[MockFunction]}
+    handleFocus={[MockFunction]}
+    handleSubmit={[MockFunction]}
+    isFocus={false}
+    isFocused={false}
+    isFocussed={true}
+    isSearchingTerm={false}
+    isSideBarRight={false}
+    keepFocused={false}
+    searchTerms=""
+    suggestionProviders={
+      Array [
+        SearchDateProvider {
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchChannelProvider {
+          "autocompleteChannelsForSearch": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchUserProvider {
+          "autocompleteUsersInTeam": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+      ]
+    }
+    updateHighlightedSearchHint={[MockFunction]}
+  />
+</ContextProvider>
+`;
+
+exports[`components/search_bar/SearchBar should match snapshot without search on focus in mobile 1`] = `
+<ContextProvider
+  value={
+    Object {
+      "defaultFormats": Object {},
+      "defaultLocale": "en",
+      "formatDate": [Function],
+      "formatDateToParts": [Function],
+      "formatDisplayName": [Function],
+      "formatList": [Function],
+      "formatMessage": [Function],
+      "formatNumber": [Function],
+      "formatNumberToParts": [Function],
+      "formatPlural": [Function],
+      "formatRelativeTime": [Function],
+      "formatTime": [Function],
+      "formatTimeToParts": [Function],
+      "formats": Object {},
+      "formatters": Object {
+        "getDateTimeFormat": [Function],
+        "getDisplayNames": [Function],
+        "getListFormat": [Function],
+        "getMessageFormat": [Function],
+        "getNumberFormat": [Function],
+        "getPluralRules": [Function],
+        "getRelativeTimeFormat": [Function],
+      },
+      "locale": "en",
+      "messages": Object {},
+      "onError": [Function],
+      "textComponent": Symbol(react.fragment),
+      "timeZone": undefined,
+      "wrapRichTextChunksInFragment": undefined,
+    }
+  }
+>
+  <SearchBar
+    getFocus={[Function]}
+    handleBlur={[MockFunction]}
+    handleChange={[MockFunction]}
+    handleClear={[MockFunction]}
+    handleEnterKey={[MockFunction]}
+    handleFocus={[MockFunction]}
+    handleSubmit={[MockFunction]}
+    isFocus={false}
+    isFocused={false}
+    isFocussed={true}
+    isSearchingTerm={false}
+    isSideBarRight={false}
+    keepFocused={false}
+    searchTerms=""
+    suggestionProviders={
+      Array [
+        SearchDateProvider {
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchChannelProvider {
+          "autocompleteChannelsForSearch": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+        SearchUserProvider {
+          "autocompleteUsersInTeam": [MockFunction],
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+        },
+      ]
+    }
+    updateHighlightedSearchHint={[MockFunction]}
+  />
+</ContextProvider>
+`;

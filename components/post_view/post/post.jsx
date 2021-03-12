@@ -3,17 +3,21 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {injectIntl} from 'react-intl';
+
 import {Posts} from 'mattermost-redux/constants';
-import {intlShape} from 'react-intl';
 import {isMeMessage as checkIsMeMessage} from 'mattermost-redux/utils/post_utils';
 
 import * as PostUtils from 'utils/post_utils.jsx';
-import {A11yCustomEventTypes} from 'utils/constants.jsx';
+import Constants, {A11yCustomEventTypes} from 'utils/constants';
+import {intlShape} from 'utils/react_intl';
 import PostProfilePicture from 'components/post_profile_picture';
 import PostBody from 'components/post_view/post_body';
 import PostHeader from 'components/post_view/post_header';
+import PostContext from 'components/post_view/post_context';
+import PostPreHeader from 'components/post_view/post_pre_header';
 
-export default class Post extends React.PureComponent {
+class Post extends React.PureComponent {
     static propTypes = {
 
         /**
@@ -22,14 +26,9 @@ export default class Post extends React.PureComponent {
         post: PropTypes.object.isRequired,
 
         /**
-         * The reactions to use for screen readers
+         * The function to create an aria-label
          */
-        reactions: PropTypes.object,
-
-        /**
-         * Author of the post
-         */
-        author: PropTypes.string,
+        createAriaLabel: PropTypes.func.isRequired,
 
         /**
          * The logged in user ID
@@ -50,11 +49,6 @@ export default class Post extends React.PureComponent {
          * Set to render a preview of the parent post above this reply
          */
         isFirstReply: PropTypes.bool,
-
-        /*
-         * Set to mark the post as flagged
-         */
-        isFlagged: PropTypes.bool,
 
         /**
          * Set to highlight the background of the post
@@ -86,15 +80,28 @@ export default class Post extends React.PureComponent {
          */
         replyCount: PropTypes.number,
 
+        /**
+         * To Check if the current post is last in the list
+         */
+        isLastPost: PropTypes.bool,
+
+        /**
+         * Whether or not the channel that contains this post is archived
+         */
+        channelIsArchived: PropTypes.bool.isRequired,
+
+        intl: intlShape.isRequired,
         actions: PropTypes.shape({
             selectPost: PropTypes.func.isRequired,
             selectPostCard: PropTypes.func.isRequired,
+            markPostAsUnread: PropTypes.func.isRequired,
         }).isRequired,
-    }
 
-    static contextTypes = {
-        intl: intlShape.isRequired,
-    };
+        /*
+         * Set to mark the post as flagged
+         */
+        isFlagged: PropTypes.bool.isRequired,
+    }
 
     static defaultProps = {
         post: {},
@@ -108,27 +115,50 @@ export default class Post extends React.PureComponent {
         this.state = {
             dropdownOpened: false,
             hover: false,
+            alt: false,
             a11yActive: false,
-            sameRoot: this.hasSameRoot(props),
+            currentAriaLabel: '',
+            ariaHidden: true,
+            fadeOutHighlight: false,
         };
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
-        this.setState({sameRoot: this.hasSameRoot(nextProps)});
-    }
-
     componentDidMount() {
-        this.postRef.current.addEventListener(A11yCustomEventTypes.ACTIVATE, this.handleA11yActivateEvent);
-        this.postRef.current.addEventListener(A11yCustomEventTypes.DEACTIVATE, this.handleA11yDeactivateEvent);
-    }
-    componentWillUnmount() {
-        this.postRef.current.removeEventListener(A11yCustomEventTypes.ACTIVATE, this.handleA11yActivateEvent);
-        this.postRef.current.removeEventListener(A11yCustomEventTypes.DEACTIVATE, this.handleA11yDeactivateEvent);
+        document.addEventListener('keydown', this.handleAlt);
+        document.addEventListener('keyup', this.handleAlt);
+
+        // Refs can be null when this component is shallowly rendered for testing
+        if (this.postRef.current) {
+            this.postRef.current.addEventListener(A11yCustomEventTypes.ACTIVATE, this.handleA11yActivateEvent);
+            this.postRef.current.addEventListener(A11yCustomEventTypes.DEACTIVATE, this.handleA11yDeactivateEvent);
+        }
+
+        if (this.props.shouldHighlight) {
+            this.highlightTimeout = setTimeout(() => {
+                this.setState({fadeOutHighlight: true});
+            }, Constants.PERMALINK_FADEOUT);
+        }
     }
 
-    componentDidUpdate() {
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.handleAlt);
+        document.removeEventListener('keyup', this.handleAlt);
+
+        if (this.postRef.current) {
+            this.postRef.current.removeEventListener(A11yCustomEventTypes.ACTIVATE, this.handleA11yActivateEvent);
+            this.postRef.current.removeEventListener(A11yCustomEventTypes.DEACTIVATE, this.handleA11yDeactivateEvent);
+        }
+
+        clearTimeout(this.highlightTimeout);
+    }
+
+    componentDidUpdate(prevProps) {
         if (this.state.a11yActive) {
             this.postRef.current.dispatchEvent(new Event(A11yCustomEventTypes.UPDATE));
+        }
+        if (this.props.post.state === Posts.POST_DELETED && prevProps.post.state !== Posts.POST_DELETED) {
+            // ensure deleted message content does not remain in stale aria-label
+            this.updateAriaLabel();
         }
     }
 
@@ -139,7 +169,6 @@ export default class Post extends React.PureComponent {
         if (!post) {
             return;
         }
-
         this.props.actions.selectPost(post);
     }
 
@@ -147,8 +176,22 @@ export default class Post extends React.PureComponent {
         if (!post) {
             return;
         }
-
         this.props.actions.selectPostCard(post);
+    }
+
+    handlePostClick = (e) => {
+        const post = this.props.post;
+        if (!post) {
+            return;
+        }
+
+        if (this.props.channelIsArchived || post.system_post_ids) {
+            return;
+        }
+
+        if (e.altKey) {
+            this.props.actions.markPostAsUnread(post);
+        }
     }
 
     handleDropdownOpened = (opened) => {
@@ -182,15 +225,22 @@ export default class Post extends React.PureComponent {
             className += ' post--hide-controls';
         }
 
-        if (this.props.shouldHighlight) {
+        if (!this.state.fadeOutHighlight && this.props.shouldHighlight) {
             className += ' post--highlight';
+            if (post.is_pinned || this.props.isFlagged) {
+                className += ' post--pinned-or-flagged-highlight';
+            }
         }
 
         let rootUser = '';
-        if (this.state.sameRoot && !fromBot) {
+        if (this.hasSameRoot(this.props)) {
             rootUser = 'same--root';
         } else {
             rootUser = 'other--root';
+        }
+
+        if (fromBot) {
+            className += ' post--bot';
         }
 
         let currentUserCss = '';
@@ -233,8 +283,12 @@ export default class Post extends React.PureComponent {
             className += ' post--hovered';
         }
 
-        if (post.is_pinned) {
-            className += ' post--pinned';
+        if (post.is_pinned || this.props.isFlagged) {
+            className += ' post--pinned-or-flagged';
+        }
+
+        if (this.state.alt && !(this.props.channelIsArchived || post.system_post_ids)) {
+            className += ' cursor--pointer';
         }
 
         return className + ' ' + sameUserClass + ' ' + rootUser + ' ' + postType + ' ' + currentUserCss;
@@ -248,16 +302,36 @@ export default class Post extends React.PureComponent {
         this.setState({hover: false});
     }
 
+    handleAlt = (e) => {
+        if (this.state.alt !== e.altKey) {
+            this.setState({alt: e.altKey});
+        }
+    }
+
     handleA11yActivateEvent = () => {
-        this.setState({a11yActive: true});
+        this.setState({
+            a11yActive: true,
+            ariaHidden: false,
+        });
     }
 
     handleA11yDeactivateEvent = () => {
-        this.setState({a11yActive: false});
+        this.setState({
+            a11yActive: false,
+            ariaHidden: true,
+        });
+    }
+
+    handlePostFocus = () => {
+        this.updateAriaLabel();
+    }
+
+    updateAriaLabel = () => {
+        this.setState({currentAriaLabel: this.props.createAriaLabel(this.props.intl)});
     }
 
     render() {
-        const {post, author, isFlagged, reactions} = this.props;
+        const {post} = this.props;
         if (!post.id) {
             return null;
         }
@@ -269,7 +343,7 @@ export default class Post extends React.PureComponent {
         const fromBot = post && post.props && post.props.from_bot === 'true';
 
         let profilePic;
-        const hideProfilePicture = this.state.sameRoot && this.props.consecutivePostByUser && (!post.root_id && this.props.replyCount === 0) && !fromBot;
+        const hideProfilePicture = this.hasSameRoot(this.props) && this.props.consecutivePostByUser && (!post.root_id && this.props.replyCount === 0) && !fromBot;
         if (!hideProfilePicture) {
             profilePic = (
                 <PostProfilePicture
@@ -294,48 +368,63 @@ export default class Post extends React.PureComponent {
         }
 
         return (
-            <div
-                ref={this.postRef}
-                id={'post_' + post.id}
-                role='listitem'
-                className={`a11y__section ${this.getClassName(post, isSystemMessage, isMeMessage, fromWebhook, fromAutoResponder, fromBot)}`}
-                tabIndex='0'
-                onFocus={this.setFocus}
-                onBlur={this.removeFocus}
-                onMouseOver={this.setHover}
-                onMouseLeave={this.unsetHover}
-                onTouchStart={this.setHover}
-                aria-label={PostUtils.createAriaLabelForPost(post, author, isFlagged, reactions, this.context.intl)}
-            >
+            <PostContext.Provider value={{handlePopupOpened: this.handleDropdownOpened}}>
                 <div
-                    id='postContent'
-                    className={'post__content ' + centerClass}
+                    ref={this.postRef}
+                    id={'post_' + post.id}
+                    data-testid='postView'
+                    role='listitem'
+                    className={`a11y__section ${this.getClassName(post, isSystemMessage, isMeMessage, fromWebhook, fromAutoResponder, fromBot)}`}
+                    tabIndex='0'
+                    onFocus={this.handlePostFocus}
+                    onBlur={this.removeFocus}
+                    onMouseOver={this.setHover}
+                    onMouseLeave={this.unsetHover}
+                    onTouchStart={this.setHover}
+                    onClick={this.handlePostClick}
+                    aria-label={this.state.currentAriaLabel}
+                    aria-atomic={true}
                 >
-                    <div className='post__img'>
-                        {profilePic}
-                    </div>
-                    <div>
-                        <PostHeader
-                            post={post}
-                            handleCommentClick={this.handleCommentClick}
-                            handleCardClick={this.handleCardClick}
-                            handleDropdownOpened={this.handleDropdownOpened}
-                            compactDisplay={this.props.compactDisplay}
-                            isFirstReply={this.props.isFirstReply}
-                            replyCount={this.props.replyCount}
-                            showTimeWithoutHover={!hideProfilePicture}
-                            hover={this.state.hover || this.state.a11yActive}
-                        />
-                        <PostBody
-                            post={post}
-                            handleCommentClick={this.handleCommentClick}
-                            compactDisplay={this.props.compactDisplay}
-                            isCommentMention={this.props.isCommentMention}
-                            isFirstReply={this.props.isFirstReply}
-                        />
+                    <PostPreHeader
+                        isFlagged={this.props.isFlagged}
+                        isPinned={post.is_pinned}
+                        channelId={post.channel_id}
+                    />
+                    <div
+                        role='application'
+                        data-testid='postContent'
+                        className={'post__content ' + centerClass}
+                        aria-hidden={this.state.ariaHidden}
+                    >
+                        <div className='post__img'>
+                            {profilePic}
+                        </div>
+                        <div>
+                            <PostHeader
+                                post={post}
+                                handleCommentClick={this.handleCommentClick}
+                                handleCardClick={this.handleCardClick}
+                                handleDropdownOpened={this.handleDropdownOpened}
+                                compactDisplay={this.props.compactDisplay}
+                                isFirstReply={this.props.isFirstReply}
+                                replyCount={this.props.replyCount}
+                                showTimeWithoutHover={!hideProfilePicture}
+                                hover={this.state.hover || this.state.a11yActive}
+                                isLastPost={this.props.isLastPost}
+                            />
+                            <PostBody
+                                post={post}
+                                handleCommentClick={this.handleCommentClick}
+                                compactDisplay={this.props.compactDisplay}
+                                isCommentMention={this.props.isCommentMention}
+                                isFirstReply={this.props.isFirstReply}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </PostContext.Provider>
         );
     }
 }
+
+export default injectIntl(Post);

@@ -30,10 +30,6 @@ span.greyed-out {
     }
 
 }
-.btn-toggle.btn-lg {
-    margin-left: 68px;
-    margin-bottom: -5px;
-}
 
 .help-text-small.help-text-no-padding {
     margin-top: 0;
@@ -45,7 +41,16 @@ span.greyed-out {
     max-width: 440px;
 }
 .large-team-image-col {
-    max-width: 120px;
+    max-width: 129px;
+    padding-right: 20px;
+
+    .TeamIcon {
+        background: rgba(0, 0, 0, .12);
+        margin-right: 12px;
+    }
+}
+.team-desc-col, .channel-desc-col {
+    line-height: 20px;
 }
 .center-row > div {
     display: inline-block;
@@ -66,13 +71,13 @@ span.greyed-out {
     }
 }
 
-
 .help-text-small {
-    height: 34px;
-    width: 668px;
-    opacity: 0.5;
-    color: #000000;
-    font-family: "Open Sans";
+    max-width: 668px;
+    opacity: 0.6;
     font-size: 12px;
     line-height: 17px;
+}
+
+#teams, #team_profile, #channels, #channel_profile {
+    margin-top: 0px;
 }

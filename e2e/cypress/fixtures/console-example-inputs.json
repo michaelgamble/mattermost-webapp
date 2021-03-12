@@ -1,0 +1,98 @@
+[
+    {
+        "section": "about",
+        "disabledInputs": [
+            {
+                "path": "/admin_console/about/license",
+                "selector": "remove-button"
+            }
+        ]
+    },
+    {
+        "section": "reporting",
+        "disabledInputs": []
+    },
+    {
+        "section": "user_management.system_users",
+        "disabledInputs": []
+    },
+    {
+        "section": "user_management.groups",
+        "disabledInputs": []
+    },
+    {
+        "section": "user_management.teams",
+        "disabledInputs": []
+    },
+    {
+        "section": "user_management.channel",
+        "disabledInputs": []
+    },
+    {
+        "section": "user_management.permissions",
+        "disabledInputs": []
+    },
+    {
+        "section": "environment",
+        "disabledInputs": [
+            {
+                "path": "/admin_console/environment/web_server",
+                "selector": "ServiceSettings.ListenAddressinput"
+            }
+        ]
+    },
+    {
+        "section": "site",
+        "disabledInputs": [
+            {
+                "path": "admin_console/site_config/customization",
+                "selector": "TeamSettings.SiteNameinput"
+            }
+        ]
+    },
+    {
+        "section": "authentication",
+        "disabledInputs": [
+            {
+                "path": "/admin_console/authentication/password",
+                "selector": "passwordMinimumLengthinput"
+            }
+        ]
+    },
+    {
+        "section": "plugins",
+        "disabledInputs": [
+            {
+                "path": "/admin_console/plugins/plugin_management",
+                "selector": "marketplaceUrlinput"
+            }
+        ]
+    },
+    {
+        "section": "integrations",
+        "disabledInputs": [
+            {
+                "path": "/admin_console/integrations/gif",
+                "selector": "ServiceSettings.GfycatApiKeyinput"
+            }
+        ]
+    },
+    {
+        "section": "compliance",
+        "disabledInputs": [
+            {
+                "path": "/admin_console/compliance/data_retention",
+                "selector": "deletionJobStartTimeinput"
+            }
+        ]
+    },
+    {
+        "section": "experimental",
+        "disabledInputs": [
+            {
+                "path": "/admin_console/experimental/features",
+                "selector": "ExperimentalSettings.LinkMetadataTimeoutMillisecondsnumber"
+            }
+        ]
+    }
+]

@@ -5,7 +5,7 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Setting from './setting.jsx';
+import Setting from './setting';
 
 export default class RemoveFileSetting extends Setting {
     static get propTypes() {
@@ -21,12 +21,18 @@ export default class RemoveFileSetting extends Setting {
         };
     }
 
+    constructor(props) {
+        super(props);
+
+        this.removeButtonRef = React.createRef();
+    }
+
     handleRemove = (e) => {
         e.preventDefault();
 
-        $(this.refs.remove_button).button('loading');
+        $(this.removeButtonRef.current).button('loading');
         this.props.onSubmit(this.props.id, () => {
-            $(this.refs.remove_button).button('reset');
+            $(this.removeButtonRef.current).button('reset');
         });
     }
 
@@ -42,9 +48,10 @@ export default class RemoveFileSetting extends Setting {
                         {this.props.fileName}
                     </div>
                     <button
+                        type='button'
                         className='btn btn-danger'
                         onClick={this.handleRemove}
-                        ref='remove_button'
+                        ref={this.removeButtonRef}
                         disabled={this.props.disabled}
                         data-loading-text={`<span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span> ${this.props.removingText}`}
                     >

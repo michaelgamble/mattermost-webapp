@@ -1,20 +1,20 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Redirect} from 'react-router';
 import {viewChannel} from 'mattermost-redux/actions/channels';
+import semver from 'semver';
 
-import * as GlobalActions from 'actions/global_actions.jsx';
+import * as GlobalActions from 'actions/global_actions';
 import * as WebSocketActions from 'actions/websocket_actions.jsx';
-import * as UserAgent from 'utils/user_agent.jsx';
-import LoadingScreen from 'components/loading_screen.jsx';
+import * as UserAgent from 'utils/user_agent';
+import LoadingScreen from 'components/loading_screen';
 import {getBrowserTimezone} from 'utils/timezone.jsx';
 import store from 'stores/redux_store.jsx';
-import {webappConnector} from 'utils/webapp_connector';
 import WebSocketClient from 'client/web_websocket_client.jsx';
+import BrowserStore from 'stores/browser_store';
 
 const dispatch = store.dispatch;
 const getState = store.getState;
@@ -30,6 +30,7 @@ export default class LoggedIn extends React.PureComponent {
         enableTimezone: PropTypes.bool.isRequired,
         actions: PropTypes.shape({
             autoUpdateTimezone: PropTypes.func.isRequired,
+            getChannelURLAction: PropTypes.func.isRequired,
         }).isRequired,
         showTermsOfService: PropTypes.bool.isRequired,
     }
@@ -56,93 +57,57 @@ export default class LoggedIn extends React.PureComponent {
         }
 
         // Make sure the websockets close and reset version
-        $(window).on('beforeunload',
-            () => {
-                // Turn off to prevent getting stuck in a loop
-                $(window).off('beforeunload');
-                if (document.cookie.indexOf('MMUSERID=') > -1) {
-                    viewChannel('', this.props.currentChannelId || '')(dispatch, getState);
-                }
-                WebSocketActions.close();
-            }
-        );
+        window.addEventListener('beforeunload', this.handleBeforeUnload);
 
         // Listen for focused tab/window state
         window.addEventListener('focus', this.onFocusListener);
         window.addEventListener('blur', this.onBlurListener);
-
-        // Listen for user activity updates from external sources via the webapp connector
-        if (webappConnector.active) {
-            webappConnector.on('user-activity-update', this.handleUserActivityUpdates);
+        if (!document.hasFocus()) {
+            GlobalActions.emitBrowserFocus(false);
         }
 
-        // Because current CSS requires the root tag to have specific stuff
+        // Listen for messages from the desktop app
+        window.addEventListener('message', this.onDesktopMessageListener);
+
+        // Tell the desktop app the webapp is ready
+        window.postMessage(
+            {
+                type: 'webapp-ready',
+            },
+            window.location.origin,
+        );
 
         // Device tracking setup
         if (UserAgent.isIos()) {
-            $('body').addClass('ios');
+            document.body.classList.add('ios');
         } else if (UserAgent.isAndroid()) {
-            $('body').addClass('android');
+            document.body.classList.add('android');
         }
 
         if (!this.props.currentUser) {
-            $('#root').attr('class', '');
+            const rootEl = document.getElementById('root');
+            if (rootEl) {
+                rootEl.setAttribute('class', '');
+            }
             GlobalActions.emitUserLoggedOutEvent('/login?redirect_to=' + encodeURIComponent(this.props.location.pathname), true, false);
         }
 
-        $('body').on('mouseenter mouseleave', ':not(.post-list__dynamic) .post', function mouseOver(ev) {
-            if (ev.type === 'mouseenter') {
-                $(this).prev('.date-separator, .new-separator').addClass('hovered--after');
-                $(this).next('.date-separator, .new-separator').addClass('hovered--before');
-            } else {
-                $(this).prev('.date-separator, .new-separator').removeClass('hovered--after');
-                $(this).next('.date-separator, .new-separator').removeClass('hovered--before');
-            }
-        });
-
-        $('body').on('mouseenter mouseleave', '.search-item__container .post', function mouseOver(ev) {
-            if (ev.type === 'mouseenter') {
-                $(this).closest('.search-item__container').find('.date-separator').addClass('hovered--after');
-                $(this).closest('.search-item__container').next('div').find('.date-separator').addClass('hovered--before');
-            } else {
-                $(this).closest('.search-item__container').find('.date-separator').removeClass('hovered--after');
-                $(this).closest('.search-item__container').next('div').find('.date-separator').removeClass('hovered--before');
-            }
-        });
-
-        $('body').on('mouseenter mouseleave', ':not(.post-list__dynamic) .post.post--comment.same--root', function mouseOver(ev) {
-            if (ev.type === 'mouseenter') {
-                $(this).prev('.date-separator, .new-separator').addClass('hovered--comment');
-                $(this).next('.date-separator, .new-separator').addClass('hovered--comment');
-            } else {
-                $(this).prev('.date-separator, .new-separator').removeClass('hovered--comment');
-                $(this).next('.date-separator, .new-separator').removeClass('hovered--comment');
-            }
-        });
-
         // Prevent backspace from navigating back a page
-        $(window).on('keydown.preventBackspace', (e) => {
-            if (e.which === BACKSPACE_CHAR && !$(e.target).is('input, textarea')) {
-                e.preventDefault();
-            }
-        });
+        window.addEventListener('keydown', this.handleBackSpace);
+
+        if (this.isValidState()) {
+            BrowserStore.signalLogin();
+        }
     }
 
     componentWillUnmount() {
         WebSocketActions.close();
 
-        $('body').off('click.userpopover');
-        $('body').off('mouseenter mouseleave', '.post');
-        $('body').off('mouseenter mouseleave', '.post.post--comment.same--root');
-
-        $('.modal').off('show.bs.modal');
-
-        $(window).off('keydown.preventBackspace');
+        window.removeEventListener('keydown', this.handleBackSpace);
 
         window.removeEventListener('focus', this.onFocusListener);
         window.removeEventListener('blur', this.onBlurListener);
-
-        webappConnector.removeListener('user-activity-update', this.handleUserActivityUpdates);
+        window.removeEventListener('message', this.onDesktopMessageListener);
     }
 
     render() {
@@ -173,12 +138,58 @@ export default class LoggedIn extends React.PureComponent {
         GlobalActions.emitBrowserFocus(false);
     }
 
-    handleUserActivityUpdates = ({userIsActive, manual}) => {
+    // listen for messages from the desktop app
+    onDesktopMessageListener = ({origin, data: {type, message = {}} = {}} = {}) => {
         if (!this.props.currentUser) {
             return;
         }
+        if (origin !== window.location.origin) {
+            return;
+        }
 
-        // update the server with the users current away status
-        WebSocketClient.userUpdateActiveStatus(userIsActive, manual);
+        switch (type) {
+        case 'register-desktop': {
+            const {version} = message;
+            if (!window.desktop) {
+                window.desktop = {};
+            }
+            window.desktop.version = semver.valid(semver.coerce(version));
+            break;
+        }
+        case 'user-activity-update': {
+            const {userIsActive, manual} = message;
+
+            // update the server with the users current away status
+            if (userIsActive === true || userIsActive === false) {
+                WebSocketClient.userUpdateActiveStatus(userIsActive, manual);
+            }
+            break;
+        }
+        case 'notification-clicked': {
+            const {channel, teamId} = message;
+            window.focus();
+
+            // navigate to the appropriate channel
+            this.props.actions.getChannelURLAction(channel, teamId);
+            break;
+        }
+        }
+    }
+
+    handleBackSpace = (e) => {
+        const excludedElements = ['input', 'textarea'];
+
+        if (e.which === BACKSPACE_CHAR && !(excludedElements.includes(e.target.tagName.toLowerCase()))) {
+            e.preventDefault();
+        }
+    }
+
+    handleBeforeUnload = () => {
+        // remove the event listener to prevent getting stuck in a loop
+        window.removeEventListener('beforeunload', this.handleBeforeUnload);
+        if (document.cookie.indexOf('MMUSERID=') > -1) {
+            viewChannel('', this.props.currentChannelId || '')(dispatch, getState);
+        }
+        WebSocketActions.close();
     }
 }

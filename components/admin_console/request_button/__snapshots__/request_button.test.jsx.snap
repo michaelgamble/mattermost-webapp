@@ -3,6 +3,7 @@
 exports[`components/admin_console/request_button/request_button.jsx should match snapshot 1`] = `
 <div
   className="form-group"
+  id={null}
 >
   <div
     className="col-sm-offset-4 col-sm-8"
@@ -12,6 +13,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
         className="btn btn-default"
         disabled={false}
         onClick={[Function]}
+        type="button"
       >
         <LoadingWrapper
           loading={false}
@@ -20,7 +22,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
           <FormattedMessage
             defaultMessage="Button Text"
             id="test"
-            values={Object {}}
           />
         </LoadingWrapper>
       </button>
@@ -31,7 +32,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
       <FormattedMessage
         defaultMessage="Help Text"
         id="test"
-        values={Object {}}
       />
     </div>
   </div>
@@ -44,7 +44,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Button Text"
       id="test"
-      values={Object {}}
     />
   }
   disabled={false}
@@ -58,37 +57,10 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Help Text"
       id="test"
-      values={Object {}}
     />
   }
+  id={null}
   includeDetailedError={true}
-  intl={
-    Object {
-      "defaultFormats": Object {},
-      "defaultLocale": "en",
-      "formatDate": [Function],
-      "formatHTMLMessage": [Function],
-      "formatMessage": [Function],
-      "formatNumber": [Function],
-      "formatPlural": [Function],
-      "formatRelative": [Function],
-      "formatTime": [Function],
-      "formats": Object {},
-      "formatters": Object {
-        "getDateTimeFormat": [Function],
-        "getMessageFormat": [Function],
-        "getNumberFormat": [Function],
-        "getPluralFormat": [Function],
-        "getRelativeFormat": [Function],
-      },
-      "locale": "en",
-      "messages": Object {},
-      "now": [Function],
-      "onError": [Function],
-      "textComponent": "span",
-      "timeZone": "Etc/UTC",
-    }
-  }
   requestAction={
     [MockFunction] {
       "calls": Array [
@@ -116,6 +88,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
 >
   <div
     className="form-group"
+    id={null}
   >
     <div
       className="col-sm-offset-4 col-sm-8"
@@ -125,6 +98,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
           className="btn btn-default"
           disabled={false}
           onClick={[Function]}
+          type="button"
         >
           <LoadingWrapper
             loading={false}
@@ -133,7 +107,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
             <FormattedMessage
               defaultMessage="Button Text"
               id="test"
-              values={Object {}}
             >
               <span>
                 Button Text
@@ -148,16 +121,20 @@ exports[`components/admin_console/request_button/request_button.jsx should match
             <WarningIcon
               additionalClassName={null}
             >
-              <FormattedMessage
-                defaultMessage="Warning Icon"
-                id="generic_icons.warning"
-                values={Object {}}
+              <LocalizedIcon
+                className="fa fa-warning"
+                title={
+                  Object {
+                    "defaultMessage": "Warning Icon",
+                    "id": "generic_icons.warning",
+                  }
+                }
               >
                 <i
                   className="fa fa-warning"
                   title="Warning Icon"
                 />
-              </FormattedMessage>
+              </LocalizedIcon>
             </WarningIcon>
             <FormattedMessage
               defaultMessage="Error Message: {error}"
@@ -181,7 +158,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
         <FormattedMessage
           defaultMessage="Help Text"
           id="test"
-          values={Object {}}
         >
           <span>
             Help Text
@@ -199,7 +175,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Button Text"
       id="test"
-      values={Object {}}
     />
   }
   disabled={false}
@@ -213,37 +188,10 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Help Text"
       id="test"
-      values={Object {}}
     />
   }
+  id={null}
   includeDetailedError={false}
-  intl={
-    Object {
-      "defaultFormats": Object {},
-      "defaultLocale": "en",
-      "formatDate": [Function],
-      "formatHTMLMessage": [Function],
-      "formatMessage": [Function],
-      "formatNumber": [Function],
-      "formatPlural": [Function],
-      "formatRelative": [Function],
-      "formatTime": [Function],
-      "formats": Object {},
-      "formatters": Object {
-        "getDateTimeFormat": [Function],
-        "getMessageFormat": [Function],
-        "getNumberFormat": [Function],
-        "getPluralFormat": [Function],
-        "getRelativeFormat": [Function],
-      },
-      "locale": "en",
-      "messages": Object {},
-      "now": [Function],
-      "onError": [Function],
-      "textComponent": "span",
-      "timeZone": "Etc/UTC",
-    }
-  }
   requestAction={
     [MockFunction] {
       "calls": Array [
@@ -279,6 +227,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
 >
   <div
     className="form-group"
+    id={null}
   >
     <div
       className="col-sm-offset-4 col-sm-8"
@@ -288,6 +237,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
           className="btn btn-default"
           disabled={false}
           onClick={[Function]}
+          type="button"
         >
           <LoadingWrapper
             loading={false}
@@ -296,7 +246,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
             <FormattedMessage
               defaultMessage="Button Text"
               id="test"
-              values={Object {}}
             >
               <span>
                 Button Text
@@ -311,16 +260,20 @@ exports[`components/admin_console/request_button/request_button.jsx should match
             <WarningIcon
               additionalClassName={null}
             >
-              <FormattedMessage
-                defaultMessage="Warning Icon"
-                id="generic_icons.warning"
-                values={Object {}}
+              <LocalizedIcon
+                className="fa fa-warning"
+                title={
+                  Object {
+                    "defaultMessage": "Warning Icon",
+                    "id": "generic_icons.warning",
+                  }
+                }
               >
                 <i
                   className="fa fa-warning"
                   title="Warning Icon"
                 />
-              </FormattedMessage>
+              </LocalizedIcon>
             </WarningIcon>
             <FormattedMessage
               defaultMessage="Error Message: {error}"
@@ -344,7 +297,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
         <FormattedMessage
           defaultMessage="Help Text"
           id="test"
-          values={Object {}}
         >
           <span>
             Help Text
@@ -362,7 +314,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Button Text"
       id="test"
-      values={Object {}}
     />
   }
   disabled={false}
@@ -376,37 +327,10 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Help Text"
       id="test"
-      values={Object {}}
     />
   }
+  id={null}
   includeDetailedError={false}
-  intl={
-    Object {
-      "defaultFormats": Object {},
-      "defaultLocale": "en",
-      "formatDate": [Function],
-      "formatHTMLMessage": [Function],
-      "formatMessage": [Function],
-      "formatNumber": [Function],
-      "formatPlural": [Function],
-      "formatRelative": [Function],
-      "formatTime": [Function],
-      "formats": Object {},
-      "formatters": Object {
-        "getDateTimeFormat": [Function],
-        "getMessageFormat": [Function],
-        "getNumberFormat": [Function],
-        "getPluralFormat": [Function],
-        "getRelativeFormat": [Function],
-      },
-      "locale": "en",
-      "messages": Object {},
-      "now": [Function],
-      "onError": [Function],
-      "textComponent": "span",
-      "timeZone": "Etc/UTC",
-    }
-  }
   requestAction={
     [MockFunction] {
       "calls": Array [
@@ -434,6 +358,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
 >
   <div
     className="form-group"
+    id={null}
   >
     <div
       className="col-sm-offset-4 col-sm-8"
@@ -443,6 +368,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
           className="btn btn-default"
           disabled={false}
           onClick={[Function]}
+          type="button"
         >
           <LoadingWrapper
             loading={false}
@@ -451,7 +377,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
             <FormattedMessage
               defaultMessage="Button Text"
               id="test"
-              values={Object {}}
             >
               <span>
                 Button Text
@@ -464,21 +389,24 @@ exports[`components/admin_console/request_button/request_button.jsx should match
             className="alert alert-success"
           >
             <SuccessIcon>
-              <FormattedMessage
-                defaultMessage="Success Icon"
-                id="generic_icons.success"
-                values={Object {}}
+              <LocalizedIcon
+                className="fa fa-check"
+                title={
+                  Object {
+                    "defaultMessage": "Success Icon",
+                    "id": "generic_icons.success",
+                  }
+                }
               >
                 <i
                   className="fa fa-check"
                   title="Success Icon"
                 />
-              </FormattedMessage>
+              </LocalizedIcon>
             </SuccessIcon>
             <FormattedMessage
               defaultMessage="Success Message"
               id="success.message"
-              values={Object {}}
             >
               <span>
                 Success Message
@@ -493,7 +421,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
         <FormattedMessage
           defaultMessage="Help Text"
           id="test"
-          values={Object {}}
         >
           <span>
             Help Text
@@ -511,7 +438,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Button Text"
       id="test"
-      values={Object {}}
     />
   }
   disabled={false}
@@ -525,37 +451,10 @@ exports[`components/admin_console/request_button/request_button.jsx should match
     <FormattedMessage
       defaultMessage="Help Text"
       id="test"
-      values={Object {}}
     />
   }
+  id={null}
   includeDetailedError={false}
-  intl={
-    Object {
-      "defaultFormats": Object {},
-      "defaultLocale": "en",
-      "formatDate": [Function],
-      "formatHTMLMessage": [Function],
-      "formatMessage": [Function],
-      "formatNumber": [Function],
-      "formatPlural": [Function],
-      "formatRelative": [Function],
-      "formatTime": [Function],
-      "formats": Object {},
-      "formatters": Object {
-        "getDateTimeFormat": [Function],
-        "getMessageFormat": [Function],
-        "getNumberFormat": [Function],
-        "getPluralFormat": [Function],
-        "getRelativeFormat": [Function],
-      },
-      "locale": "en",
-      "messages": Object {},
-      "now": [Function],
-      "onError": [Function],
-      "textComponent": "span",
-      "timeZone": "Etc/UTC",
-    }
-  }
   requestAction={
     [MockFunction] {
       "calls": Array [
@@ -591,6 +490,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
 >
   <div
     className="form-group"
+    id={null}
   >
     <div
       className="col-sm-offset-4 col-sm-8"
@@ -600,6 +500,7 @@ exports[`components/admin_console/request_button/request_button.jsx should match
           className="btn btn-default"
           disabled={false}
           onClick={[Function]}
+          type="button"
         >
           <LoadingWrapper
             loading={false}
@@ -608,7 +509,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
             <FormattedMessage
               defaultMessage="Button Text"
               id="test"
-              values={Object {}}
             >
               <span>
                 Button Text
@@ -623,7 +523,6 @@ exports[`components/admin_console/request_button/request_button.jsx should match
         <FormattedMessage
           defaultMessage="Help Text"
           id="test"
-          values={Object {}}
         >
           <span>
             Help Text

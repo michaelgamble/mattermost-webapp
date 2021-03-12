@@ -1,34 +1,86 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import PQueue from 'p-queue';
+
 import {getChannelAndMyMember, getChannelMembersByIds} from 'mattermost-redux/actions/channels';
-import {savePreferences as savePreferencesRedux} from 'mattermost-redux/actions/preferences';
+import {savePreferences} from 'mattermost-redux/actions/preferences';
 import {getTeamMembersByIds} from 'mattermost-redux/actions/teams';
 import * as UserActions from 'mattermost-redux/actions/users';
-import {Preferences as PreferencesRedux} from 'mattermost-redux/constants';
+import {Preferences as PreferencesRedux, General} from 'mattermost-redux/constants';
 import {
     getChannel,
     getCurrentChannelId,
     getMyChannels,
     getMyChannelMember,
     getChannelMembersInChannels,
+    getDirectChannels,
 } from 'mattermost-redux/selectors/entities/channels';
+import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {getBool} from 'mattermost-redux/selectors/entities/preferences';
 import {getCurrentTeamId, getTeamMember} from 'mattermost-redux/selectors/entities/teams';
 import * as Selectors from 'mattermost-redux/selectors/entities/users';
+import {legacyMakeFilterAutoclosedDMs, makeFilterManuallyClosedDMs} from 'mattermost-redux/selectors/entities/channel_categories';
+import {CategoryTypes} from 'mattermost-redux/constants/channel_categories';
 
 import {loadStatusesForProfilesList, loadStatusesForProfilesMap} from 'actions/status_actions.jsx';
-import store from 'stores/redux_store.jsx';
-import * as Utils from 'utils/utils.jsx';
-import {Constants, Preferences, UserStatuses} from 'utils/constants.jsx';
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 
+import {getDisplayedChannels} from 'selectors/views/channel_sidebar';
+
+import store from 'stores/redux_store.jsx';
+
+import * as Utils from 'utils/utils.jsx';
+import {Constants, Preferences, UserStatuses} from 'utils/constants';
+
+export const queue = new PQueue({concurrency: 4});
 const dispatch = store.dispatch;
 const getState = store.getState;
 
-export function loadProfilesAndTeamMembers(page, perPage, teamId) {
+export function loadProfilesAndStatusesInChannel(channelId, page = 0, perPage = General.PROFILE_CHUNK_SIZE, sort = '', options = {}) {
+    return async (doDispatch) => {
+        const {data} = await doDispatch(UserActions.getProfilesInChannel(channelId, page, perPage, sort, options));
+        if (data) {
+            doDispatch(loadStatusesForProfilesList(data));
+        }
+        return {data: true};
+    };
+}
+
+export function loadProfilesAndReloadTeamMembers(page, perPage, teamId, options = {}) {
     return async (doDispatch, doGetState) => {
         const newTeamId = teamId || getCurrentTeamId(doGetState());
-        const {data} = await doDispatch(UserActions.getProfilesInTeam(newTeamId, page, perPage));
+        const {data} = await doDispatch(UserActions.getProfilesInTeam(newTeamId, page, perPage, '', options));
+        if (data) {
+            await Promise.all([
+                doDispatch(loadTeamMembersForProfilesList(data, newTeamId, true)),
+                doDispatch(loadStatusesForProfilesList(data)),
+            ]);
+        }
+
+        return {data: true};
+    };
+}
+
+export function loadProfilesAndReloadChannelMembers(page, perPage, channelId, sort = '', options = {}) {
+    return async (doDispatch, doGetState) => {
+        const newChannelId = channelId || getCurrentChannelId(doGetState());
+        const {data} = await doDispatch(UserActions.getProfilesInChannel(newChannelId, page, perPage, sort, options));
+        if (data) {
+            await Promise.all([
+                doDispatch(loadChannelMembersForProfilesList(data, newChannelId, true)),
+                doDispatch(loadStatusesForProfilesList(data)),
+            ]);
+        }
+
+        return {data: true};
+    };
+}
+
+export function loadProfilesAndTeamMembers(page, perPage, teamId, options) {
+    return async (doDispatch, doGetState) => {
+        const newTeamId = teamId || getCurrentTeamId(doGetState());
+        const {data} = await doDispatch(UserActions.getProfilesInTeam(newTeamId, page, perPage, '', options));
         if (data) {
             doDispatch(loadTeamMembersForProfilesList(data, newTeamId));
             doDispatch(loadStatusesForProfilesList(data));
@@ -38,12 +90,42 @@ export function loadProfilesAndTeamMembers(page, perPage, teamId) {
     };
 }
 
-export function loadProfilesAndTeamMembersAndChannelMembers(page, perPage, teamId, channelId) {
+export function searchProfilesAndTeamMembers(term = '', options = {}) {
+    return async (doDispatch, doGetState) => {
+        const newTeamId = options.team_id || getCurrentTeamId(doGetState());
+        const {data} = await doDispatch(UserActions.searchProfiles(term, options));
+        if (data) {
+            await Promise.all([
+                doDispatch(loadTeamMembersForProfilesList(data, newTeamId)),
+                doDispatch(loadStatusesForProfilesList(data)),
+            ]);
+        }
+
+        return {data: true};
+    };
+}
+
+export function searchProfilesAndChannelMembers(term, options = {}) {
+    return async (doDispatch, doGetState) => {
+        const newChannelId = options.in_channel_id || getCurrentChannelId(doGetState());
+        const {data} = await doDispatch(UserActions.searchProfiles(term, options));
+        if (data) {
+            await Promise.all([
+                doDispatch(loadChannelMembersForProfilesList(data, newChannelId)),
+                doDispatch(loadStatusesForProfilesList(data)),
+            ]);
+        }
+
+        return {data: true};
+    };
+}
+
+export function loadProfilesAndTeamMembersAndChannelMembers(page, perPage, teamId, channelId, options) {
     return async (doDispatch, doGetState) => {
         const state = doGetState();
         const teamIdParam = teamId || getCurrentTeamId(state);
         const channelIdParam = channelId || getCurrentChannelId(state);
-        const {data} = await doDispatch(UserActions.getProfilesInChannel(channelIdParam, page, perPage));
+        const {data} = await doDispatch(UserActions.getProfilesInChannel(channelIdParam, page, perPage, '', options));
         if (data) {
             const {data: listData} = await doDispatch(loadTeamMembersForProfilesList(data, teamIdParam));
             if (listData) {
@@ -56,7 +138,7 @@ export function loadProfilesAndTeamMembersAndChannelMembers(page, perPage, teamI
     };
 }
 
-export function loadTeamMembersForProfilesList(profiles, teamId) {
+export function loadTeamMembersForProfilesList(profiles, teamId, reloadAllMembers = false) {
     return async (doDispatch, doGetState) => {
         const state = doGetState();
         const teamIdParam = teamId || getCurrentTeamId(state);
@@ -64,7 +146,7 @@ export function loadTeamMembersForProfilesList(profiles, teamId) {
         for (let i = 0; i < profiles.length; i++) {
             const pid = profiles[i].id;
 
-            if (!getTeamMember(state, teamIdParam, pid)) {
+            if (reloadAllMembers === true || !getTeamMember(state, teamIdParam, pid)) {
                 membersToLoad[pid] = true;
             }
         }
@@ -80,9 +162,9 @@ export function loadTeamMembersForProfilesList(profiles, teamId) {
     };
 }
 
-export function loadProfilesWithoutTeam(page, perPage) {
+export function loadProfilesWithoutTeam(page, perPage, options) {
     return async (doDispatch) => {
-        const {data} = await doDispatch(UserActions.getProfilesWithoutTeam(page, perPage));
+        const {data} = await doDispatch(UserActions.getProfilesWithoutTeam(page, perPage, options));
 
         doDispatch(loadStatusesForProfilesMap(data));
 
@@ -104,7 +186,7 @@ export function loadTeamMembersAndChannelMembersForProfilesList(profiles, teamId
     };
 }
 
-export function loadChannelMembersForProfilesList(profiles, channelId) {
+export function loadChannelMembersForProfilesList(profiles, channelId, reloadAllMembers = false) {
     return async (doDispatch, doGetState) => {
         const state = doGetState();
         const channelIdParam = channelId || getCurrentChannelId(state);
@@ -113,7 +195,7 @@ export function loadChannelMembersForProfilesList(profiles, channelId) {
             const pid = profiles[i].id;
 
             const members = getChannelMembersInChannels(state)[channelIdParam];
-            if (!members || !members[pid]) {
+            if (reloadAllMembers === true || !members || !members[pid]) {
                 membersToLoad[pid] = true;
             }
         }
@@ -128,52 +210,60 @@ export function loadChannelMembersForProfilesList(profiles, channelId) {
     };
 }
 
-export async function loadNewDMIfNeeded(channelId) {
-    function checkPreference(channel) {
-        const userId = Utils.getUserIdFromChannelName(channel);
+export function loadNewDMIfNeeded(channelId) {
+    return async (doDispatch, doGetState) => {
+        const state = doGetState();
+        const currentUserId = Selectors.getCurrentUserId(state);
 
-        if (!userId) {
-            return;
+        function checkPreference(channel) {
+            const userId = Utils.getUserIdFromChannelName(channel);
+
+            if (!userId) {
+                return;
+            }
+
+            const pref = getBool(state, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, userId, false);
+            if (pref === false) {
+                const now = Utils.getTimestamp();
+                savePreferences(currentUserId, [
+                    {user_id: currentUserId, category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: userId, value: 'true'},
+                    {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: channelId, value: now.toString()},
+                ])(doDispatch, doGetState);
+                loadProfilesForDM();
+            }
         }
 
-        const pref = getBool(getState(), Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, userId, false);
-        if (pref === false) {
-            const now = Utils.getTimestamp();
-            const currentUserId = Selectors.getCurrentUserId(getState());
-            savePreferencesRedux(currentUserId, [
-                {user_id: currentUserId, category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: userId, value: 'true'},
-                {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: channelId, value: now.toString()},
-            ])(dispatch, getState);
-            loadProfilesForDM();
+        const channel = getChannel(doGetState(), channelId);
+        if (channel) {
+            checkPreference(channel);
+        } else {
+            const {data} = await getChannelAndMyMember(channelId)(doDispatch, doGetState);
+            if (data) {
+                checkPreference(data.channel);
+            }
         }
-    }
-
-    const channel = getChannel(getState(), channelId);
-    if (channel) {
-        checkPreference(channel);
-    } else {
-        const {data} = await getChannelAndMyMember(channelId)(dispatch, getState);
-        if (data) {
-            checkPreference(data.channel);
-        }
-    }
+    };
 }
 
-export async function loadNewGMIfNeeded(channelId) {
-    function checkPreference() {
-        const pref = getBool(getState(), Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channelId, false);
-        if (pref === false) {
-            const currentUserId = Selectors.getCurrentUserId(getState());
-            savePreferencesRedux(currentUserId, [{user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: channelId, value: 'true'}])(dispatch, getState);
-            loadProfilesForGM();
-        }
-    }
+export function loadNewGMIfNeeded(channelId) {
+    return async (doDispatch, doGetState) => {
+        const state = doGetState();
+        const currentUserId = Selectors.getCurrentUserId(state);
 
-    const channel = getChannel(getState(), channelId);
-    if (!channel) {
-        await getChannelAndMyMember(channelId)(dispatch, getState);
-    }
-    checkPreference();
+        function checkPreference() {
+            const pref = getBool(state, Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channelId, false);
+            if (pref === false) {
+                dispatch(savePreferences(currentUserId, [{user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: channelId, value: 'true'}]));
+                loadProfilesForGM();
+            }
+        }
+
+        const channel = getChannel(state, channelId);
+        if (!channel) {
+            await getChannelAndMyMember(channelId)(doDispatch, doGetState);
+        }
+        checkPreference();
+    };
 }
 
 export function loadProfilesForGroupChannels(groupChannels) {
@@ -192,28 +282,53 @@ export function loadProfilesForGroupChannels(groupChannels) {
 
         if (groupChannelsToFetch.length > 0) {
             doDispatch(UserActions.getProfilesInGroupChannels(groupChannelsToFetch));
+            return {data: true};
         }
+
+        return {data: false};
     };
 }
 
-export function loadProfilesForSidebar() {
-    loadProfilesForDM();
-    loadProfilesForGM();
+export async function loadProfilesForSidebar() {
+    await Promise.all([loadProfilesForDM(), loadProfilesForGM()]);
 }
+
+export const getGMsForLoading = (() => {
+    const legacyFilterAutoclosedDMs = legacyMakeFilterAutoclosedDMs();
+    const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
+
+    return (state) => {
+        const config = getConfig(state);
+
+        let channels;
+        if (config.EnableLegacySidebar === 'true') {
+            // Start with all channels
+            channels = getMyChannels(state);
+
+            // Filter out autoclosed DMs/GMs and any other category
+            channels = legacyFilterAutoclosedDMs(state, channels, CategoryTypes.DIRECT_MESSAGES);
+
+            // Then filter out manually closed DMs/GMs
+            channels = filterManuallyClosedDMs(state, channels);
+        } else {
+            // Get all channels visible on the current team which doesn't include hidden GMs/DMs
+            channels = getDisplayedChannels(state);
+        }
+
+        // Make sure we only have GMs
+        channels = channels.filter((channel) => channel.type === General.GM_CHANNEL);
+
+        return channels;
+    };
+})();
 
 export async function loadProfilesForGM() {
     const state = getState();
-    const channels = getMyChannels(state);
     const newPreferences = [];
     const userIdsInChannels = Selectors.getUserIdsInChannels(state);
     const currentUserId = Selectors.getCurrentUserId(state);
 
-    for (let i = 0; i < channels.length; i++) {
-        const channel = channels[i];
-        if (channel.type !== Constants.GM_CHANNEL) {
-            continue;
-        }
-
+    for (const channel of getGMsForLoading(state)) {
         const userIds = userIdsInChannels[channel.id] || new Set();
         if (userIds.size >= Constants.MIN_USERS_IN_GM) {
             continue;
@@ -235,11 +350,13 @@ export async function loadProfilesForGM() {
             });
         }
 
-        await dispatch(UserActions.getProfilesInChannel(channel.id, 0, Constants.MAX_USERS_IN_GM)); //eslint-disable-line no-await-in-loop
+        const getProfilesAction = UserActions.getProfilesInChannel(channel.id, 0, Constants.MAX_USERS_IN_GM);
+        queue.add(() => dispatch(getProfilesAction));
     }
 
+    await queue.onEmpty();
     if (newPreferences.length > 0) {
-        savePreferencesRedux(currentUserId, newPreferences)(dispatch, getState);
+        dispatch(savePreferences(currentUserId, newPreferences));
     }
 }
 
@@ -281,7 +398,7 @@ export async function loadProfilesForDM() {
     }
 
     if (newPreferences.length > 0) {
-        savePreferencesRedux(currentUserId, newPreferences)(dispatch, getState);
+        savePreferences(currentUserId, newPreferences)(dispatch, getState);
     }
 
     if (profilesToLoad.length > 0) {
@@ -289,18 +406,19 @@ export async function loadProfilesForDM() {
     }
 }
 
-export async function autocompleteUsersInTeam(username, success) {
-    const {data} = await UserActions.autocompleteUsers(username, getCurrentTeamId(getState()))(dispatch, getState);
-    if (success) {
-        success(data);
-    }
+export function autocompleteUsersInTeam(username) {
+    return async (doDispatch, doGetState) => {
+        const currentTeamId = getCurrentTeamId(doGetState());
+        const {data} = await doDispatch(UserActions.autocompleteUsers(username, currentTeamId));
+        return data;
+    };
 }
 
-export async function autocompleteUsers(username, success) {
-    const {data} = await UserActions.autocompleteUsers(username)(dispatch, getState);
-    if (success) {
-        success(data);
-    }
+export function autocompleteUsers(username) {
+    return async (doDispatch) => {
+        const {data} = await doDispatch(UserActions.autocompleteUsers(username));
+        return data;
+    };
 }
 
 export function autoResetStatus() {
@@ -320,5 +438,15 @@ export function autoResetStatus() {
         }
 
         return userStatus;
+    };
+}
+
+export function trackDMGMOpenChannels() {
+    return (doDispatch, doGetState) => {
+        const state = doGetState();
+        const channels = getDirectChannels(state);
+        trackEvent('ui', 'LHS_DM_GM_Count', {count: channels.length});
+
+        return {data: true};
     };
 }

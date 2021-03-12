@@ -6,12 +6,14 @@ import React from 'react';
 import {Client4} from 'mattermost-redux/client';
 
 import * as Utils from 'utils/utils.jsx';
-import ProfilePicture from 'components/profile_picture.jsx';
-import BotBadge from 'components/widgets/badges/bot_badge.jsx';
+import ProfilePicture from 'components/profile_picture';
+import UserProfile from 'components/user_profile';
 
-import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
+import FormattedMarkdownMessage from 'components/formatted_markdown_message';
+import Nbsp from 'components/html_entities/nbsp';
+import CustomStatusEmoji from 'components/custom_status/custom_status_emoji';
 
-export default class UserListRow extends React.Component {
+export default class UserListRow extends React.PureComponent {
     static propTypes = {
         user: PropTypes.object.isRequired,
         status: PropTypes.string,
@@ -89,20 +91,41 @@ export default class UserListRow extends React.Component {
                 <ProfilePicture
                     src={Client4.getProfilePictureUrl(this.props.user.id, this.props.user.last_picture_update)}
                     status={status}
-                    width='32'
-                    height='32'
+                    size='md'
+                    userId={this.props.user.id}
+                    hasMention={true}
+                    username={this.props.user.username}
                 />
                 <div
                     className='more-modal__details'
+                    data-testid='userListItemDetails'
                 >
-                    <div
-                        id={userCountID}
-                        className='more-modal__name'
-                    >
-                        {Utils.displayEntireNameForUser(this.props.user)}
-                        <BotBadge
-                            className='badge-popoverlist'
-                            show={Boolean(this.props.user.is_bot)}
+                    <div className='d-flex whitespace--nowrap'>
+                        <div
+                            id={userCountID}
+                            className='more-modal__name'
+                        >
+                            <UserProfile
+                                userId={this.props.user.id}
+                                hasMention={true}
+                                displayUsername={true}
+                            />
+                            <Nbsp/>
+                            {
+                                this.props.user.first_name || this.props.user.last_name || this.props.user.nickname ?
+                                    '-' : null
+                            }
+                            <Nbsp/>
+                            {Utils.displayFullAndNicknameForUser(this.props.user)}
+                        </div>
+                        <CustomStatusEmoji
+                            userID={this.props.user.id}
+                            emojiSize={15}
+                            showTooltip={true}
+                            emojiStyle={{
+                                marginLeft: 0,
+                                marginBottom: -3,
+                            }}
                         />
                     </div>
                     <div
@@ -114,6 +137,7 @@ export default class UserListRow extends React.Component {
                     {this.props.extraInfo}
                 </div>
                 <div
+                    data-testid='userListItemActions'
                     className='more-modal__actions'
                 >
                     {buttons}

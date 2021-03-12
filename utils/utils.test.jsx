@@ -1,9 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import assert from 'assert';
 import {GeneralTypes} from 'mattermost-redux/action_types';
 
-import * as Utils from 'utils/utils.jsx';
 import store from 'stores/redux_store.jsx';
+
+import Constants, {ValidationErrors} from 'utils/constants';
+import * as Utils from 'utils/utils.jsx';
+import * as lineBreakHelpers from 'tests/helpers/line_break_helpers.js';
+import {makeBoldHotkeyEvent, makeItalicHotkeyEvent, makeSelectionEvent} from 'tests/helpers/markdown_hotkey_helpers.js';
+import * as ua from 'tests/helpers/user_agent_mocks';
 
 describe('Utils.getDisplayNameByUser', () => {
     afterEach(() => {
@@ -33,7 +39,7 @@ describe('Utils.getDisplayNameByUser', () => {
         });
 
         [userA, userB, userC, userD, userE, userF, userG, userH, userI, userJ].forEach((user) => {
-            expect(Utils.getDisplayNameByUser(user)).toEqual(user.username);
+            expect(Utils.getDisplayNameByUser(store.getState(), user)).toEqual(user.username);
         });
     });
 
@@ -57,7 +63,7 @@ describe('Utils.getDisplayNameByUser', () => {
             {user: userI, result: userI.nickname},
             {user: userJ, result: userJ.first_name},
         ]) {
-            expect(Utils.getDisplayNameByUser(data.user)).toEqual(data.result);
+            expect(Utils.getDisplayNameByUser(store.getState(), data.user)).toEqual(data.result);
         }
     });
 
@@ -81,7 +87,7 @@ describe('Utils.getDisplayNameByUser', () => {
             {user: userI, result: userI.first_name},
             {user: userJ, result: userJ.first_name},
         ]) {
-            expect(Utils.getDisplayNameByUser(data.user)).toEqual(data.result);
+            expect(Utils.getDisplayNameByUser(store.getState(), data.user)).toEqual(data.result);
         }
     });
 });
@@ -145,7 +151,7 @@ describe('Utils.sortUsersByStatusAndDisplayName', () => {
                 result: [userD, userE, userF, userJ, userK, userL, userM],
             },
         ]) {
-            const sortedUsers = Utils.sortUsersByStatusAndDisplayName(data.users, statusesByUserId);
+            const sortedUsers = Utils.sortUsersByStatusAndDisplayName(data.users, statusesByUserId, 'username');
             for (let i = 0; i < sortedUsers.length; i++) {
                 expect(sortedUsers[i]).toEqual(data.result[i]);
             }
@@ -174,7 +180,7 @@ describe('Utils.sortUsersByStatusAndDisplayName', () => {
                 result: [userJ, userF, userE, userD, userK, userL, userM],
             },
         ]) {
-            const sortedUsers = Utils.sortUsersByStatusAndDisplayName(data.users, statusesByUserId);
+            const sortedUsers = Utils.sortUsersByStatusAndDisplayName(data.users, statusesByUserId, 'nickname_full_name');
             for (let i = 0; i < sortedUsers.length; i++) {
                 expect(sortedUsers[i]).toEqual(data.result[i]);
             }
@@ -203,7 +209,7 @@ describe('Utils.sortUsersByStatusAndDisplayName', () => {
                 result: [userD, userF, userE, userJ, userK, userL, userM],
             },
         ]) {
-            const sortedUsers = Utils.sortUsersByStatusAndDisplayName(data.users, statusesByUserId);
+            const sortedUsers = Utils.sortUsersByStatusAndDisplayName(data.users, statusesByUserId, 'full_name');
             for (let i = 0; i < sortedUsers.length; i++) {
                 expect(sortedUsers[i]).toEqual(data.result[i]);
             }
@@ -359,6 +365,54 @@ describe('Utils.isValidPassword', () => {
         ]) {
             const {valid} = Utils.isValidPassword(data.password, data.config);
             expect(data.valid).toEqual(valid);
+        }
+    });
+});
+
+describe('Utils.isValidUsername', () => {
+    const tests = [
+        {
+            testUserName: 'sonic.the.hedgehog',
+            expectedError: undefined,
+        }, {
+            testUserName: null,
+            expectedError: ValidationErrors.USERNAME_REQUIRED,
+        }, {
+            testUserName: 'sanic.the.speedy.errored.hedgehog@10_10-10',
+            expectedError: ValidationErrors.INVALID_LENGTH,
+        }, {
+            testUserName: 'sanic⭑',
+            expectedError: ValidationErrors.INVALID_CHARACTERS,
+        }, {
+            testUserName: '.sanic',
+            expectedError: ValidationErrors.INVALID_FIRST_CHARACTER,
+        }, {
+            testUserName: 'valet',
+            expectedError: ValidationErrors.RESERVED_NAME,
+        },
+    ];
+    test('Validate username', () => {
+        for (const test of tests) {
+            const testError = Utils.isValidUsername(test.testUserName);
+            if (testError) {
+                expect(testError.id).toEqual(test.expectedError);
+            } else {
+                expect(testError).toBe(undefined);
+            }
+        }
+    });
+    test('Validate bot username', () => {
+        tests.push({
+            testUserName: 'sanic.the.hedgehog.',
+            expectedError: ValidationErrors.INVALID_LAST_CHARACTER,
+        });
+        for (const test of tests) {
+            const testError = Utils.isValidUsername(test.testUserName);
+            if (testError) {
+                expect(testError.id).toEqual(test.expectedError);
+            } else {
+                expect(testError).toBe(undefined);
+            }
         }
     });
 });
@@ -709,5 +763,435 @@ describe('Utils.enableDevModeFeatures', () => {
         test('invoke Set.Length', () => {
             expect(new Set().length).toEqual(undefined);
         });
+    });
+});
+
+describe('Utils.getSortedUsers', () => {
+    test('should sort users by who reacted first', () => {
+        const baseDate = Date.now();
+        const currentUserId = 'user_id_1';
+        const profiles = [{id: 'user_id_1', username: 'username_1'}, {id: 'user_id_2', username: 'username_2'}, {id: 'user_id_3', username: 'username_3'}];
+        const reactions = [
+            {user_id: 'user_id_2', create_at: baseDate}, // Will be sorted 2nd, after the logged-in user
+            {user_id: 'user_id_1', create_at: baseDate + 5000}, // Logged-in user, will be sorted first although 2nd user reacted first
+            {user_id: 'user_id_3', create_at: baseDate + 8000}, // Last to react, will be sorted last
+        ];
+
+        const {currentUserReacted, users} = Utils.getSortedUsers(reactions, currentUserId, profiles, 'username');
+
+        expect(currentUserReacted).toEqual(true);
+        assert.deepEqual(
+            users,
+            ['You', 'username_2', 'username_3'],
+        );
+    });
+});
+
+describe('Utils.imageURLForUser', () => {
+    test('should return url when user id and last_picture_update is given', () => {
+        const imageUrl = Utils.imageURLForUser('foobar-123', 123456);
+        expect(imageUrl).toEqual('/api/v4/users/foobar-123/image?_=123456');
+    });
+
+    test('should return url when user id is given without last_picture_update', () => {
+        const imageUrl = Utils.imageURLForUser('foobar-123');
+        expect(imageUrl).toEqual('/api/v4/users/foobar-123/image?_=0');
+    });
+});
+
+describe('Utils.isUnhandledLineBreakKeyCombo', () => {
+    test('isUnhandledLineBreakKeyCombo returns true for alt + enter for Chrome UA', () => {
+        ua.mockChrome();
+        expect(Utils.isUnhandledLineBreakKeyCombo(lineBreakHelpers.getAltKeyEvent())).toBe(true);
+    });
+
+    test('isUnhandledLineBreakKeyCombo returns false for alt + enter for Safari UA', () => {
+        ua.mockSafari();
+        expect(Utils.isUnhandledLineBreakKeyCombo(lineBreakHelpers.getAltKeyEvent())).toBe(false);
+    });
+
+    test('isUnhandledLineBreakKeyCombo returns false for shift + enter', () => {
+        expect(Utils.isUnhandledLineBreakKeyCombo(lineBreakHelpers.getShiftKeyEvent())).toBe(false);
+    });
+
+    test('isUnhandledLineBreakKeyCombo returns false for ctrl/command + enter', () => {
+        expect(Utils.isUnhandledLineBreakKeyCombo(lineBreakHelpers.getCtrlKeyEvent())).toBe(false);
+        expect(Utils.isUnhandledLineBreakKeyCombo(lineBreakHelpers.getMetaKeyEvent())).toBe(false);
+    });
+
+    test('isUnhandledLineBreakKeyCombo returns false for just enter', () => {
+        expect(Utils.isUnhandledLineBreakKeyCombo(lineBreakHelpers.BASE_EVENT)).toBe(false);
+    });
+
+    test('isUnhandledLineBreakKeyCombo returns false for f (random key)', () => {
+        const e = {
+            ...lineBreakHelpers.BASE_EVENT,
+            key: Constants.KeyCodes.F[0],
+            keyCode: Constants.KeyCodes.F[1],
+        };
+        expect(Utils.isUnhandledLineBreakKeyCombo(e)).toBe(false);
+    });
+
+    // restore initial user agent
+    afterEach(ua.reset);
+});
+
+describe('Utils.insertLineBreakFromKeyEvent', () => {
+    test('insertLineBreakFromKeyEvent returns with line break appending (no selection range)', () => {
+        expect(Utils.insertLineBreakFromKeyEvent(lineBreakHelpers.getAppendEvent())).toBe(lineBreakHelpers.OUTPUT_APPEND);
+    });
+    test('insertLineBreakFromKeyEvent returns with line break replacing (with selection range)', () => {
+        expect(Utils.insertLineBreakFromKeyEvent(lineBreakHelpers.getReplaceEvent())).toBe(lineBreakHelpers.OUTPUT_REPLACE);
+    });
+});
+
+describe('Utils.applyHotkeyMarkdown', () => {
+    test('applyHotkeyMarkdown returns correct markdown for bold hotkey', () => {
+        // "Fafda" is selected with ctrl + B hotkey
+        const e = makeBoldHotkeyEvent('Jalebi Fafda & Sambharo', 7, 12);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi **Fafda** & Sambharo',
+                selectionStart: 9,
+                selectionEnd: 14,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for undo bold', () => {
+        // "Fafda" is selected with ctrl + B hotkey
+        const e = makeBoldHotkeyEvent('Jalebi **Fafda** & Sambharo', 9, 14);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi Fafda & Sambharo',
+                selectionStart: 7,
+                selectionEnd: 12,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for italic hotkey', () => {
+        // "Fafda" is selected with ctrl + I hotkey
+        const e = makeItalicHotkeyEvent('Jalebi Fafda & Sambharo', 7, 12);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi *Fafda* & Sambharo',
+                selectionStart: 8,
+                selectionEnd: 13,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for undo italic', () => {
+        // "Fafda" is selected with ctrl + I hotkey
+        const e = makeItalicHotkeyEvent('Jalebi *Fafda* & Sambharo', 8, 13);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi Fafda & Sambharo',
+                selectionStart: 7,
+                selectionEnd: 12,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for bold hotkey and empty', () => {
+        // Nothing is selected with ctrl + B hotkey and caret is just before "Fafda"
+        const e = makeBoldHotkeyEvent('Jalebi Fafda & Sambharo', 7, 7);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi ****Fafda & Sambharo',
+                selectionStart: 9,
+                selectionEnd: 9,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for italic hotkey and empty', () => {
+        // Nothing is selected with ctrl + I hotkey and caret is just before "Fafda"
+        const e = makeItalicHotkeyEvent('Jalebi Fafda & Sambharo', 7, 7);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi **Fafda & Sambharo',
+                selectionStart: 8,
+                selectionEnd: 8,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for italic with bold', () => {
+        // "Fafda" is selected with ctrl + I hotkey
+        const e = makeItalicHotkeyEvent('Jalebi **Fafda** & Sambharo', 9, 14);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi ***Fafda*** & Sambharo',
+                selectionStart: 10,
+                selectionEnd: 15,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for bold with italic', () => {
+        // "Fafda" is selected with ctrl + B hotkey
+        const e = makeBoldHotkeyEvent('Jalebi *Fafda* & Sambharo', 8, 13);
+
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi ***Fafda*** & Sambharo',
+                selectionStart: 10,
+                selectionEnd: 15,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for bold with italic+bold', () => {
+        // "Fafda" is selected with ctrl + B hotkey
+        const e = makeBoldHotkeyEvent('Jalebi ***Fafda*** & Sambharo', 10, 15);
+
+        // Should undo bold
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi *Fafda* & Sambharo',
+                selectionStart: 8,
+                selectionEnd: 13,
+            });
+    });
+
+    test('applyHotkeyMarkdown returns correct markdown for italic with italic+bold', () => {
+        // "Fafda" is selected with ctrl + I hotkey
+        const e = makeItalicHotkeyEvent('Jalebi ***Fafda*** & Sambharo', 10, 15);
+
+        // Should undo italic
+        expect(Utils.applyHotkeyMarkdown(e)).
+            toEqual({
+                message: 'Jalebi **Fafda** & Sambharo',
+                selectionStart: 9,
+                selectionEnd: 14,
+            });
+    });
+});
+
+describe('Utils.adjustSelection', () => {
+    test('adjustSelection fixes selection to correct text', () => {
+        // "_Fafda_" is selected
+        const e = makeSelectionEvent('Jalebi _Fafda_ and Sambharo', 7, 14);
+        const input = {
+            focus: jest.fn(),
+            setSelectionRange: jest.fn(),
+        };
+
+        Utils.adjustSelection(input, e);
+        expect(input.setSelectionRange).toHaveBeenCalledWith(8, 13);
+    });
+
+    test('adjustSelection does not fix selection when selected text does not end with "_"', () => {
+        // "_Fafda" is selected
+        const e = makeSelectionEvent('Jalebi _Fafda and Sambharo', 7, 13);
+        const input = {
+            focus: jest.fn(),
+            setSelectionRange: jest.fn(),
+        };
+
+        Utils.adjustSelection(input, e);
+        expect(input.setSelectionRange).not.toHaveBeenCalled();
+    });
+
+    test('adjustSelection does not fix selection when selected text does start end with "_"', () => {
+        // "Fafda_" is selected
+        const e = makeSelectionEvent('Jalebi Fafda_ and Sambharo', 7, 13);
+        const input = {
+            focus: jest.fn(),
+            setSelectionRange: jest.fn(),
+        };
+
+        Utils.adjustSelection(input, e);
+        expect(input.setSelectionRange).not.toHaveBeenCalled();
+    });
+
+    test('adjustSelection fixes selection at start of text', () => {
+        // "_Jalebi_" is selected
+        const e = makeSelectionEvent('_Jalebi_ Fafda and Sambharo', 0, 8);
+        const input = {
+            focus: jest.fn(),
+            setSelectionRange: jest.fn(),
+        };
+
+        Utils.adjustSelection(input, e);
+        expect(input.setSelectionRange).toHaveBeenCalledWith(1, 7);
+    });
+
+    test('adjustSelection fixes selection at end of text', () => {
+        // "_Sambharo_" is selected
+        const e = makeSelectionEvent('Jalebi Fafda and _Sambharo_', 17, 27);
+        const input = {
+            focus: jest.fn(),
+            setSelectionRange: jest.fn(),
+        };
+
+        Utils.adjustSelection(input, e);
+        expect(input.setSelectionRange).toHaveBeenCalledWith(18, 26);
+    });
+});
+
+describe('Utils.copyTextAreaToDiv', () => {
+    const textArea = document.createElement('textarea');
+
+    test('copyTextAreaToDiv actually creates a div element', () => {
+        const copy = Utils.copyTextAreaToDiv(textArea);
+
+        expect(copy.nodeName).toEqual('DIV');
+    });
+
+    test('copyTextAreaToDiv copies the content into the div element', () => {
+        textArea.value = 'the content';
+
+        const copy = Utils.copyTextAreaToDiv(textArea);
+
+        expect(copy.innerHTML).toEqual('the content');
+    });
+
+    test('copyTextAreaToDiv correctly copies the styles of the textArea element', () => {
+        textArea.style.fontFamily = 'Sans-serif';
+
+        const copy = Utils.copyTextAreaToDiv(textArea);
+
+        expect(copy.style.fontFamily).toEqual('Sans-serif');
+    });
+});
+
+describe('Utils.getCaretXYCoordinate', () => {
+    const cleanUp = () => {
+        document.createRange = undefined;
+    };
+
+    afterAll(cleanUp);
+
+    const textArea = document.createElement('textarea');
+    document.createRange = () => {
+        const range = new Range();
+
+        range.getClientRects = () => {
+            return [{
+                top: 10,
+                left: 15,
+            }];
+        };
+
+        return range;
+    };
+    textArea.value = 'm'.repeat(10);
+
+    test('getCaretXYCoordinate returns the coordinates of the caret', () => {
+        const coordinates = Utils.getCaretXYCoordinate(textArea);
+
+        expect(coordinates.x).toEqual(15);
+        expect(coordinates.y).toEqual(10);
+    });
+
+    test('getCaretXYCoordinate returns the coordinates of the caret with a left scroll', () => {
+        textArea.scrollLeft = 5;
+
+        const coordinates = Utils.getCaretXYCoordinate(textArea);
+
+        expect(coordinates.x).toEqual(10);
+    });
+});
+
+describe('Utils.getViewportSize', () => {
+    test('getViewportSize returns the right viewport using default jsDom window', () => {
+        // the default values of the jsDom window are w: 1024, h: 768
+        const viewportDimensions = Utils.getViewportSize();
+
+        expect(viewportDimensions.w).toEqual(1024);
+        expect(viewportDimensions.h).toEqual(768);
+    });
+
+    test('getViewportSize returns the right viewport width with custom parameter', () => {
+        const mockWindow = {document: {body: {}, compatMode: undefined}};
+        mockWindow.document.body.clientWidth = 1025;
+        mockWindow.document.body.clientHeight = 860;
+
+        const viewportDimensions = Utils.getViewportSize(mockWindow);
+
+        expect(viewportDimensions.w).toEqual(1025);
+        expect(viewportDimensions.h).toEqual(860);
+    });
+
+    test('getViewportSize returns the right viewport width with custom parameter - innerWidth', () => {
+        const mockWindow = {innerWidth: 1027, innerHeight: 767};
+
+        const viewportDimensions = Utils.getViewportSize(mockWindow);
+
+        expect(viewportDimensions.w).toEqual(1027);
+        expect(viewportDimensions.h).toEqual(767);
+    });
+});
+
+describe('Utils.offsetTopLeft', () => {
+    test('offsetTopLeft returns the right offset values', () => {
+        const textArea = document.createElement('textArea');
+
+        textArea.getBoundingClientRect = jest.fn(() => ({
+            top: 967,
+            left: 851,
+        }));
+
+        const offsetTopLeft = Utils.offsetTopLeft(textArea);
+        expect(offsetTopLeft.top).toEqual(967);
+        expect(offsetTopLeft.left).toEqual(851);
+    });
+});
+
+describe('Utils.getSuggestionBoxAlgn', () => {
+    const cleanUp = () => {
+        document.createRange = undefined;
+    };
+
+    afterAll(cleanUp);
+
+    const textArea = document.createElement('textArea');
+
+    textArea.value = 'a'.repeat(30);
+
+    jest.spyOn(textArea, 'offsetWidth', 'get').
+        mockImplementation(() => 950);
+
+    textArea.getBoundingClientRect = jest.fn(() => ({
+        left: 50,
+    }));
+
+    const createRange = (size) => {
+        document.createRange = () => {
+            const range = new Range();
+            range.getClientRects = () => {
+                return [{
+                    top: 100,
+                    left: size,
+                }];
+            };
+            return range;
+        };
+    };
+
+    const fixedToTheRight = textArea.offsetWidth - Constants.SUGGESTION_LIST_MODAL_WIDTH;
+
+    test('getSuggestionBoxAlgn returns 0 (box stuck to left) when the length of the text is small', () => {
+        const smallSizeText = 15;
+        createRange(smallSizeText);
+        const suggestionBoxAlgn = Utils.getSuggestionBoxAlgn(textArea, Utils.getPxToSubstract());
+        expect(suggestionBoxAlgn.pixelsToMoveX).toEqual(0);
+    });
+
+    test('getSuggestionBoxAlgn returns pixels to move when text is medium size', () => {
+        const mediumSizeText = 155;
+        createRange(mediumSizeText);
+        const suggestionBoxAlgn = Utils.getSuggestionBoxAlgn(textArea, Utils.getPxToSubstract());
+        expect(suggestionBoxAlgn.pixelsToMoveX).toBeGreaterThan(0);
+        expect(suggestionBoxAlgn.pixelsToMoveX).not.toBe(fixedToTheRight);
+    });
+
+    test('getSuggestionBoxAlgn align box to the righ when text is large size', () => {
+        const largeSizeText = 700;
+        createRange(largeSizeText);
+        const suggestionBoxAlgn = Utils.getSuggestionBoxAlgn(textArea, Utils.getPxToSubstract());
+        expect(fixedToTheRight).toEqual(suggestionBoxAlgn.pixelsToMoveX);
     });
 });

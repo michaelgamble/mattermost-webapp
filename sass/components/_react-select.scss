@@ -1,0 +1,119 @@
+.app__body {
+    .react-select {
+        .a11y--focused {
+            box-shadow: none;
+        }
+    }
+
+    .react-select__value-container {
+        padding: 0 8px;
+    }
+
+    .react-select__multi-value {
+        align-items: center;
+        background: rgba(var(--center-channel-color-rgb), 0.08);
+        border-radius: 32px;
+        color: var(--center-channel-color);
+        margin: 4px 4px 4px 0;
+    }
+
+    .react-select__multi-value__remove {
+        cursor: pointer;
+
+        span {
+            height: 16px;
+            width: 16px;
+            display: flex;
+        }
+
+        &:hover {
+            background: none;
+        }
+
+        svg {
+            height: 16px;
+            width: 16px;
+            fill: var(--center-channel-color-64);
+
+            &:hover {
+                fill: var(--center-channel-color-80);
+            }
+
+            opacity: .6;
+        }
+    }
+
+    .react-select__control {
+        background: v(center-channel-bg);
+        border-color: v(center-channel-color-20);
+        height: 36px;
+        min-height: 36px;
+
+        &.react-select-auto {
+            height: auto;
+        }
+
+        &:hover {
+            .react-select__indicator {
+                opacity: .8;
+            }
+        }
+
+        &.react-select__control--is-disabled {
+            background: #eeeeee;
+        }
+    }
+
+    .react-select__padded-component {
+        padding: 4px 2px 4px 8px;
+    }
+
+    .react-select__control--is-focused {
+        box-shadow: inset 0 0 0 1px rgba(var(--button-bg-rgb), 1);
+        border-color: rgba(var(--button-bg-rgb), 1) !important;
+    }
+
+    .react-select__indicator-separator {
+        background-color: rgba(var(--center-channel-color-rgb), 0.40);
+    }
+
+    .react-select__indicator {
+        @include single-transition(opacity, .2s, ease);
+        color: inherit;
+        padding: 7px 8px;
+        opacity: .4;
+    }
+
+    .react-select__single-value {
+        color: inherit;
+    }
+
+    .react-select__input {
+        color: v(center-channel-color);
+    }
+
+    .react-select__menu {
+        background: v(center-channel-bg);
+    }
+
+    .react-select__menu-list {
+        border: 1px solid v(center-channel-color-20);
+        border-radius: 4px;
+    }
+
+    .react-select__option--is-focused {
+        background: rgba(var(--button-bg-rgb), 0.24);
+    }
+
+    .react-select__option--is-selected {
+        background: v(button-bg);
+        color: v(button-color);
+    }
+
+    .react-select-top {
+        .react-select__menu {
+            top: auto;
+            bottom: 100%;
+        }
+    }
+}

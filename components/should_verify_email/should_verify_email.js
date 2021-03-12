@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import BackButton from 'components/common/back_button.jsx';
-import SuccessIcon from 'components/icon/success_icon';
+import BackButton from 'components/common/back_button';
+import SuccessIcon from 'components/widgets/icons/fa_success_icon';
 
 export default class ShouldVerifyEmail extends React.PureComponent {
     static propTypes = {
@@ -45,7 +45,10 @@ export default class ShouldVerifyEmail extends React.PureComponent {
             resendConfirm = (
                 <div>
                     <br/>
-                    <p className='alert alert-success'>
+                    <p
+                        data-testid='emailVerifySentMessage'
+                        className='alert alert-success'
+                    >
                         <SuccessIcon/>
                         <FormattedMessage
                             id='email_verify.sent'
@@ -83,7 +86,7 @@ export default class ShouldVerifyEmail extends React.PureComponent {
                 <BackButton/>
                 <div className='col-sm-12'>
                     <div className='signup-team__container'>
-                        <h3>
+                        <h3 data-testid='emailVerifyAlmost'>
                             <FormattedMessage
                                 id='email_verify.almost'
                                 defaultMessage='{siteName}: You are almost done'
@@ -93,13 +96,14 @@ export default class ShouldVerifyEmail extends React.PureComponent {
                             />
                         </h3>
                         <div>
-                            <p>
+                            <p data-testid='emailVerifyNotVerifiedBody'>
                                 <FormattedMessage
                                     id='email_verify.notVerifiedBody'
                                     defaultMessage='Please verify your email address. Check your inbox for an email.'
                                 />
                             </p>
                             <button
+                                data-testid='emailVerifyResend'
                                 onClick={this.handleResend}
                                 className='btn btn-primary'
                             >

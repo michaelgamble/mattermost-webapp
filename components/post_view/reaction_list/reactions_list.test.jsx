@@ -4,7 +4,7 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import ReactionList from './reaction_list.jsx';
+import ReactionList from './reaction_list';
 
 describe('components/ReactionList', () => {
     const reaction = {
@@ -24,7 +24,6 @@ describe('components/ReactionList', () => {
 
     const actions = {
         addReaction: jest.fn(),
-        scrollPostList: jest.fn(),
     };
 
     const baseProps = {
@@ -42,7 +41,7 @@ describe('components/ReactionList', () => {
         };
 
         const wrapper = shallow(
-            <ReactionList {...props}/>
+            <ReactionList {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -50,7 +49,7 @@ describe('components/ReactionList', () => {
 
     test('should render when there are reactions', () => {
         const wrapper = shallow(
-            <ReactionList {...baseProps}/>
+            <ReactionList {...baseProps}/>,
         );
 
         expect(wrapper).toMatchSnapshot();

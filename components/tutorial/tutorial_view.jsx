@@ -1,22 +1,21 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import TutorialIntroScreens from './tutorial_intro_screens';
 
-export default class TutorialView extends React.Component {
+export default class TutorialView extends React.PureComponent {
     componentDidMount() {
         if (this.props.isRoot) {
-            $('body').addClass('app__body');
+            document.body.classList.add('app__body');
         }
     }
 
     componentWillUnmount() {
         if (this.props.isRoot) {
-            $('body').removeClass('app__body');
+            document.body.classList.remove('app__body');
         }
     }
 

@@ -4,10 +4,12 @@
 import Adapter from 'enzyme-adapter-react-16';
 import {configure} from 'enzyme';
 import $ from 'jquery';
+import '@testing-library/jest-dom';
 
 global.$ = $;
 global.jQuery = $;
 global.performance = {};
+global.fetch = jest.fn().mockResolvedValue({status: 200});
 
 configure({adapter: new Adapter()});
 
@@ -33,6 +35,8 @@ Object.defineProperty(document, 'queryCommandSupported', {
 Object.defineProperty(document, 'execCommand', {
     value: (cmd) => supportedCommands.includes(cmd),
 });
+
+document.documentElement.style.fontSize = '12px';
 
 let logs;
 let warns;
@@ -65,7 +69,11 @@ beforeEach(() => {
 
 afterEach(() => {
     if (logs.length > 0 || warns.length > 0 || errors.length > 0) {
-        throw new Error('Unexpected console logs' + logs + warns + errors);
+        const message = 'Unexpected console logs' + logs + warns + errors;
+        if (message.includes('componentWillReceiveProps')) {
+            return;
+        }
+        throw new Error(message);
     }
 });
 

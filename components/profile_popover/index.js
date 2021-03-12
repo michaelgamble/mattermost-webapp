@@ -18,10 +18,12 @@ import {
 
 import {openDirectChannelToUserId} from 'actions/channel_actions.jsx';
 import {getMembershipForCurrentEntities} from 'actions/views/profile_popover';
-import {openModal} from 'actions/views/modals';
+import {closeModal, openModal} from 'actions/views/modals';
 
 import {areTimezonesEnabledAndSupported} from 'selectors/general';
 import {getSelectedPost, getRhsState} from 'selectors/rhs';
+
+import {makeGetCustomStatus, isCustomStatusEnabled} from 'selectors/views/custom_status';
 
 import ProfilePopover from './profile_popover.jsx';
 
@@ -29,6 +31,7 @@ function mapStateToProps(state, ownProps) {
     const userId = ownProps.userId;
     const team = getCurrentTeam(state);
     const teamMember = getTeamMember(state, team.id, userId);
+    const getCustomStatus = makeGetCustomStatus();
 
     let isTeamAdmin = false;
     if (teamMember && teamMember.scheme_admin) {
@@ -36,10 +39,9 @@ function mapStateToProps(state, ownProps) {
     }
 
     const selectedPost = getSelectedPost(state);
-    const currentChannel = getCurrentChannel(state);
-
     let channelId;
     if (selectedPost.exists === false) {
+        const currentChannel = getCurrentChannel(state) || {};
         channelId = currentChannel.id;
     } else {
         channelId = selectedPost.channel_id;
@@ -58,17 +60,21 @@ function mapStateToProps(state, ownProps) {
         enableTimezone: areTimezonesEnabledAndSupported(state),
         isTeamAdmin,
         isChannelAdmin,
-        isInCurrentTeam: Boolean(teamMember),
+        isInCurrentTeam: Boolean(teamMember) && teamMember.delete_at === 0,
         canManageAnyChannelMembersInCurrentTeam: canManageAnyChannelMembersInCurrentTeam(state),
         status: getStatusForUserId(state, userId),
         teamUrl: getCurrentRelativeTeamUrl(state),
         user: getUser(state, userId),
+        modals: state.views.modals.modalState,
+        customStatus: getCustomStatus(state, userId),
+        isCustomStatusEnabled: isCustomStatusEnabled(state),
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({
+            closeModal,
             openDirectChannelToUserId,
             openModal,
             getMembershipForCurrentEntities,

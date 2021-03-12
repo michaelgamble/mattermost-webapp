@@ -3,15 +3,35 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {leaveChannel as leaveChannelRedux, joinChannel, unfavoriteChannel} from 'mattermost-redux/actions/channels';
+import {
+    leaveChannel as leaveChannelRedux,
+    joinChannel,
+    markChannelAsRead,
+    unfavoriteChannel,
+} from 'mattermost-redux/actions/channels';
 import * as PostActions from 'mattermost-redux/actions/posts';
+import {TeamTypes} from 'mattermost-redux/action_types';
 import {autocompleteUsers} from 'mattermost-redux/actions/users';
-import {Posts} from 'mattermost-redux/constants';
-import {getChannel, getChannelsNameMapInCurrentTeam, getCurrentChannel, getRedirectChannelNameForTeam} from 'mattermost-redux/selectors/entities/channels';
-import {getCurrentRelativeTeamUrl, getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
+import {selectTeam} from 'mattermost-redux/actions/teams';
+import {Posts, RequestStatus} from 'mattermost-redux/constants';
+
+import {
+    getChannel,
+    getChannelsNameMapInCurrentTeam,
+    getCurrentChannel,
+    getRedirectChannelNameForTeam,
+    getMyChannels,
+    getMyChannelMemberships,
+    getAllDirectChannelsNameMapInCurrentTeam,
+    isFavoriteChannel,
+    isManuallyUnread,
+} from 'mattermost-redux/selectors/entities/channels';
+import {getCurrentRelativeTeamUrl, getCurrentTeam, getCurrentTeamId, getTeamsList} from 'mattermost-redux/selectors/entities/teams';
 import {getCurrentUserId, getUserByUsername} from 'mattermost-redux/selectors/entities/users';
-import {getMyPreferences} from 'mattermost-redux/selectors/entities/preferences';
-import {getChannelByName, isFavoriteChannel} from 'mattermost-redux/utils/channel_utils';
+import {getMostRecentPostIdInChannel, getPost} from 'mattermost-redux/selectors/entities/posts';
+import {makeAddLastViewAtToProfiles} from 'mattermost-redux/selectors/entities/utils';
+
+import {getChannelByName} from 'mattermost-redux/utils/channel_utils';
 import EventEmitter from 'mattermost-redux/utils/event_emitter';
 
 import {openDirectChannelToUserId} from 'actions/channel_actions.jsx';
@@ -20,9 +40,10 @@ import {getLastPostsApiTimeForChannel} from 'selectors/views/channel';
 import {getSocketStatus} from 'selectors/views/websocket';
 
 import {browserHistory} from 'utils/browser_history';
-import {Constants, ActionTypes, EventTypes, PostRequestTypes} from 'utils/constants.jsx';
+import {Constants, ActionTypes, EventTypes, PostRequestTypes} from 'utils/constants';
 import {isMobile} from 'utils/utils.jsx';
 import LocalStorageStore from 'stores/local_storage_store.jsx';
+import {isArchivedChannel} from 'utils/channel_utils';
 
 export function checkAndSetMobileView() {
     return (dispatch) => {
@@ -36,13 +57,15 @@ export function checkAndSetMobileView() {
 export function goToLastViewedChannel() {
     return async (dispatch, getState) => {
         const state = getState();
-        const currentChannel = getCurrentChannel(state);
+        const currentChannel = getCurrentChannel(state) || {};
         const channelsInTeam = getChannelsNameMapInCurrentTeam(state);
+        const directChannel = getAllDirectChannelsNameMapInCurrentTeam(state);
+        const channels = Object.assign({}, channelsInTeam, directChannel);
 
-        let channelToSwitchTo = getChannelByName(channelsInTeam, getLastViewedChannelName(state));
+        let channelToSwitchTo = getChannelByName(channels, getLastViewedChannelName(state));
 
         if (currentChannel.id === channelToSwitchTo.id) {
-            channelToSwitchTo = getChannelByName(channelsInTeam, getRedirectChannelNameForTeam(state, getCurrentTeamId(state)));
+            channelToSwitchTo = getChannelByName(channels, getRedirectChannelNameForTeam(state, getCurrentTeamId(state)));
         }
 
         return dispatch(switchToChannel(channelToSwitchTo));
@@ -97,22 +120,40 @@ export function joinChannelById(channelId) {
 
 export function leaveChannel(channelId) {
     return async (dispatch, getState) => {
-        const state = getState();
-        const myPreferences = getMyPreferences(state);
+        let state = getState();
         const currentUserId = getCurrentUserId(state);
-        const currentTeamId = getCurrentTeamId(state);
+        const currentTeam = getCurrentTeam(state);
+        const channel = getChannel(state, channelId);
 
-        if (isFavoriteChannel(myPreferences, channelId)) {
+        if (isFavoriteChannel(state, channelId)) {
             dispatch(unfavoriteChannel(channelId));
         }
 
         const teamUrl = getCurrentRelativeTeamUrl(state);
-        LocalStorageStore.removePreviousChannelName(currentUserId, currentTeamId);
-        browserHistory.push(teamUrl);
 
+        if (!isArchivedChannel(channel)) {
+            LocalStorageStore.removePreviousChannelName(currentUserId, currentTeam.id, state);
+        }
         const {error} = await dispatch(leaveChannelRedux(channelId));
         if (error) {
             return {error};
+        }
+        state = getState();
+
+        const prevChannelName = LocalStorageStore.getPreviousChannelName(currentUserId, currentTeam.id, state);
+        const channelsInTeam = getChannelsNameMapInCurrentTeam(state);
+        const prevChannel = getChannelByName(channelsInTeam, prevChannelName);
+        if (!prevChannel || !getMyChannelMemberships(state)[prevChannel.id]) {
+            LocalStorageStore.removePreviousChannelName(currentUserId, currentTeam.id, state);
+        }
+
+        if (getMyChannels(getState()).filter((c) => c.type === Constants.OPEN_CHANNEL || c.type === Constants.PRIVATE_CHANNEL).length === 0) {
+            LocalStorageStore.removePreviousChannelName(currentUserId, currentTeam.id, state);
+            dispatch(selectTeam(''));
+            dispatch({type: TeamTypes.LEAVE_TEAM, data: currentTeam});
+            browserHistory.push('/');
+        } else {
+            browserHistory.push(teamUrl);
         }
 
         return {
@@ -121,32 +162,99 @@ export function leaveChannel(channelId) {
     };
 }
 
+export function leaveDirectChannel(channelName) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const currentUserId = getCurrentUserId(state);
+        const teams = getTeamsList(state); // dms are shared across teams but on local storage are set linked to one, we need to look into all.
+        teams.forEach((currentTeam) => {
+            const previousChannel = LocalStorageStore.getPreviousChannelName(currentUserId, currentTeam.id, state);
+            const penultimateChannel = LocalStorageStore.getPenultimateChannelName(currentUserId, currentTeam.id, state);
+            if (channelName === previousChannel) {
+                LocalStorageStore.removePreviousChannelName(currentUserId, currentTeam.id, state);
+            } else if (channelName === penultimateChannel) {
+                LocalStorageStore.removePenultimateChannelName(currentUserId, currentTeam.id, state);
+            }
+        });
+        return {
+            data: true,
+        };
+    };
+}
+
 export function autocompleteUsersInChannel(prefix, channelId) {
+    const addLastViewAtToProfiles = makeAddLastViewAtToProfiles();
     return async (dispatch, getState) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
 
-        return dispatch(autocompleteUsers(prefix, currentTeamId, channelId));
+        const respose = await dispatch(autocompleteUsers(prefix, currentTeamId, channelId));
+        const data = respose.data;
+        if (data) {
+            return {
+                ...respose,
+                data: {
+                    ...data,
+                    users: addLastViewAtToProfiles(state, data.users || []),
+                    out_of_channel: addLastViewAtToProfiles(state, data.out_of_channel || []),
+                },
+            };
+        }
+
+        return respose;
     };
 }
 
-export function loadUnreads(channelId) {
+export function loadUnreads(channelId, prefetch = false) {
     return async (dispatch) => {
+        const time = Date.now();
+        if (prefetch) {
+            dispatch({
+                type: ActionTypes.PREFETCH_POSTS_FOR_CHANNEL,
+                channelId,
+                status: RequestStatus.STARTED,
+            });
+        }
         const {data, error} = await dispatch(PostActions.getPostsUnread(channelId));
         if (error) {
+            if (prefetch) {
+                dispatch({
+                    type: ActionTypes.PREFETCH_POSTS_FOR_CHANNEL,
+                    channelId,
+                    status: RequestStatus.FAILURE,
+                });
+            }
             return {
                 error,
                 atLatestMessage: false,
                 atOldestmessage: false,
             };
         }
+        const actions = [];
 
-        dispatch({
+        actions.push({
             type: ActionTypes.INCREASE_POST_VISIBILITY,
             data: channelId,
             amount: data.order.length,
         });
 
+        if (prefetch) {
+            actions.push({
+                type: ActionTypes.PREFETCH_POSTS_FOR_CHANNEL,
+                channelId,
+                status: RequestStatus.SUCCESS,
+            });
+        }
+
+        if (data.next_post_id === '') {
+            actions.push({
+                type: ActionTypes.RECEIVED_POSTS_FOR_CHANNEL_AT_TIME,
+                channelId,
+                time,
+            });
+        }
+
+        dispatch(batchActions(actions));
         return {
             atLatestMessage: data.next_post_id === '',
             atOldestmessage: data.prev_post_id === '',
@@ -251,38 +359,96 @@ export function loadPosts({channelId, postId, type}) {
     };
 }
 
-export function syncPostsInChannel(channelId, since) {
+export function syncPostsInChannel(channelId, since, prefetch = false) {
     return async (dispatch, getState) => {
         const time = Date.now();
         const state = getState();
         const socketStatus = getSocketStatus(state);
         let sinceTimeToGetPosts = since;
         const lastPostsApiCallForChannel = getLastPostsApiTimeForChannel(state, channelId);
+        const actions = [];
 
         if (lastPostsApiCallForChannel && lastPostsApiCallForChannel < socketStatus.lastDisconnectAt) {
             sinceTimeToGetPosts = lastPostsApiCallForChannel;
         }
 
+        if (prefetch) {
+            dispatch({
+                type: ActionTypes.PREFETCH_POSTS_FOR_CHANNEL,
+                channelId,
+                status: RequestStatus.STARTED,
+            });
+        }
+
         const {data, error} = await dispatch(PostActions.getPostsSince(channelId, sinceTimeToGetPosts));
         if (data) {
-            dispatch({
+            actions.push({
                 type: ActionTypes.RECEIVED_POSTS_FOR_CHANNEL_AT_TIME,
                 channelId,
                 time,
             });
         }
+
+        if (prefetch) {
+            if (error) {
+                actions.push({
+                    type: ActionTypes.PREFETCH_POSTS_FOR_CHANNEL,
+                    channelId,
+                    status: RequestStatus.FAILURE,
+                });
+            } else {
+                actions.push({
+                    type: ActionTypes.PREFETCH_POSTS_FOR_CHANNEL,
+                    channelId,
+                    status: RequestStatus.SUCCESS,
+                });
+            }
+        }
+
+        dispatch(batchActions(actions));
+
         return {data, error};
+    };
+}
+
+export function prefetchChannelPosts(channelId, jitter) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const recentPostIdInChannel = getMostRecentPostIdInChannel(state, channelId);
+
+        if (!state.entities.posts.postsInChannel[channelId] || !recentPostIdInChannel) {
+            if (jitter) {
+                await new Promise((resolve) => setTimeout(resolve, jitter));
+            }
+            return dispatch(loadUnreads(channelId, true));
+        }
+
+        const recentPost = getPost(state, recentPostIdInChannel);
+        return dispatch(syncPostsInChannel(channelId, recentPost.create_at, true));
     };
 }
 
 export function scrollPostListToBottom() {
     return () => {
-        EventEmitter.emit(EventTypes.POST_LIST_SCROLL_CHANGE, true);
+        EventEmitter.emit(EventTypes.POST_LIST_SCROLL_TO_BOTTOM);
     };
 }
 
-export function scrollPostList() {
-    return () => {
-        EventEmitter.emit(EventTypes.POST_LIST_SCROLL_CHANGE, false);
+export function markChannelAsReadOnFocus(channelId) {
+    return (dispatch, getState) => {
+        if (isManuallyUnread(getState(), channelId)) {
+            return;
+        }
+
+        dispatch(markChannelAsRead(channelId));
+    };
+}
+
+export function updateToastStatus(status) {
+    return (dispatch) => {
+        dispatch({
+            type: ActionTypes.UPDATE_TOAST_STATUS,
+            data: status,
+        });
     };
 }

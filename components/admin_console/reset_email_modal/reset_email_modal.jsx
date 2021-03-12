@@ -10,7 +10,7 @@ import {isEmail} from 'mattermost-redux/utils/helpers';
 
 import {adminResetEmail} from 'actions/admin_actions.jsx';
 
-export default class ResetEmailModal extends React.Component {
+export default class ResetEmailModal extends React.PureComponent {
     static propTypes = {
         user: PropTypes.object,
         show: PropTypes.bool.isRequired,
@@ -29,13 +29,15 @@ export default class ResetEmailModal extends React.Component {
         this.state = {
             error: null,
         };
+
+        this.emailRef = React.createRef();
     }
 
     doSubmit = (e) => {
         e.preventDefault();
 
-        if (this.refs.email) {
-            const email = this.refs.email.value;
+        if (this.emailRef.current) {
+            const email = this.emailRef.current.value;
             if (!isEmail(email)) {
                 const errMsg = (
                     <FormattedMessage
@@ -49,7 +51,7 @@ export default class ResetEmailModal extends React.Component {
         }
 
         const user = Object.assign({}, this.props.user);
-        const email = this.refs.email.value.trim().toLowerCase();
+        const email = this.emailRef.current.value.trim().toLowerCase();
         user.email = email;
 
         this.setState({error: null});
@@ -62,7 +64,7 @@ export default class ResetEmailModal extends React.Component {
             (err) => {
                 const serverError = err.message ? err.message : err;
                 this.setState({error: serverError});
-            }
+            },
         );
     }
 
@@ -97,6 +99,7 @@ export default class ResetEmailModal extends React.Component {
                 onHide={this.doCancel}
                 role='dialog'
                 aria-labelledby='resetEmailModalLabel'
+                data-testid='resetEmailModal'
             >
                 <Modal.Header closeButton={true}>
                     <Modal.Title
@@ -113,7 +116,10 @@ export default class ResetEmailModal extends React.Component {
                     <Modal.Body>
                         <div className='form-group'>
                             <div className='col-sm-10'>
-                                <div className={urlClass}>
+                                <div
+                                    className={urlClass}
+                                    data-testid='resetEmailForm'
+                                >
                                     <span
                                         data-toggle='tooltip'
                                         title='New Email'
@@ -126,11 +132,10 @@ export default class ResetEmailModal extends React.Component {
                                     </span>
                                     <input
                                         type='email'
-                                        ref='email'
+                                        ref={this.emailRef}
                                         className='form-control'
                                         maxLength='128'
                                         autoFocus={true}
-                                        tabIndex='1'
                                     />
                                 </div>
                                 {errorMsg}
@@ -152,7 +157,7 @@ export default class ResetEmailModal extends React.Component {
                             onClick={this.doSubmit}
                             type='submit'
                             className='btn btn-primary'
-                            tabIndex='2'
+                            data-testid='resetEmailButton'
                         >
                             <FormattedMessage
                                 id='admin.reset_email.reset'

@@ -4,10 +4,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 import BlockableLink from 'components/admin_console/blockable_link';
 import * as Utils from 'utils/utils.jsx';
 
-export default class AdminSidebarSection extends React.Component {
+export default class AdminSidebarSection extends React.PureComponent {
     static get propTypes() {
         return {
             name: PropTypes.string.isRequired,
@@ -17,6 +18,8 @@ export default class AdminSidebarSection extends React.Component {
             subsection: PropTypes.bool,
             children: PropTypes.node,
             action: PropTypes.node,
+            definitionKey: PropTypes.string,
+            tag: PropTypes.node,
         };
     }
 
@@ -59,16 +62,25 @@ export default class AdminSidebarSection extends React.Component {
         if (this.props.subsection) {
             className += ' sidebar-subsection';
         }
-
+        let tag = '';
+        if (this.props.tag) {
+            tag = (
+                <span className={`${className}-tag`}>
+                    {this.props.tag}
+                </span>
+            );
+        }
+        const sidebarItemSafeId = Utils.createSafeId(this.props.name);
         let sidebarItem = (
             <BlockableLink
-                id={Utils.createSafeId(this.props.name)}
+                id={sidebarItemSafeId}
                 className={`${className}-title`}
                 activeClassName={`${className}-title ${className}-title--active`}
                 to={link}
+                onClick={() => trackEvent('admin', sidebarItemSafeId)}
             >
                 <span className={`${className}-title__text`}>
-                    {this.props.title}
+                    {this.props.title}{tag}
                 </span>
                 {this.props.action}
             </BlockableLink>
@@ -88,7 +100,10 @@ export default class AdminSidebarSection extends React.Component {
         }
 
         return (
-            <li className={className}>
+            <li
+                className={className}
+                data-testid={this.props.definitionKey}
+            >
                 {sidebarItem}
                 {clonedChildren}
             </li>

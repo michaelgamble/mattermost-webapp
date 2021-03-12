@@ -4,16 +4,16 @@
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import {isKeyPressed} from 'utils/utils.jsx';
 
-import {redirectUserToDefaultTeam} from 'actions/global_actions.jsx';
+import {redirectUserToDefaultTeam} from 'actions/global_actions';
 
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 
 const KeyCodes = Constants.KeyCodes;
 
-export default class Confirm extends React.Component {
+export default class Confirm extends React.PureComponent {
     componentDidMount() {
         document.body.addEventListener('keydown', this.onKeyPress);
     }

@@ -1,586 +1,786 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`components/AdminSidebar Plugins should filter plugins 1`] = `
+<div
+  className="admin-sidebar"
+>
+  <Connect(SidebarHeader) />
+  <div
+    className="filter-container"
+  >
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter active"
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value="autolink"
+    />
+  </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter="autolink"
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        >
+          <AdminSidebarCategory
+            definitionKey="plugins"
+            icon="fa-plug"
+            key="plugins"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Plugins (Beta)"
+                id="admin.sidebar.plugins"
+              />
+            }
+          >
+            <AdminSidebarSection
+              key="custompluginmattermost-autolink"
+              name="plugins/plugin_mattermost-autolink"
+              parentLink=""
+              subsection={false}
+              title="Autolink"
+            />
+          </AdminSidebarCategory>
+        </ul>
+      </Highlight>
+    </div>
+  </Scrollbars>
+</div>
+`;
+
+exports[`components/AdminSidebar Plugins should match snapshot 1`] = `
+<div
+  className="admin-sidebar"
+>
+  <Connect(SidebarHeader) />
+  <div
+    className="filter-container"
+  >
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter "
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value=""
+    />
+  </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter=""
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        >
+          <AdminSidebarCategory
+            definitionKey="plugins"
+            icon="fa-plug"
+            key="plugins"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Plugins (Beta)"
+                id="admin.sidebar.plugins"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="plugins.plugin_management"
+              key="plugins.plugin_management"
+              name="plugins/plugin_management"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Plugin Management"
+                  id="admin.plugins.pluginManagement"
+                />
+              }
+            />
+            <AdminSidebarSection
+              key="custompluginmattermost-autolink"
+              name="plugins/plugin_mattermost-autolink"
+              parentLink=""
+              subsection={false}
+              title="Autolink"
+            />
+          </AdminSidebarCategory>
+        </ul>
+      </Highlight>
+    </div>
+  </Scrollbars>
+</div>
+`;
+
 exports[`components/AdminSidebar should match snapshot 1`] = `
 <div
   className="admin-sidebar"
 >
   <Connect(SidebarHeader) />
   <div
-    className="nav-pills__container"
+    className="filter-container"
   >
-    <Highlight
-      filter=""
-    >
-      <ul
-        className="nav nav-pills nav-stacked"
-      >
-        <li
-          className="filter-container"
-        >
-          <SearchIcon
-            aria-hidden="true"
-            className="search__icon"
-            id="searchIcon"
-          />
-          <input
-            className="filter "
-            onChange={[Function]}
-            placeholder="Find settings"
-            type="text"
-            value=""
-          />
-        </li>
-        <AdminSidebarCategory
-          icon="fa-bar-chart"
-          key="1"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Reporting"
-              id="admin.sidebar.reporting"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="reporting/system_analytics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Site Statistics"
-                id="admin.sidebar.siteStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="reporting/team_statistics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Team Statistics"
-                id="admin.sidebar.teamStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="reporting/server_logs"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Server Logs"
-                id="admin.sidebar.logs"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-users"
-          key="2"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="User Management"
-              id="admin.sidebar.userManagement"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="user_management/users"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users"
-                id="admin.sidebar.users"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-server"
-          key="3"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Environment"
-              id="admin.sidebar.environment"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="environment/web_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Web Server"
-                id="admin.sidebar.webServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="environment/database"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Database"
-                id="admin.sidebar.database"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/file_storage"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Storage"
-                id="admin.sidebar.fileStorage"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="environment/image_proxy"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Image Proxy"
-                id="admin.sidebar.imageProxy"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="environment/smtp"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="SMTP"
-                id="admin.sidebar.smtp"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="environment/push_notification_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Push Notification Server"
-                id="admin.sidebar.pushNotificationServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="environment/rate_limiting"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Rate Limiting"
-                id="admin.sidebar.rateLimiting"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="12"
-            name="environment/logging"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Logging"
-                id="admin.sidebar.logging"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="13"
-            name="environment/session_lengths"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Session Lengths"
-                id="admin.sidebar.sessionLengths"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="15"
-            name="environment/developer"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Developer"
-                id="admin.sidebar.developer"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-cogs"
-          key="4"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Site Configuration"
-              id="admin.sidebar.site"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="site_config/customization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Customization"
-                id="admin.sidebar.customization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="site_config/localization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Localization"
-                id="admin.sidebar.localization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="site_config/users_and_teams"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users and Teams"
-                id="admin.sidebar.usersAndTeams"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/notifications"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Notifications"
-                id="admin.sidebar.notifications"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="site_config/emoji"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Emoji"
-                id="admin.sidebar.emoji"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="site_config/posts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Posts"
-                id="admin.sidebar.posts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="site_config/file_sharing_downloads"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Sharing and Downloads"
-                id="admin.sidebar.fileSharingDownloads"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="site_config/public_links"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Public Links"
-                id="admin.sidebar.publicLinks"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-shield"
-          key="5"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Authentication"
-              id="admin.sidebar.authentication"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="authentication/signup"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Signup"
-                id="admin.sidebar.signup"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="authentication/email"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Email"
-                id="admin.sidebar.email"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="authentication/password"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Password"
-                id="admin.sidebar.password"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="authentication/mfa"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="MFA"
-                id="admin.sidebar.mfa"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="authentication/gitlab"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GitLab"
-                id="admin.sidebar.gitlab"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-plug"
-          key="6"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Plugins (Beta)"
-              id="admin.sidebar.plugins"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="plugins/plugin_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Plugin Management"
-                id="admin.plugins.pluginManagement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="custompluginplugin_0"
-            name="plugins/plugin_plugin_0"
-            parentLink=""
-            subsection={false}
-            title="Plugin 0"
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-sitemap"
-          key="7"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Integrations"
-              id="admin.sidebar.integrations"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="integrations/integration_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Integration Management"
-                id="admin.integrations.integrationManagement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="integrations/bot_accounts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Bot Accounts"
-                id="admin.integrations.botAccounts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="integrations/gif"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GIF (Beta)"
-                id="admin.sidebar.gif"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="integrations/cors"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="CORS"
-                id="admin.sidebar.cors"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-flask"
-          key="9"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Experimental"
-              id="admin.sidebar.experimental"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="experimental/features"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Features"
-                id="admin.sidebar.experimentalFeatures"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-      </ul>
-    </Highlight>
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter "
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value=""
+    />
   </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter=""
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        >
+          <AdminSidebarCategory
+            definitionKey="about"
+            icon="fa-info-circle"
+            key="about"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="About"
+                id="admin.sidebar.about"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="about.license"
+              key="about.license"
+              name="about/license"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Edition and License"
+                  id="admin.sidebar.license"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="reporting"
+            icon="fa-bar-chart"
+            key="reporting"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Reporting"
+                id="admin.sidebar.reporting"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="reporting.system_analytics"
+              key="reporting.system_analytics"
+              name="reporting/system_analytics"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Site Statistics"
+                  id="admin.sidebar.siteStatistics"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="reporting.team_statistics"
+              key="reporting.team_statistics"
+              name="reporting/team_statistics"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Team Statistics"
+                  id="admin.sidebar.teamStatistics"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="reporting.server_logs"
+              key="reporting.server_logs"
+              name="reporting/server_logs"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Server Logs"
+                  id="admin.sidebar.logs"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="environment"
+            icon="fa-server"
+            key="environment"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Environment"
+                id="admin.sidebar.environment"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="environment.web_server"
+              key="environment.web_server"
+              name="environment/web_server"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Web Server"
+                  id="admin.sidebar.webServer"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.database"
+              key="environment.database"
+              name="environment/database"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Database"
+                  id="admin.sidebar.database"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.storage"
+              key="environment.storage"
+              name="environment/file_storage"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="File Storage"
+                  id="admin.sidebar.fileStorage"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.image_proxy"
+              key="environment.image_proxy"
+              name="environment/image_proxy"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Image Proxy"
+                  id="admin.sidebar.imageProxy"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.smtp"
+              key="environment.smtp"
+              name="environment/smtp"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="SMTP"
+                  id="admin.sidebar.smtp"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.push_notification_server"
+              key="environment.push_notification_server"
+              name="environment/push_notification_server"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Push Notification Server"
+                  id="admin.sidebar.pushNotificationServer"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.rate_limiting"
+              key="environment.rate_limiting"
+              name="environment/rate_limiting"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Rate Limiting"
+                  id="admin.sidebar.rateLimiting"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.logging"
+              key="environment.logging"
+              name="environment/logging"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Logging"
+                  id="admin.sidebar.logging"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.session_lengths"
+              key="environment.session_lengths"
+              name="environment/session_lengths"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Session Lengths"
+                  id="admin.sidebar.sessionLengths"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.metrics"
+              key="environment.metrics"
+              name="environment/performance_monitoring"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Performance Monitoring"
+                  id="admin.sidebar.metrics"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.developer"
+              key="environment.developer"
+              name="environment/developer"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Developer"
+                  id="admin.sidebar.developer"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="authentication"
+            icon="fa-shield"
+            key="authentication"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Authentication"
+                id="admin.sidebar.authentication"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="authentication.signup"
+              key="authentication.signup"
+              name="authentication/signup"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Signup"
+                  id="admin.sidebar.signup"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.email"
+              key="authentication.email"
+              name="authentication/email"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Email"
+                  id="admin.sidebar.email"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.password"
+              key="authentication.password"
+              name="authentication/password"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Password"
+                  id="admin.sidebar.password"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.mfa"
+              key="authentication.mfa"
+              name="authentication/mfa"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="MFA"
+                  id="admin.sidebar.mfa"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.gitlab"
+              key="authentication.gitlab"
+              name="authentication/gitlab"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="GitLab"
+                  id="admin.sidebar.gitlab"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="plugins"
+            icon="fa-plug"
+            key="plugins"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Plugins (Beta)"
+                id="admin.sidebar.plugins"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="plugins.plugin_management"
+              key="plugins.plugin_management"
+              name="plugins/plugin_management"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Plugin Management"
+                  id="admin.plugins.pluginManagement"
+                />
+              }
+            />
+            <AdminSidebarSection
+              key="custompluginplugin_0"
+              name="plugins/plugin_plugin_0"
+              parentLink=""
+              subsection={false}
+              title="Plugin 0"
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="integrations"
+            icon="fa-sitemap"
+            key="integrations"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Integrations"
+                id="admin.sidebar.integrations"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="integrations.integration_management"
+              key="integrations.integration_management"
+              name="integrations/integration_management"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Integration Management"
+                  id="admin.integrations.integrationManagement"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="integrations.bot_accounts"
+              key="integrations.bot_accounts"
+              name="integrations/bot_accounts"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Bot Accounts"
+                  id="admin.integrations.botAccounts"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="integrations.gif"
+              key="integrations.gif"
+              name="integrations/gif"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="GIF (Beta)"
+                  id="admin.sidebar.gif"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="integrations.cors"
+              key="integrations.cors"
+              name="integrations/cors"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="CORS"
+                  id="admin.sidebar.cors"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="experimental"
+            icon="fa-flask"
+            key="experimental"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Experimental"
+                id="admin.sidebar.experimental"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="experimental.experimental_features"
+              key="experimental.experimental_features"
+              name="experimental/features"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Features"
+                  id="admin.sidebar.experimentalFeatures"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="experimental.feature_flags"
+              key="experimental.feature_flags"
+              name="experimental/feature_flags"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Feature Flags"
+                  id="admin.feature_flags.title"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="experimental.bleve"
+              key="experimental.bleve"
+              name="experimental/blevesearch"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Bleve"
+                  id="admin.sidebar.blevesearch"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+        </ul>
+      </Highlight>
+    </div>
+  </Scrollbars>
+</div>
+`;
+
+exports[`components/AdminSidebar should match snapshot, no access 1`] = `
+<div
+  className="admin-sidebar"
+>
+  <Connect(SidebarHeader) />
+  <div
+    className="filter-container"
+  >
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter "
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value=""
+    />
+  </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter=""
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        />
+      </Highlight>
+    </div>
+  </Scrollbars>
 </div>
 `;
 
@@ -590,1151 +790,111 @@ exports[`components/AdminSidebar should match snapshot, not prevent the console 
 >
   <Connect(SidebarHeader) />
   <div
-    className="nav-pills__container"
+    className="filter-container"
   >
-    <Highlight
-      filter=""
-    >
-      <ul
-        className="nav nav-pills nav-stacked"
-      >
-        <li
-          className="filter-container"
-        >
-          <SearchIcon
-            aria-hidden="true"
-            className="search__icon"
-            id="searchIcon"
-          />
-          <input
-            className="filter "
-            onChange={[Function]}
-            placeholder="Find settings"
-            type="text"
-            value=""
-          />
-        </li>
-        <AdminSidebarCategory
-          icon="fa-bar-chart"
-          key="1"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Reporting"
-              id="admin.sidebar.reporting"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="reporting/system_analytics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Site Statistics"
-                id="admin.sidebar.siteStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="reporting/team_statistics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Team Statistics"
-                id="admin.sidebar.teamStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="reporting/server_logs"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Server Logs"
-                id="admin.sidebar.logs"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-users"
-          key="2"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="User Management"
-              id="admin.sidebar.userManagement"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="user_management/users"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users"
-                id="admin.sidebar.users"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-server"
-          key="3"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Environment"
-              id="admin.sidebar.environment"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="environment/web_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Web Server"
-                id="admin.sidebar.webServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="environment/database"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Database"
-                id="admin.sidebar.database"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/file_storage"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Storage"
-                id="admin.sidebar.fileStorage"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="environment/image_proxy"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Image Proxy"
-                id="admin.sidebar.imageProxy"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="environment/smtp"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="SMTP"
-                id="admin.sidebar.smtp"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="environment/push_notification_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Push Notification Server"
-                id="admin.sidebar.pushNotificationServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="environment/rate_limiting"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Rate Limiting"
-                id="admin.sidebar.rateLimiting"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="12"
-            name="environment/logging"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Logging"
-                id="admin.sidebar.logging"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="13"
-            name="environment/session_lengths"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Session Lengths"
-                id="admin.sidebar.sessionLengths"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="15"
-            name="environment/developer"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Developer"
-                id="admin.sidebar.developer"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-cogs"
-          key="4"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Site Configuration"
-              id="admin.sidebar.site"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="site_config/customization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Customization"
-                id="admin.sidebar.customization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="site_config/localization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Localization"
-                id="admin.sidebar.localization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="site_config/users_and_teams"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users and Teams"
-                id="admin.sidebar.usersAndTeams"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/notifications"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Notifications"
-                id="admin.sidebar.notifications"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="site_config/emoji"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Emoji"
-                id="admin.sidebar.emoji"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="site_config/posts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Posts"
-                id="admin.sidebar.posts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="site_config/file_sharing_downloads"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Sharing and Downloads"
-                id="admin.sidebar.fileSharingDownloads"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="site_config/public_links"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Public Links"
-                id="admin.sidebar.publicLinks"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-shield"
-          key="5"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Authentication"
-              id="admin.sidebar.authentication"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="authentication/signup"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Signup"
-                id="admin.sidebar.signup"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="authentication/email"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Email"
-                id="admin.sidebar.email"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="authentication/password"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Password"
-                id="admin.sidebar.password"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="authentication/mfa"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="MFA"
-                id="admin.sidebar.mfa"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="authentication/gitlab"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GitLab"
-                id="admin.sidebar.gitlab"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-plug"
-          key="6"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Plugins (Beta)"
-              id="admin.sidebar.plugins"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="plugins/plugin_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Plugin Management"
-                id="admin.plugins.pluginManagement"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-sitemap"
-          key="7"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Integrations"
-              id="admin.sidebar.integrations"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="integrations/integration_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Integration Management"
-                id="admin.integrations.integrationManagement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="integrations/bot_accounts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Bot Accounts"
-                id="admin.integrations.botAccounts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="integrations/gif"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GIF (Beta)"
-                id="admin.sidebar.gif"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="integrations/cors"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="CORS"
-                id="admin.sidebar.cors"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-flask"
-          key="9"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Experimental"
-              id="admin.sidebar.experimental"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="experimental/features"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Features"
-                id="admin.sidebar.experimentalFeatures"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-      </ul>
-    </Highlight>
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter "
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value=""
+    />
   </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter=""
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        />
+      </Highlight>
+    </div>
+  </Scrollbars>
 </div>
 `;
 
-exports[`components/AdminSidebar should match snapshot, not render the plugin in the sidebar because does not have settings 1`] = `
+exports[`components/AdminSidebar should match snapshot, render plugins without any settings as well 1`] = `
 <div
   className="admin-sidebar"
 >
   <Connect(SidebarHeader) />
   <div
-    className="nav-pills__container"
+    className="filter-container"
   >
-    <Highlight
-      filter=""
-    >
-      <ul
-        className="nav nav-pills nav-stacked"
-      >
-        <li
-          className="filter-container"
-        >
-          <SearchIcon
-            aria-hidden="true"
-            className="search__icon"
-            id="searchIcon"
-          />
-          <input
-            className="filter "
-            onChange={[Function]}
-            placeholder="Find settings"
-            type="text"
-            value=""
-          />
-        </li>
-        <AdminSidebarCategory
-          icon="fa-bar-chart"
-          key="1"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Reporting"
-              id="admin.sidebar.reporting"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="reporting/system_analytics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Site Statistics"
-                id="admin.sidebar.siteStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="reporting/team_statistics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Team Statistics"
-                id="admin.sidebar.teamStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="reporting/server_logs"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Server Logs"
-                id="admin.sidebar.logs"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-users"
-          key="2"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="User Management"
-              id="admin.sidebar.userManagement"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="user_management/users"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users"
-                id="admin.sidebar.users"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-server"
-          key="3"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Environment"
-              id="admin.sidebar.environment"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="environment/web_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Web Server"
-                id="admin.sidebar.webServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="environment/database"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Database"
-                id="admin.sidebar.database"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/file_storage"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Storage"
-                id="admin.sidebar.fileStorage"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="environment/image_proxy"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Image Proxy"
-                id="admin.sidebar.imageProxy"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="environment/smtp"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="SMTP"
-                id="admin.sidebar.smtp"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="environment/push_notification_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Push Notification Server"
-                id="admin.sidebar.pushNotificationServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="environment/rate_limiting"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Rate Limiting"
-                id="admin.sidebar.rateLimiting"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="12"
-            name="environment/logging"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Logging"
-                id="admin.sidebar.logging"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="13"
-            name="environment/session_lengths"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Session Lengths"
-                id="admin.sidebar.sessionLengths"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="15"
-            name="environment/developer"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Developer"
-                id="admin.sidebar.developer"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-cogs"
-          key="4"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Site Configuration"
-              id="admin.sidebar.site"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="site_config/customization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Customization"
-                id="admin.sidebar.customization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="site_config/localization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Localization"
-                id="admin.sidebar.localization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="site_config/users_and_teams"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users and Teams"
-                id="admin.sidebar.usersAndTeams"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/notifications"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Notifications"
-                id="admin.sidebar.notifications"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="site_config/emoji"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Emoji"
-                id="admin.sidebar.emoji"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="site_config/posts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Posts"
-                id="admin.sidebar.posts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="site_config/file_sharing_downloads"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Sharing and Downloads"
-                id="admin.sidebar.fileSharingDownloads"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="site_config/public_links"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Public Links"
-                id="admin.sidebar.publicLinks"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-shield"
-          key="5"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Authentication"
-              id="admin.sidebar.authentication"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="authentication/signup"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Signup"
-                id="admin.sidebar.signup"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="authentication/email"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Email"
-                id="admin.sidebar.email"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="authentication/password"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Password"
-                id="admin.sidebar.password"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="authentication/mfa"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="MFA"
-                id="admin.sidebar.mfa"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="authentication/gitlab"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GitLab"
-                id="admin.sidebar.gitlab"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-plug"
-          key="6"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Plugins (Beta)"
-              id="admin.sidebar.plugins"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="plugins/plugin_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Plugin Management"
-                id="admin.plugins.pluginManagement"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-sitemap"
-          key="7"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Integrations"
-              id="admin.sidebar.integrations"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="integrations/integration_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Integration Management"
-                id="admin.integrations.integrationManagement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="integrations/bot_accounts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Bot Accounts"
-                id="admin.integrations.botAccounts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="integrations/gif"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GIF (Beta)"
-                id="admin.sidebar.gif"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="integrations/cors"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="CORS"
-                id="admin.sidebar.cors"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-flask"
-          key="9"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Experimental"
-              id="admin.sidebar.experimental"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="experimental/features"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Features"
-                id="admin.sidebar.experimentalFeatures"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-      </ul>
-    </Highlight>
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter "
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value=""
+    />
   </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter=""
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        />
+      </Highlight>
+    </div>
+  </Scrollbars>
 </div>
 `;
 
@@ -1744,797 +904,711 @@ exports[`components/AdminSidebar should match snapshot, with license (with all f
 >
   <Connect(SidebarHeader) />
   <div
-    className="nav-pills__container"
+    className="filter-container"
   >
-    <Highlight
-      filter=""
-    >
-      <ul
-        className="nav nav-pills nav-stacked"
-      >
-        <li
-          className="filter-container"
-        >
-          <SearchIcon
-            aria-hidden="true"
-            className="search__icon"
-            id="searchIcon"
-          />
-          <input
-            className="filter "
-            onChange={[Function]}
-            placeholder="Find settings"
-            type="text"
-            value=""
-          />
-        </li>
-        <AdminSidebarCategory
-          icon="fa-info-circle"
-          key="0"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="About"
-              id="admin.sidebar.about"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="about/license"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Edition and License"
-                id="admin.sidebar.license"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-bar-chart"
-          key="1"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Reporting"
-              id="admin.sidebar.reporting"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="reporting/system_analytics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Site Statistics"
-                id="admin.sidebar.siteStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="reporting/team_statistics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Team Statistics"
-                id="admin.sidebar.teamStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="reporting/server_logs"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Server Logs"
-                id="admin.sidebar.logs"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-users"
-          key="2"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="User Management"
-              id="admin.sidebar.userManagement"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="user_management/users"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users"
-                id="admin.sidebar.users"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="user_management/groups"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Groups"
-                id="admin.sidebar.groups"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="user_management/teams"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Teams"
-                id="admin.sidebar.teams"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="user_management/channels"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Channels"
-                id="admin.sidebar.channels"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="14"
-            name="user_management/permissions/"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Permissions"
-                id="admin.sidebar.permissions"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-server"
-          key="3"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Environment"
-              id="admin.sidebar.environment"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="environment/web_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Web Server"
-                id="admin.sidebar.webServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="environment/database"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Database"
-                id="admin.sidebar.database"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="environment/elasticsearch"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Elasticsearch"
-                id="admin.sidebar.elasticsearch"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/file_storage"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Storage"
-                id="admin.sidebar.fileStorage"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="environment/image_proxy"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Image Proxy"
-                id="admin.sidebar.imageProxy"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="environment/smtp"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="SMTP"
-                id="admin.sidebar.smtp"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="environment/push_notification_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Push Notification Server"
-                id="admin.sidebar.pushNotificationServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="environment/high_availability"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="High Availability"
-                id="admin.sidebar.highAvailability"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="environment/rate_limiting"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Rate Limiting"
-                id="admin.sidebar.rateLimiting"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="12"
-            name="environment/logging"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Logging"
-                id="admin.sidebar.logging"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="13"
-            name="environment/session_lengths"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Session Lengths"
-                id="admin.sidebar.sessionLengths"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="14"
-            name="environment/performance_monitoring"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Performance Monitoring"
-                id="admin.sidebar.metrics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="15"
-            name="environment/developer"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Developer"
-                id="admin.sidebar.developer"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-cogs"
-          key="4"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Site Configuration"
-              id="admin.sidebar.site"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="site_config/customization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Customization"
-                id="admin.sidebar.customization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="site_config/localization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Localization"
-                id="admin.sidebar.localization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="site_config/users_and_teams"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users and Teams"
-                id="admin.sidebar.usersAndTeams"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/notifications"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Notifications"
-                id="admin.sidebar.notifications"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="site_config/announcement_banner"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Announcement Banner"
-                id="admin.sidebar.announcement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="site_config/emoji"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Emoji"
-                id="admin.sidebar.emoji"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="site_config/posts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Posts"
-                id="admin.sidebar.posts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="site_config/file_sharing_downloads"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Sharing and Downloads"
-                id="admin.sidebar.fileSharingDownloads"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="site_config/public_links"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Public Links"
-                id="admin.sidebar.publicLinks"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-shield"
-          key="5"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Authentication"
-              id="admin.sidebar.authentication"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="authentication/signup"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Signup"
-                id="admin.sidebar.signup"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="authentication/email"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Email"
-                id="admin.sidebar.email"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="authentication/password"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Password"
-                id="admin.sidebar.password"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="authentication/mfa"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="MFA"
-                id="admin.sidebar.mfa"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="authentication/ldap"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="AD/LDAP"
-                id="admin.sidebar.ldap"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="authentication/saml"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="SAML 2.0"
-                id="admin.sidebar.saml"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="authentication/oauth"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="OAuth 2.0"
-                id="admin.sidebar.oauth"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-plug"
-          key="6"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Plugins (Beta)"
-              id="admin.sidebar.plugins"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="plugins/plugin_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Plugin Management"
-                id="admin.plugins.pluginManagement"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-sitemap"
-          key="7"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Integrations"
-              id="admin.sidebar.integrations"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="integrations/integration_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Integration Management"
-                id="admin.integrations.integrationManagement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="integrations/bot_accounts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Bot Accounts"
-                id="admin.integrations.botAccounts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="integrations/gif"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GIF (Beta)"
-                id="admin.sidebar.gif"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="integrations/cors"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="CORS"
-                id="admin.sidebar.cors"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-list"
-          key="8"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Compliance"
-              id="admin.sidebar.compliance"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="compliance/data_retention"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Data Retention Policy"
-                id="admin.sidebar.dataRetentionPolicy"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="compliance/export"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Compliance Export (Beta)"
-                id="admin.sidebar.complianceExport"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="compliance/monitoring"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Compliance Monitoring"
-                id="admin.sidebar.complianceMonitoring"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="compliance/custom_terms_of_service"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Custom Terms of Service (Beta)"
-                id="admin.sidebar.customTermsOfService"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-flask"
-          key="9"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Experimental"
-              id="admin.sidebar.experimental"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="experimental/features"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Features"
-                id="admin.sidebar.experimentalFeatures"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-      </ul>
-    </Highlight>
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter "
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value=""
+    />
   </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter=""
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        >
+          <AdminSidebarCategory
+            definitionKey="about"
+            icon="fa-info-circle"
+            key="about"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="About"
+                id="admin.sidebar.about"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="about.license"
+              key="about.license"
+              name="about/license"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Edition and License"
+                  id="admin.sidebar.license"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="reporting"
+            icon="fa-bar-chart"
+            key="reporting"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Reporting"
+                id="admin.sidebar.reporting"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="reporting.system_analytics"
+              key="reporting.system_analytics"
+              name="reporting/system_analytics"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Site Statistics"
+                  id="admin.sidebar.siteStatistics"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="reporting.team_statistics"
+              key="reporting.team_statistics"
+              name="reporting/team_statistics"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Team Statistics"
+                  id="admin.sidebar.teamStatistics"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="reporting.server_logs"
+              key="reporting.server_logs"
+              name="reporting/server_logs"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Server Logs"
+                  id="admin.sidebar.logs"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="environment"
+            icon="fa-server"
+            key="environment"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Environment"
+                id="admin.sidebar.environment"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="environment.web_server"
+              key="environment.web_server"
+              name="environment/web_server"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Web Server"
+                  id="admin.sidebar.webServer"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.database"
+              key="environment.database"
+              name="environment/database"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Database"
+                  id="admin.sidebar.database"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.elasticsearch"
+              key="environment.elasticsearch"
+              name="environment/elasticsearch"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Elasticsearch"
+                  id="admin.sidebar.elasticsearch"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.storage"
+              key="environment.storage"
+              name="environment/file_storage"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="File Storage"
+                  id="admin.sidebar.fileStorage"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.image_proxy"
+              key="environment.image_proxy"
+              name="environment/image_proxy"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Image Proxy"
+                  id="admin.sidebar.imageProxy"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.smtp"
+              key="environment.smtp"
+              name="environment/smtp"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="SMTP"
+                  id="admin.sidebar.smtp"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.push_notification_server"
+              key="environment.push_notification_server"
+              name="environment/push_notification_server"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Push Notification Server"
+                  id="admin.sidebar.pushNotificationServer"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.high_availability"
+              key="environment.high_availability"
+              name="environment/high_availability"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="High Availability"
+                  id="admin.sidebar.highAvailability"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.rate_limiting"
+              key="environment.rate_limiting"
+              name="environment/rate_limiting"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Rate Limiting"
+                  id="admin.sidebar.rateLimiting"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.logging"
+              key="environment.logging"
+              name="environment/logging"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Logging"
+                  id="admin.sidebar.logging"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.session_lengths"
+              key="environment.session_lengths"
+              name="environment/session_lengths"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Session Lengths"
+                  id="admin.sidebar.sessionLengths"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.metrics"
+              key="environment.metrics"
+              name="environment/performance_monitoring"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Performance Monitoring"
+                  id="admin.sidebar.metrics"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="environment.developer"
+              key="environment.developer"
+              name="environment/developer"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Developer"
+                  id="admin.sidebar.developer"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="authentication"
+            icon="fa-shield"
+            key="authentication"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Authentication"
+                id="admin.sidebar.authentication"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="authentication.signup"
+              key="authentication.signup"
+              name="authentication/signup"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Signup"
+                  id="admin.sidebar.signup"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.email"
+              key="authentication.email"
+              name="authentication/email"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Email"
+                  id="admin.sidebar.email"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.password"
+              key="authentication.password"
+              name="authentication/password"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Password"
+                  id="admin.sidebar.password"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.mfa"
+              key="authentication.mfa"
+              name="authentication/mfa"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="MFA"
+                  id="admin.sidebar.mfa"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.ldap"
+              key="authentication.ldap"
+              name="authentication/ldap"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="AD/LDAP"
+                  id="admin.sidebar.ldap"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.saml"
+              key="authentication.saml"
+              name="authentication/saml"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="SAML 2.0"
+                  id="admin.sidebar.saml"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.oauth"
+              key="authentication.oauth"
+              name="authentication/oauth"
+              parentLink=""
+              subsection={false}
+              tag={
+                <FormattedMessage
+                  defaultMessage="deprecated"
+                  id="admin.sidebar.oauth.tag"
+                />
+              }
+              title={
+                <FormattedMessage
+                  defaultMessage="OAuth 2.0"
+                  id="admin.sidebar.oauth"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.openid"
+              key="authentication.openid"
+              name="authentication/openid"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="OpenID Connect"
+                  id="admin.sidebar.openid"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="authentication.guest_access"
+              key="authentication.guest_access"
+              name="authentication/guest_access"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Guest Access (Beta)"
+                  id="admin.sidebar.guest_access"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="plugins"
+            icon="fa-plug"
+            key="plugins"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Plugins (Beta)"
+                id="admin.sidebar.plugins"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="plugins.plugin_management"
+              key="plugins.plugin_management"
+              name="plugins/plugin_management"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Plugin Management"
+                  id="admin.plugins.pluginManagement"
+                />
+              }
+            />
+            <AdminSidebarSection
+              key="custompluginplugin_0"
+              name="plugins/plugin_plugin_0"
+              parentLink=""
+              subsection={false}
+              title="Plugin 0"
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="integrations"
+            icon="fa-sitemap"
+            key="integrations"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Integrations"
+                id="admin.sidebar.integrations"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="integrations.integration_management"
+              key="integrations.integration_management"
+              name="integrations/integration_management"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Integration Management"
+                  id="admin.integrations.integrationManagement"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="integrations.bot_accounts"
+              key="integrations.bot_accounts"
+              name="integrations/bot_accounts"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Bot Accounts"
+                  id="admin.integrations.botAccounts"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="integrations.gif"
+              key="integrations.gif"
+              name="integrations/gif"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="GIF (Beta)"
+                  id="admin.sidebar.gif"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="integrations.cors"
+              key="integrations.cors"
+              name="integrations/cors"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="CORS"
+                  id="admin.sidebar.cors"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="compliance"
+            icon="fa-list"
+            key="compliance"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Compliance"
+                id="admin.sidebar.compliance"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="compliance.data_retention"
+              key="compliance.data_retention"
+              name="compliance/data_retention"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Data Retention Policy"
+                  id="admin.sidebar.dataRetentionPolicy"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="compliance.message_export"
+              key="compliance.message_export"
+              name="compliance/export"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Compliance Export (Beta)"
+                  id="admin.sidebar.complianceExport"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="compliance.audits"
+              key="compliance.audits"
+              name="compliance/monitoring"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Compliance Monitoring"
+                  id="admin.sidebar.complianceMonitoring"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="compliance.custom_terms_of_service"
+              key="compliance.custom_terms_of_service"
+              name="compliance/custom_terms_of_service"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Custom Terms of Service (Beta)"
+                  id="admin.sidebar.customTermsOfService"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+          <AdminSidebarCategory
+            definitionKey="experimental"
+            icon="fa-flask"
+            key="experimental"
+            parentLink="/admin_console"
+            sectionClass=""
+            title={
+              <FormattedMessage
+                defaultMessage="Experimental"
+                id="admin.sidebar.experimental"
+              />
+            }
+          >
+            <AdminSidebarSection
+              definitionKey="experimental.experimental_features"
+              key="experimental.experimental_features"
+              name="experimental/features"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Features"
+                  id="admin.sidebar.experimentalFeatures"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="experimental.feature_flags"
+              key="experimental.feature_flags"
+              name="experimental/feature_flags"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Feature Flags"
+                  id="admin.feature_flags.title"
+                />
+              }
+            />
+            <AdminSidebarSection
+              definitionKey="experimental.bleve"
+              key="experimental.bleve"
+              name="experimental/blevesearch"
+              parentLink=""
+              subsection={false}
+              tag=""
+              title={
+                <FormattedMessage
+                  defaultMessage="Bleve"
+                  id="admin.sidebar.blevesearch"
+                />
+              }
+            />
+          </AdminSidebarCategory>
+        </ul>
+      </Highlight>
+    </div>
+  </Scrollbars>
 </div>
 `;
 
@@ -2544,653 +1618,53 @@ exports[`components/AdminSidebar should match snapshot, with license (without an
 >
   <Connect(SidebarHeader) />
   <div
-    className="nav-pills__container"
+    className="filter-container"
   >
-    <Highlight
-      filter=""
-    >
-      <ul
-        className="nav nav-pills nav-stacked"
-      >
-        <li
-          className="filter-container"
-        >
-          <SearchIcon
-            aria-hidden="true"
-            className="search__icon"
-            id="searchIcon"
-          />
-          <input
-            className="filter "
-            onChange={[Function]}
-            placeholder="Find settings"
-            type="text"
-            value=""
-          />
-        </li>
-        <AdminSidebarCategory
-          icon="fa-info-circle"
-          key="0"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="About"
-              id="admin.sidebar.about"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="about/license"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Edition and License"
-                id="admin.sidebar.license"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-bar-chart"
-          key="1"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Reporting"
-              id="admin.sidebar.reporting"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="reporting/system_analytics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Site Statistics"
-                id="admin.sidebar.siteStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="reporting/team_statistics"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Team Statistics"
-                id="admin.sidebar.teamStatistics"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="reporting/server_logs"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Server Logs"
-                id="admin.sidebar.logs"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-users"
-          key="2"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="User Management"
-              id="admin.sidebar.userManagement"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="user_management/users"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users"
-                id="admin.sidebar.users"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="14"
-            name="user_management/permissions/"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Permissions"
-                id="admin.sidebar.permissions"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-server"
-          key="3"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Environment"
-              id="admin.sidebar.environment"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="environment/web_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Web Server"
-                id="admin.sidebar.webServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="environment/database"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Database"
-                id="admin.sidebar.database"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/file_storage"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Storage"
-                id="admin.sidebar.fileStorage"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="environment/image_proxy"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Image Proxy"
-                id="admin.sidebar.imageProxy"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="environment/smtp"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="SMTP"
-                id="admin.sidebar.smtp"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="environment/push_notification_server"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Push Notification Server"
-                id="admin.sidebar.pushNotificationServer"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="environment/rate_limiting"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Rate Limiting"
-                id="admin.sidebar.rateLimiting"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="12"
-            name="environment/logging"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Logging"
-                id="admin.sidebar.logging"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="13"
-            name="environment/session_lengths"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Session Lengths"
-                id="admin.sidebar.sessionLengths"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="15"
-            name="environment/developer"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Developer"
-                id="admin.sidebar.developer"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-cogs"
-          key="4"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Site Configuration"
-              id="admin.sidebar.site"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="site_config/customization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Customization"
-                id="admin.sidebar.customization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="site_config/localization"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Localization"
-                id="admin.sidebar.localization"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="site_config/users_and_teams"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Users and Teams"
-                id="admin.sidebar.usersAndTeams"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="environment/notifications"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Notifications"
-                id="admin.sidebar.notifications"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="site_config/announcement_banner"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Announcement Banner"
-                id="admin.sidebar.announcement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="8"
-            name="site_config/emoji"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Emoji"
-                id="admin.sidebar.emoji"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="9"
-            name="site_config/posts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Posts"
-                id="admin.sidebar.posts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="site_config/file_sharing_downloads"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="File Sharing and Downloads"
-                id="admin.sidebar.fileSharingDownloads"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="11"
-            name="site_config/public_links"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Public Links"
-                id="admin.sidebar.publicLinks"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-shield"
-          key="5"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Authentication"
-              id="admin.sidebar.authentication"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="authentication/signup"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Signup"
-                id="admin.sidebar.signup"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="4"
-            name="authentication/email"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Email"
-                id="admin.sidebar.email"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="authentication/password"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Password"
-                id="admin.sidebar.password"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="authentication/mfa"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="MFA"
-                id="admin.sidebar.mfa"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="10"
-            name="authentication/oauth"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="OAuth 2.0"
-                id="admin.sidebar.oauth"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-plug"
-          key="6"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Plugins (Beta)"
-              id="admin.sidebar.plugins"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="plugins/plugin_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Plugin Management"
-                id="admin.plugins.pluginManagement"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-sitemap"
-          key="7"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Integrations"
-              id="admin.sidebar.integrations"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="4"
-            name="integrations/integration_management"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Integration Management"
-                id="admin.integrations.integrationManagement"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="5"
-            name="integrations/bot_accounts"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Bot Accounts"
-                id="admin.integrations.botAccounts"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="6"
-            name="integrations/gif"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="GIF (Beta)"
-                id="admin.sidebar.gif"
-                values={Object {}}
-              />
-            }
-          />
-          <AdminSidebarSection
-            key="7"
-            name="integrations/cors"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="CORS"
-                id="admin.sidebar.cors"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-list"
-          key="8"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Compliance"
-              id="admin.sidebar.compliance"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="5"
-            name="compliance/monitoring"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Compliance Monitoring"
-                id="admin.sidebar.complianceMonitoring"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-        <AdminSidebarCategory
-          icon="fa-flask"
-          key="9"
-          parentLink="/admin_console"
-          sectionClass=""
-          title={
-            <FormattedMessage
-              defaultMessage="Experimental"
-              id="admin.sidebar.experimental"
-              values={Object {}}
-            />
-          }
-        >
-          <AdminSidebarSection
-            key="3"
-            name="experimental/features"
-            parentLink=""
-            subsection={false}
-            title={
-              <FormattedMessage
-                defaultMessage="Features"
-                id="admin.sidebar.experimentalFeatures"
-                values={Object {}}
-              />
-            }
-          />
-        </AdminSidebarCategory>
-      </ul>
-    </Highlight>
+    <SearchIcon
+      aria-hidden="true"
+      className="search__icon"
+    />
+    <QuickInput
+      className="filter "
+      clearable={true}
+      delayInputUpdate={false}
+      id="adminSidebarFilter"
+      onChange={[Function]}
+      onClear={[Function]}
+      placeholder="Find settings"
+      tooltipPosition="bottom"
+      type="text"
+      value=""
+    />
   </div>
+  <Scrollbars
+    autoHeight={false}
+    autoHeightMax={200}
+    autoHeightMin={0}
+    autoHide={true}
+    autoHideDuration={500}
+    autoHideTimeout={500}
+    hideTracksWhenNotNeeded={false}
+    renderThumbHorizontal={[Function]}
+    renderThumbVertical={[Function]}
+    renderTrackHorizontal={[Function]}
+    renderTrackVertical={[Function]}
+    renderView={[Function]}
+    tagName="div"
+    thumbMinSize={30}
+    universal={false}
+  >
+    <div
+      className="nav-pills__container"
+    >
+      <Highlight
+        filter=""
+      >
+        <ul
+          className="nav nav-pills nav-stacked"
+        />
+      </Highlight>
+    </div>
+  </Scrollbars>
 </div>
 `;

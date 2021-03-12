@@ -3,42 +3,58 @@
 
 import React from 'react';
 
-import {Constants} from 'utils/constants.jsx';
+import {shallowWithIntl} from 'tests/helpers/intl-test-helper';
 
-import {shallowWithIntl} from 'tests/helpers/intl-test-helper.jsx';
+import {Constants} from 'utils/constants';
 
 import MainMenu from './main_menu.jsx';
 
 describe('components/Menu', () => {
+    // Neccessary for components enhanced by HOCs due to issue with enzyme.
+    // See https://github.com/enzymejs/enzyme/issues/539
+    const getMainMenuWrapper = (props) => {
+        const wrapper = shallowWithIntl(<MainMenu {...props}/>);
+        return wrapper.find('MainMenu').shallow();
+    };
+
     const defaultProps = {
         mobile: false,
         teamId: 'team-id',
         teamType: Constants.OPEN_TEAM,
-        teamName: 'team name',
+        teamName: 'team_name',
         currentUser: {id: 'test-user-id'},
         appDownloadLink: null,
         enableCommands: false,
         enableCustomEmoji: false,
-        canCreateOrDeleteCustomEmoji: false,
         enableIncomingWebhooks: false,
         enableOAuthServiceProvider: false,
         enableOutgoingWebhooks: false,
+        canManageSystemBots: false,
+        canCreateOrDeleteCustomEmoji: false,
+        canManageIntegrations: true,
         enableUserCreation: false,
         enableEmailInvitations: false,
+        enablePluginMarketplace: false,
         experimentalPrimaryTeam: null,
         helpLink: null,
         reportAProblemLink: null,
         moreTeamsToJoin: false,
         pluginMenuItems: [],
         isMentionSearch: false,
+        showGettingStarted: false,
         actions: {
             openModal: jest.fn(),
             showMentions: jest.fn(),
             showFlaggedPosts: jest.fn(),
             closeRightHandSide: jest.fn(),
             closeRhsMenu: jest.fn(),
+            unhideNextSteps: jest.fn(),
+            getSubscriptionStats: jest.fn(),
         },
         teamIsGroupConstrained: false,
+        isCloud: false,
+        subscription: {},
+        userIsAdmin: true,
     };
 
     test('should match snapshot with id', () => {
@@ -70,6 +86,7 @@ describe('components/Menu', () => {
             enableOutgoingWebhooks: true,
             enableUserCreation: true,
             enableEmailInvitations: true,
+            enablePluginMarketplace: true,
             experimentalPrimaryTeam: 'test',
             helpLink: 'test-link-help',
             reportAProblemLink: 'test-report-link',
@@ -92,6 +109,7 @@ describe('components/Menu', () => {
             enableOutgoingWebhooks: true,
             enableUserCreation: true,
             enableEmailInvitations: true,
+            enablePluginMarketplace: true,
             experimentalPrimaryTeam: 'test',
             helpLink: 'test-link-help',
             reportAProblemLink: 'test-report-link',
@@ -124,5 +142,75 @@ describe('components/Menu', () => {
         };
         const wrapper = shallowWithIntl(<MainMenu {...props}/>);
         expect(wrapper).toMatchSnapshot();
+    });
+
+    test('should show leave team option when primary team is set', () => {
+        const props = {...defaultProps, teamIsGroupConstrained: false, experimentalPrimaryTeam: null};
+        const wrapper = getMainMenuWrapper(props);
+
+        // show leave team option when experimentalPrimaryTeam is not set
+        expect(wrapper.find('#leaveTeam')).toHaveLength(1);
+        expect(wrapper.find('#leaveTeam').props().show).toEqual(true);
+
+        // hide leave team option when experimentalPrimaryTeam is same as current team
+        wrapper.setProps({experimentalPrimaryTeam: defaultProps.teamName});
+        expect(wrapper.find('#leaveTeam')).toHaveLength(1);
+        expect(wrapper.find('#leaveTeam').props().show).toEqual(false);
+
+        // show leave team option when experimentalPrimaryTeam is set to other team
+        wrapper.setProps({experimentalPrimaryTeam: 'other_name'});
+        expect(wrapper.find('#leaveTeam')).toHaveLength(1);
+        expect(wrapper.find('#leaveTeam').props().show).toEqual(true);
+    });
+
+    describe('should show integrations', () => {
+        it('when incoming webhooks enabled', () => {
+            const props = {...defaultProps, enableIncomingWebhooks: true};
+            const wrapper = getMainMenuWrapper(props);
+
+            expect(wrapper.find('#integrations').prop('show')).toBe(true);
+        });
+
+        it('when outgoing webhooks enabled', () => {
+            const props = {...defaultProps, enableOutgoingWebhooks: true};
+            const wrapper = getMainMenuWrapper(props);
+
+            expect(wrapper.find('#integrations').prop('show')).toBe(true);
+        });
+
+        it('when slash commands enabled', () => {
+            const props = {...defaultProps, enableCommands: true};
+            const wrapper = getMainMenuWrapper(props);
+
+            expect(wrapper.find('#integrations').prop('show')).toBe(true);
+        });
+
+        it('when oauth providers enabled', () => {
+            const props = {...defaultProps, enableOAuthServiceProvider: true};
+            const wrapper = getMainMenuWrapper(props);
+
+            expect(wrapper.find('#integrations').prop('show')).toBe(true);
+        });
+
+        it('when can manage system bots', () => {
+            const props = {...defaultProps, canManageSystemBots: true};
+            const wrapper = getMainMenuWrapper(props);
+
+            expect(wrapper.find('#integrations').prop('show')).toBe(true);
+        });
+
+        it('unless mobile', () => {
+            const props = {...defaultProps, mobile: true, canManageSystemBots: true};
+            const wrapper = getMainMenuWrapper(props);
+
+            expect(wrapper.find('#integrations').prop('show')).toBe(false);
+        });
+
+        it('unless cannot manage integrations', () => {
+            const props = {...defaultProps, canManageIntegrations: false, enableCommands: true};
+            const wrapper = getMainMenuWrapper(props);
+
+            expect(wrapper.find('#integrations').prop('show')).toBe(false);
+        });
     });
 });
