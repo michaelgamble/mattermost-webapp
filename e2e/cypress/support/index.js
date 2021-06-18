@@ -8,6 +8,7 @@
 /* eslint-disable no-loop-func */
 
 import dayjs from 'dayjs';
+import localforage from 'localforage';
 
 import '@testing-library/cypress/add-commands';
 import 'cypress-file-upload';
@@ -20,6 +21,7 @@ import './api_commands'; // soon to deprecate
 import './client';
 import './common_login_commands';
 import './db_commands';
+import './email';
 import './external_commands';
 import './extended_commands';
 import './fetch_commands';
@@ -104,6 +106,9 @@ Cypress.on('uncaught:exception', () => {
 });
 
 before(() => {
+    // # Clear localforage state
+    localforage.clear();
+
     // # Try to login using existing sysadmin account
     cy.apiAdminLogin({failOnStatusCode: false}).then((response) => {
         if (response.user) {

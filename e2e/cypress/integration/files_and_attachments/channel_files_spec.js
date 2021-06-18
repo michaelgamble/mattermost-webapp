@@ -7,6 +7,7 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
 // Group: @filesearch
 
 describe('Channel files', () => {
@@ -27,17 +28,17 @@ describe('Channel files', () => {
         // # Post file to user
         cy.get('#centerChannelFooter').find('#fileUploadInput').attachFile('word-file.doc');
         cy.get('.post-image__thumbnail').should('be.visible');
-        cy.postMessage('{enter}');
+        cy.get('#post_textbox').should('be.visible').clear().type('{enter}');
 
         // # Post file to user
         cy.get('#centerChannelFooter').find('#fileUploadInput').attachFile('wordx-file.docx');
         cy.get('.post-image__thumbnail').should('be.visible');
-        cy.postMessage('{enter}');
+        cy.get('#post_textbox').should('be.visible').clear().type('{enter}');
 
         // # Post file to user
         cy.get('#centerChannelFooter').find('#fileUploadInput').attachFile('jpg-image-file.jpg');
         cy.get('.post-image__thumbnail').should('be.visible');
-        cy.postMessage('{enter}');
+        cy.get('#post_textbox').should('be.visible').clear().type('{enter}');
 
         // # Click the channel files icon
         cy.get('#channelHeaderFilesButton').should('be.visible').click();

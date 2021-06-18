@@ -77,6 +77,16 @@ function config(state: Partial<AdminConfig> = {}, action: GenericAction) {
     }
 }
 
+function prevTrialLicense(state: Partial<AdminConfig> = {}, action: GenericAction) {
+    switch (action.type) {
+    case AdminTypes.PREV_TRIAL_LICENSE_SUCCESS: {
+        return action.data;
+    }
+    default:
+        return state;
+    }
+}
+
 function environmentConfig(state: Partial<EnvironmentConfig> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_ENVIRONMENT_CONFIG: {
@@ -587,7 +597,9 @@ function samlMetadataResponse(state: Partial<SamlMetadataResponse> = {}, action:
 
 function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomPolicy> = {}, action: GenericAction): IDMappedObjects<DataRetentionCustomPolicy> {
     switch (action.type) {
-    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY: {
+    case AdminTypes.CREATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS:
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY:
+    case AdminTypes.UPDATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS: {
         return {
             ...state,
             [action.data.id]: action.data,
@@ -599,6 +611,12 @@ function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomP
         for (const dataRetention of action.data.policies) {
             nextState[dataRetention.id] = dataRetention;
         }
+        return nextState;
+    }
+
+    case AdminTypes.DELETE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS: {
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
 
@@ -676,4 +694,7 @@ export default combineReducers({
 
     // total custom retention policies
     dataRetentionCustomPoliciesCount,
+
+    // the last trial license the server used.
+    prevTrialLicense,
 });

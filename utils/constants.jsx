@@ -88,6 +88,8 @@ export const Preferences = {
     LINK_PREVIEW_DISPLAY_DEFAULT: 'true',
     COLLAPSE_DISPLAY: 'collapse_previews',
     COLLAPSE_DISPLAY_DEFAULT: 'false',
+    AVAILABILITY_STATUS_ON_POSTS: 'availability_status_on_posts',
+    AVAILABILITY_STATUS_ON_POSTS_DEFAULT: 'true',
     USE_MILITARY_TIME: 'use_military_time',
     USE_MILITARY_TIME_DEFAULT: 'false',
     CATEGORY_THEME: 'theme',
@@ -111,6 +113,8 @@ export const Preferences = {
 export const ActionTypes = keyMirror({
     RECEIVED_FOCUSED_POST: null,
     SELECT_POST: null,
+    HIGHLIGHT_REPLY: null,
+    CLEAR_HIGHLIGHT_REPLY: null,
     SELECT_POST_CARD: null,
     INCREASE_POST_VISIBILITY: null,
     LOADING_POSTS: null,
@@ -226,6 +230,9 @@ export const ActionTypes = keyMirror({
 
     SET_SHOW_NEXT_STEPS_VIEW: null,
     SET_FILES_FILTER_BY_EXT: null,
+
+    SUPPRESS_RHS: null,
+    UNSUPPRESS_RHS: null,
 });
 
 export const PostRequestTypes = keyMirror({
@@ -318,6 +325,12 @@ export const EventTypes = Object.assign(
         POST_LIST_SCROLL_TO_BOTTOM: null,
     }),
 );
+
+export const CloudProducts = {
+    STARTER: 'cloud-starter',
+    PROFESSIONAL: 'cloud-professional',
+    ENTERPRISE: 'cloud-enterprise',
+};
 
 export const A11yClassNames = {
     REGION: 'a11y__region',
@@ -429,6 +442,8 @@ export const RecommendedNextSteps = {
 
 export const Threads = {
     CHANGED_SELECTED_THREAD: 'changed_selected_thread',
+    CHANGED_LAST_VIEWED_AT: 'changed_last_viewed_at',
+    MANUALLY_UNREAD_THREAD: 'manually_unread_thread',
 };
 
 export const CloudBanners = {
@@ -533,6 +548,9 @@ export const SearchTypes = keyMirror({
     SET_SYSTEM_USERS_SEARCH: null,
     SET_USER_GRID_SEARCH: null,
     SET_USER_GRID_FILTERS: null,
+    SET_TEAM_LIST_SEARCH: null,
+    SET_CHANNEL_LIST_SEARCH: null,
+    SET_CHANNEL_LIST_FILTERS: null,
 });
 
 export const StorageTypes = keyMirror({
@@ -714,6 +732,8 @@ export const AboutLinks = {
 
 export const CloudLinks = {
     BILLING_DOCS: 'https://docs.mattermost.com/cloud/cloud-billing/cloud-billing.html',
+    COMPARE_PLANS: 'https://mattermost.com/pricing-cloud/#pricing-grid-block_5fa2028808529',
+    CLOUD_PRICING: 'https://mattermost.com/pricing-cloud/',
 };
 
 export const PermissionsScope = {
@@ -785,7 +805,7 @@ export const PermissionsScope = {
     [Permissions.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE]: 'channel_scope',
     [Permissions.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC]: 'channel_scope',
     [Permissions.MANAGE_SHARED_CHANNELS]: 'system_scope',
-    [Permissions.MANAGE_REMOTE_CLUSTERS]: 'system_scope',
+    [Permissions.MANAGE_SECURE_CONNECTIONS]: 'system_scope',
 };
 
 export const DefaultRolePermissions = {
@@ -1599,6 +1619,8 @@ export const Constants = {
     MENTION_MEMBERS: 'mention.members',
     MENTION_MORE_MEMBERS: 'mention.moremembers',
     MENTION_NONMEMBERS: 'mention.nonmembers',
+    MENTION_PUBLIC_CHANNELS: 'mention.public.channels',
+    MENTION_RECENT_CHANNELS: 'mention.recent.channels',
     MENTION_SPECIAL: 'mention.special',
     MENTION_GROUPS: 'mention.groups',
     DEFAULT_NOTIFICATION_DURATION: 5000,
@@ -1619,6 +1641,8 @@ export const Constants = {
     TRANSPARENT_PIXEL: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
     TRIPLE_BACK_TICKS: /```/g,
     MAX_ATTACHMENT_FOOTER_LENGTH: 300,
+    ACCEPT_STATIC_IMAGE: '.jpeg,.jpg,.png,.bmp',
+    ACCEPT_EMOJI_IMAGE: '.jpeg,.jpg,.png,.gif',
 };
 
 export const ValidationErrors = {
@@ -1657,6 +1681,8 @@ t('suggestion.mention.unread.channels');
 t('suggestion.mention.members');
 t('suggestion.mention.moremembers');
 t('suggestion.mention.nonmembers');
+t('suggestion.mention.public.channels');
+t('suggestion.mention.recent.channels');
 t('suggestion.mention.special');
 t('suggestion.archive');
 t('suggestion.mention.groups');

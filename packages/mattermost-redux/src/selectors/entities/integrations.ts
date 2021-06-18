@@ -9,6 +9,8 @@ import {OutgoingWebhook, Command} from 'mattermost-redux/types/integrations';
 import {GlobalState} from 'mattermost-redux/types/store';
 import {IDMappedObjects} from 'mattermost-redux/types/utilities';
 
+import {appsEnabled} from './apps';
+
 export function getIncomingHooks(state: GlobalState) {
     return state.entities.integrations.incomingHooks;
 }
@@ -25,6 +27,24 @@ export function getOAuthApps(state: GlobalState) {
     return state.entities.integrations.oauthApps;
 }
 
+export const getAppsOAuthAppIDs: (state: GlobalState) => string[] = createSelector(
+    'getAppsOAuthAppIDs',
+    appsEnabled,
+    (state: GlobalState) => state.entities.integrations.appsOAuthAppIDs,
+    (apps, ids) => {
+        return apps ? ids : [];
+    },
+);
+
+export const getAppsBotIDs: (state: GlobalState) => string[] = createSelector(
+    'getAppsBotIDs',
+    appsEnabled,
+    (state: GlobalState) => state.entities.integrations.appsBotIDs,
+    (apps, ids) => {
+        return apps ? ids : [];
+    },
+);
+
 export function getSystemCommands(state: GlobalState) {
     return state.entities.integrations.systemCommands;
 }
@@ -33,6 +53,7 @@ export function getSystemCommands(state: GlobalState) {
  * get outgoing hooks in current team
  */
 export const getOutgoingHooksInCurrentTeam: (state: GlobalState) => OutgoingWebhook[] = createSelector(
+    'getOutgoingHooksInCurrentTeam',
     getCurrentTeamId,
     getOutgoingHooks,
     (teamId, hooks) => {
@@ -41,6 +62,7 @@ export const getOutgoingHooksInCurrentTeam: (state: GlobalState) => OutgoingWebh
 );
 
 export const getAllCommands: (state: GlobalState) => IDMappedObjects<Command> = createSelector(
+    'getAllCommands',
     getCommands,
     getSystemCommands,
     (commands, systemCommands) => {
@@ -52,6 +74,7 @@ export const getAllCommands: (state: GlobalState) => IDMappedObjects<Command> = 
 );
 
 export const getAutocompleteCommandsList: (state: GlobalState) => Command[] = createSelector(
+    'getAutocompleteCommandsList',
     getAllCommands,
     getCurrentTeamId,
     (commands, currentTeamId) => {

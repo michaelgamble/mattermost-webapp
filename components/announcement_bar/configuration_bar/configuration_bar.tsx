@@ -23,7 +23,6 @@ import ackIcon from 'images/icons/check-circle-outline.svg';
 import alertIcon from 'images/icons/round-white-info-icon.svg';
 import warningIcon from 'images/icons/warning-icon.svg';
 
-import UserProfile from 'components/user_profile/user_profile';
 import RenewalLink from '../renewal_link/';
 import PurchaseLink from 'components/announcement_bar/purchase_link/purchase_link';
 
@@ -31,9 +30,7 @@ type Props = {
     config?: Partial<ClientConfig>;
     intl: IntlShape;
     license?: any;
-    user?: UserProfile;
     canViewSystemErrors: boolean;
-    totalUsers?: number;
     dismissedExpiringTrialLicense?: boolean;
     dismissedExpiringLicense?: boolean;
     dismissedNumberOfActiveUsersWarnMetricStatus?: boolean;
@@ -41,9 +38,7 @@ type Props = {
     dismissedNumberOfPostsWarnMetricStatus?: boolean;
     dismissedNumberOfPostsWarnMetricStatusAck?: boolean;
     siteURL: string;
-    warnMetricsStatus?: {
-        [key: string]: Dictionary<WarnMetricStatus>;
-    };
+    warnMetricsStatus?: Dictionary<WarnMetricStatus>;
     actions: {
         dismissNotice: (notice: string) => void;
     };
@@ -220,7 +215,7 @@ const ConfigurationAnnouncementBar: React.FC<Props> = (props: Props) => {
         }
 
         const daysUntilLicenseExpires = daysToLicenseExpire(props.license);
-        if (isTrialLicense(props.license) && daysUntilLicenseExpires && daysUntilLicenseExpires <= 14 && !props.dismissedExpiringTrialLicense) {
+        if (isTrialLicense(props.license) && typeof daysUntilLicenseExpires !== 'undefined' && daysUntilLicenseExpires <= 14 && !props.dismissedExpiringTrialLicense) {
             const purchaseLicense = (
                 <PurchaseLink
                     buttonTextElement={
@@ -250,7 +245,7 @@ const ConfigurationAnnouncementBar: React.FC<Props> = (props: Props) => {
 
             let announcementBarType = AnnouncementBarTypes.ANNOUNCEMENT;
 
-            if (daysUntilLicenseExpires <= 1) {
+            if (daysUntilLicenseExpires < 1) {
                 message = (
                     <>
                         <img

@@ -9,8 +9,6 @@ import {Compliance} from 'mattermost-redux/types/compliance';
 import {GroupSearchOpts} from 'mattermost-redux/types/groups';
 import {
     CreateDataRetentionCustomPolicy,
-    PatchDataRetentionCustomPolicyTeams,
-    PatchDataRetentionCustomPolicyChannels,
 } from 'mattermost-redux/types/data_retention';
 import {
     TeamSearchOpts,
@@ -445,6 +443,21 @@ export function removeLicense(): ActionFunc {
     });
 }
 
+export function getPrevTrialLicense(): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.getPrevTrialLicense();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        dispatch({type: AdminTypes.PREV_TRIAL_LICENSE_SUCCESS, data});
+        return {data};
+    };
+}
+
 export function getAnalytics(name: string, teamId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST, data: null});
@@ -711,11 +724,36 @@ export function getDataRetentionCustomPolicy(id: string): ActionFunc {
     };
 }
 
-export function getDataRetentionCustomPolicyTeams(id: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, includeTotalCount = false): ActionFunc {
+export function deleteDataRetentionCustomPolicy(id: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        try {
+            await Client4.deleteDataRetentionCustomPolicy(id);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(
+                {
+                    type: AdminTypes.DELETE_DATA_RETENTION_CUSTOM_POLICY_FAILURE,
+                    error,
+                },
+            );
+            return {error};
+        }
+        const data = {
+            id,
+        };
+        dispatch(
+            {type: AdminTypes.DELETE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS, data},
+        );
+
+        return {data};
+    };
+}
+
+export function getDataRetentionCustomPolicyTeams(id: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
         try {
-            data = await Client4.getDataRetentionCustomPolicyTeams(id, page, perPage, includeTotalCount);
+            data = await Client4.getDataRetentionCustomPolicyTeams(id, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(
@@ -808,84 +846,109 @@ export function searchDataRetentionCustomPolicyChannels(id: string, term: string
 }
 
 export function createDataRetentionCustomPolicy(policy: CreateDataRetentionCustomPolicy): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.createDataRetentionPolicy,
-        onSuccess: AdminTypes.CREATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS,
-        params: [
-            policy,
-        ],
-    });
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.createDataRetentionPolicy(policy);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        dispatch(
+            {type: AdminTypes.CREATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS, data},
+        );
+
+        return {data};
+    };
 }
 
 export function updateDataRetentionCustomPolicy(id: string, policy: CreateDataRetentionCustomPolicy): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.updateDataRetentionPolicy,
-        onSuccess: AdminTypes.UPDATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS,
-        params: [
-            id,
-            policy,
-        ],
-    });
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.updateDataRetentionPolicy(id, policy);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        dispatch(
+            {type: AdminTypes.UPDATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS, data},
+        );
+
+        return {data};
+    };
 }
 
-export function addDataRetentionCustomPolicyTeams(id: string, policy: PatchDataRetentionCustomPolicyTeams): ActionFunc {
+export function addDataRetentionCustomPolicyTeams(id: string, teams: string[]): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.addDataRetentionPolicyTeams,
         onSuccess: AdminTypes.ADD_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SUCCESS,
         params: [
             id,
-            policy,
+            teams,
         ],
     });
 }
 
-export function removeDataRetentionCustomPolicyTeams(id: string, policy: PatchDataRetentionCustomPolicyTeams): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.removeDataRetentionPolicyTeams,
-        onSuccess: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SUCCESS,
-        params: [
-            id,
-            policy,
-        ],
-    });
+export function removeDataRetentionCustomPolicyTeams(id: string, teams: string[]): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        try {
+            await Client4.removeDataRetentionPolicyTeams(id, teams);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(
+                {
+                    type: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_TEAMS_FAILURE,
+                    error,
+                },
+            );
+            return {error};
+        }
+        const data = {
+            teams,
+        };
+        dispatch(
+            {type: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SUCCESS, data},
+        );
+
+        return {data};
+    };
 }
 
-export function addDataRetentionCustomPolicyChannels(id: string, policy: PatchDataRetentionCustomPolicyChannels): ActionFunc {
+export function addDataRetentionCustomPolicyChannels(id: string, channels: string[]): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.addDataRetentionPolicyChannels,
         onSuccess: AdminTypes.ADD_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SUCCESS,
         params: [
             id,
-            policy,
+            channels,
         ],
     });
 }
 
-export function removeDataRetentionCustomPolicyChannels(id: string, policy: PatchDataRetentionCustomPolicyChannels): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.removeDataRetentionPolicyChannels,
-        onSuccess: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SUCCESS,
-        params: [
-            id,
-            policy,
-        ],
-    });
-}
-
-export function clearDataRetentionCustomPolicyTeams(): ActionFunc {
-    return (dispatch: DispatchFunc) => {
+export function removeDataRetentionCustomPolicyChannels(id: string, channels: string[]): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        try {
+            await Client4.removeDataRetentionPolicyChannels(id, channels);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(
+                {
+                    type: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_FAILURE,
+                    error,
+                },
+            );
+            return {error};
+        }
+        const data = {
+            channels,
+        };
         dispatch(
-            {type: AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_TEAMS, data: {}},
+            {type: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SUCCESS, data},
         );
-        return {data: {}};
-    };
-}
 
-export function clearDataRetentionCustomPolicyChannels(): ActionFunc {
-    return (dispatch: DispatchFunc) => {
-        dispatch(
-            {type: AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_CHANNELS, data: {}},
-        );
-        return {data: {}};
+        return {data};
     };
 }

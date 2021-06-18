@@ -41,7 +41,6 @@ const state: GlobalState = {
             stats: {},
             groupsAssociatedToTeam: {},
             totalCount: 0,
-            teamsInPolicy: {},
         },
         channels: {
             currentChannelId: '',
@@ -55,7 +54,6 @@ const state: GlobalState = {
             manuallyUnread: {},
             channelModerations: {},
             channelMemberCountsByGroup: {},
-            channelsInPolicy: {},
         },
         posts: {
             expandedURLs: {},
@@ -100,6 +98,7 @@ const state: GlobalState = {
             analytics: {},
             dataRetentionCustomPolicies: {},
             dataRetentionCustomPoliciesCount: 0,
+            prevTrialLicense: {},
         },
         jobs: {
             jobs: {},
@@ -111,6 +110,8 @@ const state: GlobalState = {
             oauthApps: {},
             systemCommands: {},
             commands: {},
+            appsBotIDs: [],
+            appsOAuthAppIDs: [],
         },
         files: {
             files: {},

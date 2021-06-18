@@ -12,7 +12,7 @@ import {UsersState, UserProfile, UserNotifyProps} from 'mattermost-redux/types/u
 import {GlobalState} from 'mattermost-redux/types/store';
 import {TeamMembership} from 'mattermost-redux/types/teams';
 import {PreferenceType} from 'mattermost-redux/types/preferences';
-import {IDMappedObjects, RelationOneToMany, RelationOneToOne} from 'mattermost-redux/types/utilities';
+import {Dictionary, IDMappedObjects, RelationOneToMany, RelationOneToOne} from 'mattermost-redux/types/utilities';
 
 import {getPreferenceKey} from './preference_utils';
 import {displayUsername} from './user_utils';
@@ -246,12 +246,24 @@ export function isGroupOrDirectChannelVisible(
     currentUserId: string,
     users: IDMappedObjects<UserProfile>,
     lastPosts: RelationOneToOne<Channel, Post>,
+    collapsedThreads: boolean,
     currentChannelId?: string,
     now?: number,
 ): boolean {
     const lastPost = lastPosts[channel.id];
+    const unreadChannel = isUnreadChannel(memberships, channel, collapsedThreads);
 
-    if (isGroupChannel(channel) && isGroupChannelVisible(config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel), now)) {
+    if (
+        isGroupChannel(channel) &&
+        isGroupChannelVisible(
+            config,
+            myPreferences,
+            channel,
+            lastPost,
+            unreadChannel,
+            now,
+        )
+    ) {
         return true;
     }
 
@@ -267,7 +279,7 @@ export function isGroupOrDirectChannelVisible(
         myPreferences,
         channel,
         lastPost,
-        isUnreadChannel(memberships, channel),
+        unreadChannel,
         currentChannelId,
         now,
     );
@@ -429,10 +441,10 @@ export function getChannelsIdForTeam(state: GlobalState, teamId: string): string
     }, [] as string[]);
 }
 
-export function getGroupDisplayNameFromUserIds(userIds: string[], profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
+export function getGroupDisplayNameFromUserIds(userIds: string[], profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string, omitCurrentUser = true): string {
     const names: string[] = [];
     userIds.forEach((id) => {
-        if (id !== currentUserId) {
+        if (!(id === currentUserId && omitCurrentUser)) {
             names.push(displayUsername(profiles[id], teammateNameDisplay));
         }
     });
@@ -456,13 +468,13 @@ export function isDefault(channel: Channel): boolean {
     return channel.name === General.DEFAULT_CHANNEL;
 }
 
-function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel) {
+export function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel, omitCurrentUser = true) {
     const {currentUserId, profiles, profilesInChannel} = usersState;
     const profilesIds = profilesInChannel[channel.id];
     const gm = {...channel};
 
     if (profilesIds) {
-        gm.display_name = getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay);
+        gm.display_name = getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay, omitCurrentUser);
         return gm;
     }
 
@@ -514,12 +526,15 @@ function newCompleteDirectGroupInfo(currentUserId: string, profiles: IDMappedObj
     return channel;
 }
 
-export function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
+export function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel, collapsedThreads: boolean): boolean {
     const member = members[channel.id];
     if (member) {
-        const msgCount = channel.total_msg_count - member.msg_count;
+        const unreadMessageCount = getMsgCountInChannel(collapsedThreads, channel, member);
         const onlyMentions = member.notify_props && member.notify_props.mark_unread === MarkUnread.MENTION;
-        return (member.mention_count > 0 || (Boolean(msgCount) && !onlyMentions));
+        return (
+            (collapsedThreads ? member.mention_count_root : member.mention_count) > 0 ||
+            (Boolean(unreadMessageCount) && !onlyMentions)
+        );
     }
 
     return false;
@@ -622,8 +637,8 @@ export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>
     return bLastPostAt - aLastPostAt;
 }
 
-export function isChannelMuted(member: ChannelMembership): boolean {
-    return member && member.notify_props ? (member.notify_props.mark_unread === MarkUnread.MENTION) : false;
+export function isChannelMuted(member?: ChannelMembership): boolean {
+    return member?.notify_props ? (member.notify_props.mark_unread === MarkUnread.MENTION) : false;
 }
 
 export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotifyProps, currentUserNotifyProps: UserNotifyProps) {
@@ -663,6 +678,14 @@ export function filterChannelsMatchingTerm(channels: Channel[], term: string): C
         return name.startsWith(lowercasedTerm) ||
             displayName.startsWith(lowercasedTerm);
     });
+}
+
+export function channelListToMap(channelList: Channel[]): IDMappedObjects<Channel> {
+    const channels: Dictionary<Channel> = {};
+    for (let i = 0; i < channelList.length; i++) {
+        channels[channelList[i].id] = channelList[i];
+    }
+    return channels;
 }
 
 export function getMsgCountInChannel(collapsed: boolean, channel: Channel, member: ChannelMembership): number {

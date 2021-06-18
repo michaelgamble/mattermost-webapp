@@ -107,7 +107,7 @@
         @include flex(1 1 auto);
         @include flex-direction(column);
         background: v(center-channel-bg);
-        border-left: 1px solid v(center-channel-color-16);
+        border-left: 1px solid rgba(var(--center-channel-color-rgb), 0.12);
         height: calc(100% - 56px);
 
         .loading-screen {
@@ -198,6 +198,13 @@
         }
     }
 
+    .sidebar--right__follow__thread {
+        margin-right: 4px;
+        height: 2.4rem;
+        font-size: 12px;
+        line-height: 16px;
+    }
+
     .sidebar--right__header {
         @include flex(0 0 56px);
         display: flex;
@@ -212,6 +219,12 @@
 
         .btn-icon {
             font-size: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
         }
     }
 
