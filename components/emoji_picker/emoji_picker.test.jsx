@@ -43,6 +43,7 @@ describe('components/emoji_picker/EmojiPicker', () => {
         getCustomEmojis: jest.fn(),
         incrementEmojiPickerPage: jest.fn(),
         searchCustomEmojis: jest.fn(),
+        setUserSkinTone: jest.fn(),
     };
 
     const customEmojis = new Map();
@@ -68,6 +69,8 @@ describe('components/emoji_picker/EmojiPicker', () => {
         actions,
         filter: '',
         handleFilterChange: jest.fn(),
+        userSkinTone: 'default',
+        currentTeamName: 'testTeam',
     };
 
     test('Recent category should not exist if there are no recent emojis', () => {
@@ -103,10 +106,10 @@ describe('components/emoji_picker/EmojiPicker', () => {
             offsetHeight: 200,
         };
 
-        // 10 categories as there is recent caterogry
+        // 11 categories as there is recent caterogry
         expect(wrapper.find(EmojiPickerCategory).length).toBe(11);
         expect(wrapper.find(EmojiPickerCategory).find({selected: true}).length).toBe(1);
-        expect(wrapper.find(EmojiPickerCategory).find({category: 'recent'}).length).toBe(1);
+        expect(wrapper.find(EmojiPickerCategory).find({category: {name: 'recent'}}).length).toBe(1);
 
         expect(wrapper.find(EmojiPickerCategorySection).length).toBe(2);
         expect(wrapper.find(EmojiPickerCategorySection).find({categoryName: 'recent'}).length).toBe(1);

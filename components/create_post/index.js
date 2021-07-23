@@ -9,7 +9,7 @@ import {getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
 
 import {getCurrentChannel, getCurrentChannelStats, getChannelMemberCountsByGroup as selectChannelMemberCountsByGroup} from 'mattermost-redux/selectors/entities/channels';
 import {getCurrentUserId, isCurrentUserSystemAdmin, getStatusForUserId} from 'mattermost-redux/selectors/entities/users';
-import {haveIChannelPermission} from 'mattermost-redux/selectors/entities/roles';
+import {haveICurrentChannelPermission} from 'mattermost-redux/selectors/entities/roles';
 import {getChannelTimezones, getChannelMemberCountsByGroup} from 'mattermost-redux/actions/channels';
 import {get, getInt, getBool} from 'mattermost-redux/selectors/entities/preferences';
 import {
@@ -65,25 +65,10 @@ function makeMapStateToProps() {
         const badConnection = connectionErrorCount(state) > 1;
         const isTimezoneEnabled = config.ExperimentalTimezone === 'true';
         const shortcutReactToLastPostEmittedFrom = getShortcutReactToLastPostEmittedFrom(state);
-        const canPost = haveIChannelPermission(
-            state,
-            {
-                channel: currentChannel.id,
-                team: currentChannel.team_id,
-                permission: Permissions.CREATE_POST,
-            },
-        );
-        const useChannelMentions = haveIChannelPermission(state, {
-            channel: currentChannel.id,
-            team: currentChannel.team_id,
-            permission: Permissions.USE_CHANNEL_MENTIONS,
-        });
+        const canPost = haveICurrentChannelPermission(state, Permissions.CREATE_POST);
+        const useChannelMentions = haveICurrentChannelPermission(state, Permissions.USE_CHANNEL_MENTIONS);
         const isLDAPEnabled = license?.IsLicensed === 'true' && license?.LDAPGroups === 'true';
-        const useGroupMentions = isLDAPEnabled && haveIChannelPermission(state, {
-            channel: currentChannel.id,
-            team: currentChannel.team_id,
-            permission: Permissions.USE_GROUP_MENTIONS,
-        });
+        const useGroupMentions = isLDAPEnabled && haveICurrentChannelPermission(state, Permissions.USE_GROUP_MENTIONS);
         const channelMemberCountsByGroup = selectChannelMemberCountsByGroup(state, currentChannel.id);
         const currentTeamId = getCurrentTeamId(state);
         const groupsWithAllowReference = useGroupMentions ? getAssociatedGroupsForReferenceByMention(state, currentTeamId, currentChannel.id) : null;
@@ -131,6 +116,17 @@ function onSubmitPost(post, fileInfos) {
     };
 }
 
+// Temporarily store draft manually in localStorage since the current version of redux-persist
+// we're on will not save the draft quickly enough on page unload.
+function setDraft(key, value) {
+    if (value) {
+        localStorage.setItem(key, JSON.stringify(value));
+    } else {
+        localStorage.removeItem(key);
+    }
+    return setGlobalItem(key, value);
+}
+
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({
@@ -140,7 +136,7 @@ function mapDispatchToProps(dispatch) {
             moveHistoryIndexForward,
             addReaction,
             removeReaction,
-            setDraft: setGlobalItem,
+            setDraft,
             clearDraftUploads: actionOnGlobalItemsWithPrefix,
             selectPostFromRightHandSideSearchByPostId,
             setEditingPost,

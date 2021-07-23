@@ -8,6 +8,7 @@ import {injectIntl} from 'react-intl';
 import {Posts} from 'mattermost-redux/constants';
 import {isMeMessage as checkIsMeMessage} from 'mattermost-redux/utils/post_utils';
 
+import {makeIsEligibleForClick} from 'utils/utils';
 import * as PostUtils from 'utils/post_utils.jsx';
 import Constants, {A11yCustomEventTypes} from 'utils/constants';
 import {intlShape} from 'utils/react_intl';
@@ -17,6 +18,9 @@ import PostHeader from 'components/post_view/post_header';
 import PostContext from 'components/post_view/post_context';
 import PostPreHeader from 'components/post_view/post_pre_header';
 import ThreadFooter from 'components/threading/channel_threads/thread_footer';
+
+// When adding clickable targets within a root post, please add to/maintain the selector below
+const isEligibleForClick = makeIsEligibleForClick('.post-image__column, .embed-responsive-item, .attachment');
 
 class Post extends React.PureComponent {
     static propTypes = {
@@ -122,6 +126,7 @@ class Post extends React.PureComponent {
 
         this.state = {
             dropdownOpened: false,
+            fileDropdownOpened: false,
             hover: false,
             alt: false,
             a11yActive: false,
@@ -172,6 +177,7 @@ class Post extends React.PureComponent {
 
     handleCommentClick = (e) => {
         e.preventDefault();
+        e.stopPropagation();
 
         const post = this.props.post;
         if (!post) {
@@ -188,9 +194,22 @@ class Post extends React.PureComponent {
     }
 
     handlePostClick = (e) => {
-        const post = this.props.post;
+        const {post, isCollapsedThreadsEnabled} = this.props;
+
         if (!post) {
             return;
+        }
+
+        const isSystemMessage = PostUtils.isSystemMessage(post);
+        const fromAutoResponder = PostUtils.fromAutoResponder(post);
+
+        if (
+            !e.altKey &&
+            isCollapsedThreadsEnabled &&
+            (fromAutoResponder || !isSystemMessage) &&
+            isEligibleForClick(e)
+        ) {
+            this.props.actions.selectPost(post);
         }
 
         if (this.props.channelIsArchived || post.system_post_ids) {
@@ -209,6 +228,12 @@ class Post extends React.PureComponent {
 
         this.setState({
             dropdownOpened: opened,
+        });
+    }
+
+    handleFileDropdownOpened = (opened) => {
+        this.setState({
+            fileDropdownOpened: opened,
         });
     }
 
@@ -287,7 +312,7 @@ class Post extends React.PureComponent {
             className += ' post--compact';
         }
 
-        if (this.state.dropdownOpened || this.state.a11yActive) {
+        if (this.state.dropdownOpened || this.state.fileDropdownOpened || this.state.a11yActive) {
             className += ' post--hovered';
         }
 
@@ -295,7 +320,10 @@ class Post extends React.PureComponent {
             className += ' post--pinned-or-flagged';
         }
 
-        if (this.state.alt && !(this.props.channelIsArchived || post.system_post_ids)) {
+        if (
+            (this.state.alt && !(this.props.channelIsArchived || post.system_post_ids)) ||
+            (this.props.isCollapsedThreadsEnabled && (fromAutoResponder || !isSystemMessage))
+        ) {
             className += ' cursor--pointer';
         }
 
@@ -420,7 +448,7 @@ class Post extends React.PureComponent {
                                 compactDisplay={this.props.compactDisplay}
                                 isFirstReply={this.props.isFirstReply}
                                 showTimeWithoutHover={!hideProfilePicture}
-                                hover={this.state.hover || this.state.a11yActive}
+                                hover={this.state.hover || this.state.a11yActive || this.state.fileDropdownOpened}
                                 isLastPost={this.props.isLastPost}
                             />
                             <PostBody
@@ -429,6 +457,7 @@ class Post extends React.PureComponent {
                                 compactDisplay={this.props.compactDisplay}
                                 isCommentMention={this.props.isCommentMention}
                                 isFirstReply={this.props.isFirstReply}
+                                handleFileDropdownOpened={this.handleFileDropdownOpened}
                             />
                             {isCollapsedThreadsEnabled && !post.root_id && (hasReplies || post.is_following) ? (
                                 <ThreadFooter threadId={post.id}/>
