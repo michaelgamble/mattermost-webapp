@@ -3,35 +3,52 @@
 
 import React from 'react';
 import {Stripe} from '@stripe/stripe-js';
+import {FormattedMessage, injectIntl, IntlShape} from 'react-intl';
+import {RouteComponentProps, withRouter} from 'react-router-dom';
 
 import {BillingDetails} from 'types/cloud/sku';
-import {pageVisited} from 'actions/telemetry_actions';
+import {pageVisited, trackEvent} from 'actions/telemetry_actions';
 import {TELEMETRY_CATEGORIES} from 'utils/constants';
+import {Team} from '@mattermost/types/teams';
 
-import successSvg from 'images/cloud/payment_success.svg';
-import failedSvg from 'images/cloud/payment_fail.svg';
 import {t} from 'utils/i18n';
 import {getNextBillingDate} from 'utils/utils';
 
-import processSvg from 'images/cloud/processing_payment.svg';
+import CreditCardSvg from 'components/common/svg_images_components/credit_card_svg';
+import PaymentSuccessStandardSvg from 'components/common/svg_images_components/payment_success_standard_svg';
+import PaymentFailedSvg from 'components/common/svg_images_components/payment_failed_svg';
 
-import './process_payment.css';
-
-import {Product} from 'mattermost-redux/types/cloud';
+import {Product} from '@mattermost/types/cloud';
 
 import IconMessage from './icon_message';
 
-type Props = {
+import './process_payment.css';
+
+type Props = RouteComponentProps & {
     billingDetails: BillingDetails | null;
     stripe: Promise<Stripe | null>;
     isDevMode: boolean;
     contactSupportLink: string;
-    addPaymentMethod: (stripe: Stripe, billingDetails: BillingDetails, isDevMode: boolean) => Promise<boolean | null>;
-    subscribeCloudSubscription: ((productId: string) => Promise<boolean | null>) | null;
+    currentTeam: Team;
+    addPaymentMethod: (
+        stripe: Stripe,
+        billingDetails: BillingDetails,
+        isDevMode: boolean
+    ) => Promise<boolean | null>;
+    subscribeCloudSubscription:
+    | ((productId: string) => Promise<boolean | null>)
+    | null;
     onBack: () => void;
     onClose: () => void;
     selectedProduct?: Product | null | undefined;
-}
+    currentProduct?: Product | null | undefined;
+    isProratedPayment?: boolean;
+    isUpgradeFromTrial: boolean;
+    setIsUpgradeFromTrialToFalse: () => void;
+    telemetryProps?: { callerInfo: string };
+    onSuccess?: () => void;
+    intl: IntlShape;
+};
 
 type State = {
     progress: number;
@@ -48,7 +65,7 @@ enum ProcessState {
 const MIN_PROCESSING_MILLISECONDS = 5000;
 const MAX_FAKE_PROGRESS = 95;
 
-export default class ProcessPaymentSetup extends React.PureComponent<Props, State> {
+class ProcessPaymentSetup extends React.PureComponent<Props, State> {
     intervalId: NodeJS.Timeout;
 
     public constructor(props: Props) {
@@ -96,7 +113,10 @@ export default class ProcessPaymentSetup extends React.PureComponent<Props, Stat
         } = this.props;
         const success = await addPaymentMethod((await stripe)!, billingDetails!, isDevMode);
 
-        if (!success) {
+        if (typeof success !== 'boolean' || !success) {
+            trackEvent('cloud_admin', 'complete_payment_failed', {
+                callerInfo: this.props.telemetryProps?.callerInfo,
+            });
             this.setState({
                 error: true,
                 state: ProcessState.FAILED});
@@ -106,7 +126,11 @@ export default class ProcessPaymentSetup extends React.PureComponent<Props, Stat
         if (subscribeCloudSubscription) {
             const productUpdated = await subscribeCloudSubscription(this.props.selectedProduct?.id as string);
 
-            if (!productUpdated) {
+            // the action subscribeCloudSubscription returns a true boolean when successful and an error when it fails
+            if (typeof productUpdated !== 'boolean') {
+                trackEvent('cloud_admin', 'complete_payment_failed', {
+                    callerInfo: this.props.telemetryProps?.callerInfo,
+                });
                 this.setState({
                     error: true,
                     state: ProcessState.FAILED});
@@ -126,6 +150,13 @@ export default class ProcessPaymentSetup extends React.PureComponent<Props, Stat
 
     private completePayment = () => {
         clearInterval(this.intervalId);
+        trackEvent('cloud_admin', 'complete_payment_success', {
+            callerInfo: this.props.telemetryProps?.callerInfo,
+        });
+        pageVisited(
+            TELEMETRY_CATEGORIES.CLOUD_PURCHASING,
+            'pageview_payment_success',
+        );
         this.setState({state: ProcessState.SUCCESS, progress: 100});
     }
 
@@ -137,6 +168,111 @@ export default class ProcessPaymentSetup extends React.PureComponent<Props, Stat
             state: ProcessState.PROCESSING,
         });
         this.props.onBack();
+    }
+
+    private sucessPage = () => {
+        const {error} = this.state;
+        const formattedBtnText = (
+            <FormattedMessage
+                defaultMessage='Return to {team}'
+                id='admin.billing.subscription.returnToTeam'
+                values={{
+                    team: this.props.currentTeam?.display_name || this.props.intl.formatMessage({
+                        id: 'admin.sidebarHeader.systemConsole',
+                        defaultMessage: 'System Console',
+                    }),
+                }}
+            />
+        );
+        if (this.props.isProratedPayment) {
+            const formattedTitle = (
+                <FormattedMessage
+                    defaultMessage={'You are now subscribed to {selectedProductName}'}
+                    id={'admin.billing.subscription.proratedPayment.title'}
+                    values={{selectedProductName: this.props.selectedProduct?.name}}
+                />
+            );
+            const formattedSubtitle = (
+                <FormattedMessage
+                    defaultMessage={"Thank you for upgrading to {selectedProductName}. Check your workspace in a few minutes to access all the plan's features. You'll be charged a prorated amount for your {currentProductName} plan and {selectedProductName} plan based on the number of days left in the billing cycle and number of users you have."}
+                    id={'admin.billing.subscription.proratedPayment.substitle'}
+                    values={{selectedProductName: this.props.selectedProduct?.name, currentProductName: this.props.currentProduct?.name}}
+                />
+            );
+            return (
+                <>
+                    <IconMessage
+                        formattedTitle={formattedTitle}
+                        formattedSubtitle={formattedSubtitle}
+                        date={getNextBillingDate()}
+                        error={error}
+                        icon={
+                            <PaymentSuccessStandardSvg
+                                width={444}
+                                height={313}
+                            />
+                        }
+                        formattedButtonText={formattedBtnText}
+                        buttonHandler={this.props.onClose}
+                        className={'success'}
+                    />
+                </>
+            );
+        }
+        const productName = this.props.selectedProduct?.name;
+        const title = (
+            <FormattedMessage
+                id={'admin.billing.subscription.upgradedSuccess'}
+                defaultMessage={'You\'re now upgraded to {productName}'}
+                values={{productName}}
+            />
+        );
+
+        let handleClose = () => {
+            this.props.onClose();
+        };
+
+        if (typeof this.props.onSuccess === 'function') {
+            this.props.onSuccess();
+        }
+
+        // if is the first purchase, show a different success purchasing title
+        if (this.props.isUpgradeFromTrial) {
+            handleClose = () => {
+                // set the property isUpgrading to false onClose since we can not use directly isFreeTrial because of component rerendering
+                this.props.setIsUpgradeFromTrialToFalse();
+                this.props.onClose();
+            };
+        }
+
+        const formattedSubtitle = (
+            <FormattedMessage
+                id='admin.billing.subscription.nextBillingDate'
+                defaultMessage='Starting from {date}, you will be billed for the {productName} plan. You can change your plan whenever you like and we will pro-rate the charges.'
+                values={{date: getNextBillingDate(), productName}}
+            />
+        );
+        return (
+            <IconMessage
+                formattedTitle={title}
+                formattedSubtitle={formattedSubtitle}
+                error={error}
+                icon={
+                    <PaymentSuccessStandardSvg
+                        width={444}
+                        height={313}
+                    />
+                }
+                formattedButtonText={formattedBtnText}
+                buttonHandler={handleClose}
+                className={'success'}
+                tertiaryBtnText={t('admin.billing.subscription.viewBilling')}
+                tertiaryButtonHandler={() => {
+                    this.props.onClose();
+                    this.props.history.push('/admin_console/billing/subscription');
+                }}
+            />
+        );
     }
 
     public render() {
@@ -157,42 +293,35 @@ export default class ProcessPaymentSetup extends React.PureComponent<Props, Stat
                 <IconMessage
                     title={t('admin.billing.subscription.verifyPaymentInformation')}
                     subtitle={''}
-                    icon={processSvg}
+                    icon={
+                        <CreditCardSvg
+                            width={444}
+                            height={313}
+                        />
+                    }
                     footer={progressBar}
+                    className={'processing'}
                 />
             );
         case ProcessState.SUCCESS:
-            pageVisited(
-                TELEMETRY_CATEGORIES.CLOUD_PURCHASING,
-                'pageview_payment_success',
-            );
-            return (
-                <IconMessage
-                    title={t('admin.billing.subscription.upgradedSuccess')}
-                    subtitle={t('admin.billing.subscription.nextBillingDate')}
-                    date={getNextBillingDate()}
-                    error={error}
-                    icon={successSvg}
-                    buttonText={t('admin.billing.subscription.letsGo')}
-                    buttonHandler={this.props.onClose}
-                    className={'success'}
-                />
-            );
+            return this.sucessPage();
         case ProcessState.FAILED:
-            pageVisited(
-                TELEMETRY_CATEGORIES.CLOUD_PURCHASING,
-                'pageview_payment_failed',
-            );
             return (
                 <IconMessage
                     title={t('admin.billing.subscription.paymentVerificationFailed')}
                     subtitle={t('admin.billing.subscription.paymentFailed')}
-                    icon={failedSvg}
+                    icon={
+                        <PaymentFailedSvg
+                            width={444}
+                            height={313}
+                        />
+                    }
                     error={error}
                     buttonText={t('admin.billing.subscription.goBackTryAgain')}
                     buttonHandler={this.handleGoBack}
                     linkText={t('admin.billing.subscription.privateCloudCard.contactSupport')}
                     linkURL={this.props.contactSupportLink}
+                    className={'failed'}
                 />
             );
         default:
@@ -200,3 +329,6 @@ export default class ProcessPaymentSetup extends React.PureComponent<Props, Stat
         }
     }
 }
+
+export default injectIntl(withRouter(ProcessPaymentSetup));
+

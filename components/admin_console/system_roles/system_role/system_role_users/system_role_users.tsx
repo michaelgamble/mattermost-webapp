@@ -4,12 +4,11 @@
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import {Role} from 'mattermost-redux/types/roles';
-import {Dictionary} from 'mattermost-redux/types/utilities';
-import {ServerError} from 'mattermost-redux/types/errors';
-import {UserProfile, UsersStats, GetFilteredUsersStatsOpts} from 'mattermost-redux/types/users';
+import {Role} from '@mattermost/types/roles';
+import {ServerError} from '@mattermost/types/errors';
+import {UserProfile, UsersStats, GetFilteredUsersStatsOpts} from '@mattermost/types/users';
 
-import Constants from 'utils/constants';
+import Constants, {ModalIdentifiers} from 'utils/constants';
 import {t} from 'utils/i18n';
 
 import AdminPanel from 'components/widgets/admin_console/admin_panel';
@@ -25,9 +24,8 @@ export type Props = {
     role: Role;
     totalCount: number;
     term: string;
-    currentUserId: string;
-    usersToRemove: Dictionary<UserProfile>;
-    usersToAdd: Dictionary<UserProfile>;
+    usersToRemove: Record<string, UserProfile>;
+    usersToAdd: Record<string, UserProfile>;
     onAddCallback: (users: UserProfile[]) => void;
     onRemoveCallback: (user: UserProfile) => void;
     actions: {
@@ -45,8 +43,8 @@ export type Props = {
 type State = {
     loading: boolean;
     page: number;
-    includeUsers: Dictionary<UserProfile>;
-    excludeUsers: Dictionary<UserProfile>;
+    includeUsers: Record<string, UserProfile>;
+    excludeUsers: Record<string, UserProfile>;
 }
 
 const USERS_PER_PAGE = 10;
@@ -163,7 +161,7 @@ export default class SystemRoleUsers extends React.PureComponent<Props, State> {
     }
 
     getRows = () => {
-        const {users, readOnly, usersToAdd, usersToRemove, currentUserId} = this.props;
+        const {users, readOnly, usersToAdd, usersToRemove} = this.props;
         const {startCount, endCount} = this.getPaginationProps();
 
         // Remove users to remove and add users to add
@@ -196,7 +194,7 @@ export default class SystemRoleUsers extends React.PureComponent<Props, State> {
                         <UserGridRemove
                             user={user}
                             removeUser={this.onRemoveCallback}
-                            isDisabled={readOnly || user.id === currentUserId}
+                            isDisabled={readOnly}
                         />
                     ),
                 },
@@ -258,8 +256,9 @@ export default class SystemRoleUsers extends React.PureComponent<Props, State> {
                     <ToggleModalButton
                         id='addRoleMembers'
                         className='btn btn-primary'
+                        modalId={ModalIdentifiers.ADD_USER_TO_ROLE}
                         dialogType={AddUsersToRoleModal}
-                        isDisabled={readOnly}
+                        disabled={readOnly}
                         dialogProps={{
                             role,
                             onAddCallback: this.onAddCallback,

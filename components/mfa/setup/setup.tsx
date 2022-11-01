@@ -4,15 +4,30 @@
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import {UserProfile} from 'mattermost-redux/types/users';
+import {UserProfile} from '@mattermost/types/users';
 
-import * as Utils from 'utils/utils.jsx';
-import {t} from 'utils/i18n.jsx';
+import * as Utils from 'utils/utils';
+import {t} from 'utils/i18n';
 
-import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
+import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 import LocalizedInput from 'components/localized_input/localized_input';
 
+type MFAControllerState = {
+    enforceMultifactorAuthentication: boolean;
+};
+
 type Props = {
+
+    /*
+     * Object containing enforceMultifactorAuthentication
+     */
+    state: MFAControllerState;
+
+    /*
+     * Function that updates parent component with state props
+     */
+    updateParent: (state: MFAControllerState) => void;
+
     currentUser: UserProfile;
     siteName?: string;
     enforceMultifactorAuthentication: boolean;
@@ -56,7 +71,7 @@ export default class Setup extends React.PureComponent<Props, State> {
         this.input = React.createRef();
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         const user = this.props.currentUser;
         if (!user || user.mfa_active) {
             this.props.history.push('/');
@@ -78,7 +93,7 @@ export default class Setup extends React.PureComponent<Props, State> {
         });
     }
 
-    submit = (e: React.FormEvent<HTMLFormElement>) => {
+    submit = (e: React.FormEvent<HTMLFormElement>): void => {
         e.preventDefault();
         const code = this.input?.current?.value.replace(/\s/g, '');
         if (!code || code.length === 0) {
@@ -107,7 +122,7 @@ export default class Setup extends React.PureComponent<Props, State> {
         });
     }
 
-    public render() {
+    public render(): JSX.Element {
         let formClass = 'form-group';
         let errorContent;
         if (this.state.error) {
@@ -138,9 +153,30 @@ export default class Setup extends React.PureComponent<Props, State> {
                 >
                     {mfaRequired}
                     <p>
-                        <FormattedMarkdownMessage
+                        <FormattedMessage
                             id='mfa.setup.step1'
-                            defaultMessage="**Step 1: **On your phone, download Google Authenticator from [iTunes](!https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8') or [Google Play](!https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en)"
+                            defaultMessage='<strong>Step 1: </strong>On your phone, download Google Authenticator from <linkiTunes>iTunes</linkiTunes> or <linkGooglePlay>Google Play</linkGooglePlay>'
+                            values={{
+                                strong: (msg: React.ReactNode) => <strong>{msg}</strong>,
+                                linkiTunes: (msg: React.ReactNode) => (
+                                    <a
+                                        href='https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8'
+                                        target='_blank'
+                                        rel='noreferrer'
+                                    >
+                                        {msg}
+                                    </a>
+                                ),
+                                linkGooglePlay: (msg: React.ReactNode) => (
+                                    <a
+                                        href='https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en'
+                                        target='_blank'
+                                        rel='noreferrer'
+                                    >
+                                        {msg}
+                                    </a>
+                                ),
+                            }}
                         />
                     </p>
                     <p>

@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import assert from 'assert';
+
 import nock from 'nock';
 
 import {GeneralTypes} from 'mattermost-redux/action_types';
@@ -119,20 +120,6 @@ describe('Actions.General', () => {
         await TestHelper.wait(100);
         const {dataRetentionPolicy} = store.getState().entities.general;
         assert.deepEqual(dataRetentionPolicy, responseData);
-    });
-
-    it('getTimezones', async () => {
-        nock(Client4.getBaseRoute()).
-            get('/system/timezones').
-            query(true).
-            reply(200, ['America/New_York', 'America/Los_Angeles']);
-
-        await Actions.getSupportedTimezones()(store.dispatch, store.getState);
-
-        await TestHelper.wait(100);
-        const {timezones} = store.getState().entities.general;
-        assert.equal(timezones.length > 0, true);
-        assert.equal(timezones.length === 0, false);
     });
 
     it('getWarnMetricsStatus', async () => {

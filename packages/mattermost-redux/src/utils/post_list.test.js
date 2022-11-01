@@ -766,7 +766,7 @@ describe('makeCombineUserActivityPosts', () => {
             expect(combineUserActivityPosts.recomputations()).toBe(1);
         });
 
-        test('should recalculate if any post changes, but should return the same results if possible', () => {
+        test('should not recalculate if an unrelated post changes', () => {
             const combineUserActivityPosts = makeCombineUserActivityPosts();
 
             let state = initialState;
@@ -788,10 +788,20 @@ describe('makeCombineUserActivityPosts', () => {
                     },
                 },
             };
-            let result = combineUserActivityPosts(state, initialPostIds);
+            const result = combineUserActivityPosts(state, initialPostIds);
 
-            expect(combineUserActivityPosts.recomputations()).toBe(2);
+            // The selector didn't recalculate so the result didn't change
+            expect(combineUserActivityPosts.recomputations()).toBe(1);
             expect(result).toBe(initialResult);
+        });
+
+        test('should return the same result when a post changes in a way that doesn\'t affect the result', () => {
+            const combineUserActivityPosts = makeCombineUserActivityPosts();
+
+            let state = initialState;
+            const initialResult = combineUserActivityPosts(state, initialPostIds);
+
+            expect(combineUserActivityPosts.recomputations()).toBe(1);
 
             // One of the posts was updated, but post type didn't change
             state = {
@@ -807,9 +817,10 @@ describe('makeCombineUserActivityPosts', () => {
                     },
                 },
             };
-            result = combineUserActivityPosts(state, initialPostIds);
+            let result = combineUserActivityPosts(state, initialPostIds);
 
-            expect(combineUserActivityPosts.recomputations()).toBe(3);
+            // The selector recalculated but is still returning the same array
+            expect(combineUserActivityPosts.recomputations()).toBe(2);
             expect(result).toBe(initialResult);
 
             // One of the posts changed type
@@ -828,7 +839,8 @@ describe('makeCombineUserActivityPosts', () => {
             };
             result = combineUserActivityPosts(state, initialPostIds);
 
-            expect(combineUserActivityPosts.recomputations()).toBe(4);
+            // The selector recalculated, and the result changed
+            expect(combineUserActivityPosts.recomputations()).toBe(3);
             expect(result).not.toBe(initialResult);
         });
     });
@@ -987,7 +999,7 @@ describe('makeGenerateCombinedPost', () => {
 
         const result = generateCombinedPost(state, combinedId);
 
-        expect(result).toEqual({
+        expect(result).toMatchObject({
             id: combinedId,
             root_id: '',
             channel_id: 'channel1',
@@ -1016,7 +1028,6 @@ describe('makeGenerateCombinedPost', () => {
                     ],
                 },
             },
-            state: '',
             system_post_ids: ['post1', 'post2', 'post3'],
             type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
             user_activity_posts: [

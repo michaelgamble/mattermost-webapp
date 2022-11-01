@@ -5,10 +5,10 @@ import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import {UserProfile} from 'mattermost-redux/types/users';
+import {UserProfile} from '@mattermost/types/users';
 import {ActionResult} from 'mattermost-redux/types/actions';
 
-import * as Utils from 'utils/utils.jsx';
+import * as Utils from 'utils/utils';
 
 interface PasswordConfig {
     minimumLength: number;
@@ -19,8 +19,8 @@ interface PasswordConfig {
 }
 
 type State = {
-    serverErrorNewPass: JSX.Element|null;
-    serverErrorCurrentPass: JSX.Element|string|null;
+    serverErrorNewPass: React.ReactNode;
+    serverErrorCurrentPass: React.ReactNode;
 }
 
 type Props = {

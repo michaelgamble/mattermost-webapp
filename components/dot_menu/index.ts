@@ -7,28 +7,22 @@ import {ActionCreatorsMapObject, bindActionCreators, Dispatch} from 'redux';
 
 import {getLicense, getConfig} from 'mattermost-redux/selectors/entities/general';
 import {getChannel} from 'mattermost-redux/selectors/entities/channels';
-import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
-import {getCurrentTeamId, getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
-import {appsEnabled, makeAppBindingsSelector} from 'mattermost-redux/selectors/entities/apps';
-import {getThreadOrSynthetic} from 'mattermost-redux/selectors/entities/threads';
+import {getCurrentUserId, getCurrentUserMentionKeys} from 'mattermost-redux/selectors/entities/users';
+import {getCurrentTeamId, getCurrentTeam, getTeam} from 'mattermost-redux/selectors/entities/teams';
+import {makeGetThreadOrSynthetic} from 'mattermost-redux/selectors/entities/threads';
 import {getPost} from 'mattermost-redux/selectors/entities/posts';
 import {isCollapsedThreadsEnabled} from 'mattermost-redux/selectors/entities/preferences';
 
-import {AppBindingLocations} from 'mattermost-redux/constants/apps';
 import {isSystemMessage} from 'mattermost-redux/utils/post_utils';
-import {isCombinedUserActivityPost} from 'mattermost-redux/utils/post_list';
 
-import {ActionFunc, GenericAction} from 'mattermost-redux/types/actions';
+import {GenericAction} from 'mattermost-redux/types/actions';
 
-import {Post} from 'mattermost-redux/types/posts';
-
-import {DoAppCall, PostEphemeralCallResponseForPost} from 'types/apps';
 import {setThreadFollow} from 'mattermost-redux/actions/threads';
 
+import {ModalData} from 'types/actions';
 import {GlobalState} from 'types/store';
 
 import {openModal} from 'actions/views/modals';
-import {doAppCall, postEphemeralCallResponseForPost} from 'actions/apps';
 
 import {
     flagPost,
@@ -37,30 +31,38 @@ import {
     unpinPost,
     setEditingPost,
     markPostAsUnread,
-} from 'actions/post_actions.jsx';
-import * as PostUtils from 'utils/post_utils.jsx';
+} from 'actions/post_actions';
+
+import {getIsMobileView} from 'selectors/views/browser';
+
+import * as PostUtils from 'utils/post_utils';
 
 import {isArchivedChannel} from 'utils/channel_utils';
 import {getSiteURL} from 'utils/url';
 
-import {Locations} from 'utils/constants';
+import {Locations, Preferences} from 'utils/constants';
+import {allAtMentions} from 'utils/text_formatting';
+
+import {matchUserMentionTriggersWithMessageMentions} from 'utils/post_utils';
+
+import {Post} from '@mattermost/types/posts';
+import {setGlobalItem} from '../../actions/storage';
+import {getGlobalItem} from '../../selectors/storage';
 
 import DotMenu from './dot_menu';
 
 type Props = {
     post: Post;
     isFlagged?: boolean;
-    handleCommentClick: React.EventHandler<React.MouseEvent>;
+    handleCommentClick?: React.EventHandler<React.MouseEvent | React.KeyboardEvent>;
     handleCardClick?: (post: Post) => void;
     handleDropdownOpened: (open: boolean) => void;
-    handleAddReactionClick: () => void;
+    handleAddReactionClick?: () => void;
     isMenuOpen: boolean;
-    isReadOnly: boolean | null;
+    isReadOnly?: boolean;
     enableEmojiPicker?: boolean;
     location?: ComponentProps<typeof DotMenu>['location'];
 };
-
-const getPostMenuBindings = makeAppBindingsSelector(AppBindingLocations.POST_MENU_ITEM);
 
 function mapStateToProps(state: GlobalState, ownProps: Props) {
     const {post} = ownProps;
@@ -70,7 +72,8 @@ function mapStateToProps(state: GlobalState, ownProps: Props) {
     const userId = getCurrentUserId(state);
     const channel = getChannel(state, post.channel_id);
     const currentTeam = getCurrentTeam(state) || {};
-    const currentTeamUrl = `${getSiteURL()}/${currentTeam.name}`;
+    const team = getTeam(state, channel.team_id);
+    const teamUrl = `${getSiteURL()}/${team?.name || currentTeam.name}`;
 
     const systemMessage = isSystemMessage(post);
     const collapsedThreads = isCollapsedThreadsEnabled(state);
@@ -78,6 +81,7 @@ function mapStateToProps(state: GlobalState, ownProps: Props) {
     const rootId = post.root_id || post.id;
     let threadId = rootId;
     let isFollowingThread = false;
+    let isMentionedInRootPost = false;
     let threadReplyCount = 0;
 
     if (
@@ -93,17 +97,20 @@ function mapStateToProps(state: GlobalState, ownProps: Props) {
         )
     ) {
         const root = getPost(state, rootId);
+        const getThreadOrSynthetic = makeGetThreadOrSynthetic();
         if (root) {
             const thread = getThreadOrSynthetic(state, root);
             threadReplyCount = thread.reply_count;
+            const currentUserMentionKeys = getCurrentUserMentionKeys(state);
+            const rootMessageMentionKeys = allAtMentions(root.message);
             isFollowingThread = thread.is_following;
+            isMentionedInRootPost = thread.reply_count === 0 &&
+                matchUserMentionTriggersWithMessageMentions(currentUserMentionKeys, rootMessageMentionKeys);
             threadId = thread.id;
         }
     }
 
-    const apps = appsEnabled(state);
-    const showBindings = apps && !systemMessage && !isCombinedUserActivityPost(post.id);
-    const appBindings = showBindings ? getPostMenuBindings(state) : undefined;
+    const showForwardPostNewLabel = getGlobalItem(state, Preferences.FORWARD_POST_VIEWED, true);
 
     return {
         channelIsArchived: isArchivedChannel(channel),
@@ -114,15 +121,15 @@ function mapStateToProps(state: GlobalState, ownProps: Props) {
         pluginMenuItems: state.plugins.components.PostDropdownMenu,
         canEdit: PostUtils.canEditPost(state, post, license, config, channel, userId),
         canDelete: PostUtils.canDeletePost(state, post, channel),
-        currentTeamUrl,
-        currentTeamId: currentTeam.id,
+        teamUrl,
         userId,
         threadId,
         isFollowingThread,
+        isMentionedInRootPost,
         isCollapsedThreadsEnabled: collapsedThreads,
         threadReplyCount,
-        appBindings,
-        appsEnabled: apps,
+        isMobileView: getIsMobileView(state),
+        showForwardPostNewLabel,
         ...ownProps,
     };
 }
@@ -133,16 +140,15 @@ type Actions = {
     setEditingPost: (postId?: string, refocusId?: string, title?: string, isRHS?: boolean) => void;
     pinPost: (postId: string) => void;
     unpinPost: (postId: string) => void;
-    openModal: (postId: any) => void;
+    openModal: <P>(modalData: ModalData<P>) => void;
     markPostAsUnread: (post: Post) => void;
-    doAppCall: DoAppCall;
-    postEphemeralCallResponseForPost: PostEphemeralCallResponseForPost;
     setThreadFollow: (userId: string, teamId: string, threadId: string, newState: boolean) => void;
+    setGlobalItem: (name: string, value: any) => void;
 }
 
 function mapDispatchToProps(dispatch: Dispatch<GenericAction>) {
     return {
-        actions: bindActionCreators<ActionCreatorsMapObject<ActionFunc>, Actions>({
+        actions: bindActionCreators<ActionCreatorsMapObject, Actions>({
             flagPost,
             unflagPost,
             setEditingPost,
@@ -150,9 +156,8 @@ function mapDispatchToProps(dispatch: Dispatch<GenericAction>) {
             unpinPost,
             openModal,
             markPostAsUnread,
-            doAppCall,
-            postEphemeralCallResponseForPost,
             setThreadFollow,
+            setGlobalItem,
         }, dispatch),
     };
 }

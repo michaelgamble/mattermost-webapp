@@ -2,39 +2,46 @@
 // See LICENSE.txt for license information.
 
 import React, {memo, useCallback, useEffect, MouseEvent, useMemo} from 'react';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import classNames from 'classnames';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
-import {Channel} from 'mattermost-redux/types/channels';
-import {Post} from 'mattermost-redux/types/posts';
-import {UserThread} from 'mattermost-redux/types/threads';
-import {$ID} from 'mattermost-redux/types/utilities';
-
+import {Channel} from '@mattermost/types/channels';
+import {Post} from '@mattermost/types/posts';
+import {UserThread} from '@mattermost/types/threads';
 import {getChannel as fetchChannel} from 'mattermost-redux/actions/channels';
+import {getInt} from 'mattermost-redux/selectors/entities/preferences';
+import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 import {getMissingProfilesByIds} from 'mattermost-redux/actions/users';
+import {markLastPostInThreadAsUnread, updateThreadRead} from 'mattermost-redux/actions/threads';
+import {Posts} from 'mattermost-redux/constants';
 
 import * as Utils from 'utils/utils';
-
-import './thread_item.scss';
-
+import {Constants, CrtTutorialSteps, Preferences} from 'utils/constants';
+import {GlobalState} from 'types/store';
+import {getIsMobileView} from 'selectors/views/browser';
 import Badge from 'components/widgets/badges/badge';
 import Timestamp from 'components/timestamp';
 import Avatars from 'components/widgets/users/avatars';
 import Button from 'components/threading/common/button';
 import SimpleTooltip from 'components/widgets/simple_tooltip';
-
+import CRTListTutorialTip from 'components/crt_tour/crt_list_tutorial_tip/crt_list_tutorial_tip';
 import Markdown from 'components/markdown';
-
-import ThreadMenu from '../thread_menu';
+import {manuallyMarkThreadAsUnread} from 'actions/views/threads';
 
 import {THREADING_TIME} from '../../common/options';
 import {useThreadRouting} from '../../hooks';
+import ThreadMenu from '../thread_menu';
+
+import Attachment from './attachments';
+
+import './thread_item.scss';
 
 export type OwnProps = {
     isSelected: boolean;
-    threadId: $ID<UserThread>;
+    threadId: UserThread['id'];
     style?: any;
+    isFirstThreadInList: boolean;
 };
 
 type Props = {
@@ -62,9 +69,18 @@ function ThreadItem({
     style,
     thread,
     threadId,
+    isFirstThreadInList,
 }: Props & OwnProps): React.ReactElement|null {
     const dispatch = useDispatch();
-    const {select, goToInChannel} = useThreadRouting();
+    const {select, goToInChannel, currentTeamId} = useThreadRouting();
+    const {formatMessage} = useIntl();
+    const isMobileView = useSelector(getIsMobileView);
+    const currentUserId = useSelector(getCurrentUserId);
+    const tipStep = useSelector((state: GlobalState) => getInt(state, Preferences.CRT_TUTORIAL_STEP, currentUserId));
+    const tutorialTipAutoTour = useSelector((state: GlobalState) => getInt(state, Preferences.CRT_TUTORIAL_AUTO_TOUR_STATUS, currentUserId, Constants.AutoTourStatus.ENABLED)) === Constants.AutoTourStatus.ENABLED;
+    const showListTutorialTip = tipStep === CrtTutorialSteps.LIST_POPOVER;
+    const msgDeleted = formatMessage({id: 'post_body.deleted', defaultMessage: '(message deleted)'});
+    const postAuthor = post.props?.override_username || displayName;
 
     useEffect(() => {
         if (channel?.teammate_id) {
@@ -78,9 +94,45 @@ function ThreadItem({
         }
     }, [channel, thread?.post.channel_id]);
 
-    const participantIds = useMemo(() => thread?.participants?.map(({id}) => id), [thread?.participants]);
+    const participantIds = useMemo(() => {
+        const ids = (thread?.participants || []).flatMap(({id}) => {
+            if (id === post.user_id) {
+                return [];
+            }
+            return id;
+        }).reverse();
+        return [post.user_id, ...ids];
+    }, [thread?.participants]);
 
-    const selectHandler = useCallback(() => select(threadId), []);
+    let unreadTimestamp = post.edit_at || post.create_at;
+
+    const selectHandler = useCallback((e: MouseEvent<HTMLDivElement>) => {
+        if (e.altKey) {
+            const hasUnreads = thread ? Boolean(thread.unread_replies) : false;
+            const lastViewedAt = hasUnreads ? Date.now() : unreadTimestamp;
+
+            dispatch(manuallyMarkThreadAsUnread(threadId, lastViewedAt));
+            if (hasUnreads) {
+                dispatch(updateThreadRead(currentUserId, currentTeamId, threadId, Date.now()));
+            } else {
+                dispatch(markLastPostInThreadAsUnread(currentUserId, currentTeamId, threadId));
+            }
+        } else {
+            select(threadId);
+        }
+    }, [
+        currentUserId,
+        currentTeamId,
+        threadId,
+        thread,
+        updateThreadRead,
+        unreadTimestamp,
+    ]);
+
+    const imageProps = useMemo(() => ({
+        onImageHeightChanged: () => {},
+        onImageLoaded: () => {},
+    }), []);
 
     const goToInChannelHandler = useCallback((e: MouseEvent) => {
         e.stopPropagation();
@@ -103,12 +155,10 @@ function ThreadItem({
         is_following: isFollowing,
     } = thread;
 
-    let unreadTimestamp = post.edit_at || post.create_at;
-
     // if we have the whole thread, get the posts in it, sorted from newest to oldest.
-    // Last post - root post, second to last post - oldest reply. Use that timestamp
+    // First post is latest reply. Use that timestamp
     if (postsInThread.length > 1) {
-        const p = postsInThread[postsInThread.length - 2];
+        const p = postsInThread[0];
         unreadTimestamp = p.edit_at || p.create_at;
     }
 
@@ -120,6 +170,7 @@ function ThreadItem({
                 'is-selected': isSelected,
             })}
             tabIndex={0}
+            id={isFirstThreadInList ? 'tutorial-threads-mobile-list' : ''}
             onClick={selectHandler}
         >
             <h1>
@@ -135,9 +186,12 @@ function ThreadItem({
                         )}
                     </div>
                 )}
-                <span>{displayName}</span>
+                <span>{postAuthor}</span>
                 {Boolean(channel) && (
                     <Badge
+                        className={classNames({
+                            Badge__hidden: postAuthor === channel?.display_name,
+                        })}
                         onClick={goToInChannelHandler}
                     >
                         {channel?.display_name}
@@ -147,7 +201,6 @@ function ThreadItem({
                     {...THREADING_TIME}
                     className='alt-hidden'
                     value={lastReplyAt}
-                    capitalize={true}
                 />
             </h1>
             <div className='menu-anchor alt-visible'>
@@ -179,10 +232,16 @@ function ThreadItem({
                 tabIndex={0}
                 onClick={handleFormattedTextClick}
             >
-                <Markdown
-                    message={post?.message ?? '(message deleted)'}
-                    options={markdownPreviewOptions}
-                />
+                {post.message ? (
+                    <Markdown
+                        message={post.state === Posts.POST_DELETED ? msgDeleted : post.message}
+                        options={markdownPreviewOptions}
+                        imagesMetadata={post?.metadata && post?.metadata?.images}
+                        imageProps={imageProps}
+                    />
+                ) : (
+                    <Attachment post={post}/>
+                )}
             </div>
             <div className='activity'>
                 {participantIds?.length ? (
@@ -209,6 +268,7 @@ function ThreadItem({
                     </>
                 )}
             </div>
+            {showListTutorialTip && isFirstThreadInList && isMobileView && (<CRTListTutorialTip autoTour={tutorialTipAutoTour}/>)}
         </article>
     );
 }

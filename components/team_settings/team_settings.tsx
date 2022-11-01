@@ -4,7 +4,8 @@
 import React from 'react';
 
 import GeneralTab from 'components/team_general_tab';
-import ImportTab from 'components/team_import_tab.jsx';
+
+import {Team} from '@mattermost/types/teams';
 
 type Props = {
     activeTab: string;
@@ -12,7 +13,7 @@ type Props = {
     updateSection: (section: string) => void;
     closeModal: () => void;
     collapseModal: () => void;
-    team?: Record<string, unknown>;
+    team?: Team;
 };
 
 const TeamSettings = ({
@@ -33,19 +34,6 @@ const TeamSettings = ({
         result = (
             <div>
                 <GeneralTab
-                    team={team}
-                    activeSection={activeSection}
-                    updateSection={updateSection}
-                    closeModal={closeModal}
-                    collapseModal={collapseModal}
-                />
-            </div>
-        );
-        break;
-    case 'import':
-        result = (
-            <div>
-                <ImportTab
                     team={team}
                     activeSection={activeSection}
                     updateSection={updateSection}

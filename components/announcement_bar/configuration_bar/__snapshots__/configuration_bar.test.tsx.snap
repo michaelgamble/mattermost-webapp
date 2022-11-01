@@ -2,8 +2,11 @@
 
 exports[`components/ConfigurationBar should match snapshot, expired 1`] = `
 <Connect(AnnouncementBar)
+  handleClose={[Function]}
   message={
-    <React.Fragment>
+    <div
+      className="announcement-bar__configuration"
+    >
       <React.Fragment>
         <img
           className="advisor-icon"
@@ -22,8 +25,9 @@ exports[`components/ConfigurationBar should match snapshot, expired 1`] = `
           }
         }
       />
-    </React.Fragment>
+    </div>
   }
+  showCloseButton={true}
   tooltipMsg={
     <React.Fragment>
       <img
@@ -40,10 +44,15 @@ exports[`components/ConfigurationBar should match snapshot, expired 1`] = `
 />
 `;
 
+exports[`components/ConfigurationBar should match snapshot, expired, cloud license, show nothing 1`] = `""`;
+
 exports[`components/ConfigurationBar should match snapshot, expired, in grace period 1`] = `
 <Connect(AnnouncementBar)
+  handleClose={[Function]}
   message={
-    <React.Fragment>
+    <div
+      className="announcement-bar__configuration"
+    >
       <React.Fragment>
         <img
           className="advisor-icon"
@@ -62,8 +71,9 @@ exports[`components/ConfigurationBar should match snapshot, expired, in grace pe
           }
         }
       />
-    </React.Fragment>
+    </div>
   }
+  showCloseButton={true}
   tooltipMsg={
     <React.Fragment>
       <img
@@ -97,5 +107,7 @@ exports[`components/ConfigurationBar should match snapshot, expired, regular use
   type="critical"
 />
 `;
+
+exports[`components/ConfigurationBar should match snapshot, expiring, cloud license, show nothing 1`] = `""`;
 
 exports[`components/ConfigurationBar should match snapshot, show nothing 1`] = `""`;

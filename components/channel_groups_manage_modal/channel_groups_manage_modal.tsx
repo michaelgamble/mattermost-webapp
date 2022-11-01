@@ -6,15 +6,15 @@ import {FormattedMessage, injectIntl, IntlShape} from 'react-intl';
 
 import Groups from 'mattermost-redux/constants/groups';
 
-import {Group} from 'mattermost-redux/types/groups';
+import {Group} from '@mattermost/types/groups';
 
-import {Channel} from 'mattermost-redux/types/channels';
+import {Channel} from '@mattermost/types/channels';
 
 import AddGroupsToChannelModal from 'components/add_groups_to_channel_modal';
 
 import {ModalIdentifiers} from 'utils/constants';
 
-import ListModal, {DEFAULT_NUM_PER_PAGE} from 'components/list_modal.jsx';
+import ListModal, {DEFAULT_NUM_PER_PAGE} from 'components/list_modal';
 
 import DropdownIcon from 'components/widgets/icons/fa_dropdown_icon';
 
@@ -23,7 +23,9 @@ import groupsAvatar from 'images/groups-avatar.png';
 import MenuWrapper from 'components/widgets/menu/menu_wrapper';
 import Menu from 'components/widgets/menu/menu';
 
-import * as Utils from 'utils/utils.jsx';
+import {ModalData} from 'types/actions';
+
+import * as Utils from 'utils/utils';
 
 type Props = {
     channel: Channel;
@@ -33,8 +35,8 @@ type Props = {
         unlinkGroupSyncable: (itemId: string, channelId: string, groupsSyncableTypeChannel: string) => any;
         patchGroupSyncable: (itemId: string, channelId: string, groupsSyncableTypeChannel: string, params: {scheme_admin: boolean}) => any;
         getMyChannelMember: (channelId: string) => any;
-        closeModal: (modalIdentifiersManageChannelGroups: string) => any;
-        openModal: (params: {modalId: string; dialogType: any}) => any;
+        closeModal: (modalId: string) => void;
+        openModal: <P>(modalData: ModalData<P>) => void;
     };
 };
 

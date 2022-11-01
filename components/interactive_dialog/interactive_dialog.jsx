@@ -13,7 +13,7 @@ import {
 
 import SpinnerButton from 'components/spinner_button';
 
-import {localizeMessage} from 'utils/utils.jsx';
+import {localizeMessage} from 'utils/utils';
 
 import DialogElement from './dialog_element';
 import DialogIntroductionText from './dialog_introduction_text';
@@ -29,7 +29,7 @@ export default class InteractiveDialog extends React.PureComponent {
         submitLabel: PropTypes.string,
         notifyOnCancel: PropTypes.bool,
         state: PropTypes.string,
-        onHide: PropTypes.func,
+        onExited: PropTypes.func,
         actions: PropTypes.shape({
             submitInteractiveDialog: PropTypes.func.isRequired,
         }).isRequired,
@@ -196,12 +196,15 @@ export default class InteractiveDialog extends React.PureComponent {
                 dialogClassName='a11y__modal about-modal'
                 show={this.state.show}
                 onHide={this.onHide}
-                onExited={this.props.onHide}
+                onExited={this.props.onExited}
                 backdrop='static'
                 role='dialog'
                 aria-labelledby='interactiveDialogModalLabel'
             >
-                <form onSubmit={this.handleSubmit}>
+                <form
+                    onSubmit={this.handleSubmit}
+                    autoComplete={'off'}
+                >
                     <Modal.Header
                         closeButton={true}
                         style={{borderBottom: elements == null && '0px'}}

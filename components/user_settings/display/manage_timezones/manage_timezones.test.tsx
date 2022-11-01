@@ -4,7 +4,7 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import {UserProfile} from 'mattermost-redux/types/users';
+import {UserProfile} from '@mattermost/types/users';
 
 import ManageTimezones from './manage_timezones';
 
@@ -19,6 +19,7 @@ describe('components/user_settings/display/manage_timezones/manage_timezones', (
         useAutomaticTimezone: true,
         automaticTimezone: '',
         manualTimezone: '',
+        timezoneLabel: '',
         timezones: [],
         updateSection: jest.fn(),
         actions: {

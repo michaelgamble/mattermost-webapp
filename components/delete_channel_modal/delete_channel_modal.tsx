@@ -5,14 +5,14 @@ import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import {Channel} from 'mattermost-redux/types/channels';
+import {Channel} from '@mattermost/types/channels';
 
-import {browserHistory} from 'utils/browser_history';
+import {getHistory} from 'utils/browser_history';
 import Constants from 'utils/constants';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 
 export type Props = {
-    onHide: () => void;
+    onExited: () => void;
     channel: Channel;
     currentTeamDetails: {name: string};
     canViewArchivedChannels?: boolean;
@@ -38,7 +38,7 @@ export default class DeleteChannelModal extends React.PureComponent<Props, State
         }
         if (!this.props.canViewArchivedChannels) {
             const {penultimateViewedChannelName} = this.props;
-            browserHistory.push('/' + this.props.currentTeamDetails.name + '/channels/' + penultimateViewedChannelName);
+            getHistory().push('/' + this.props.currentTeamDetails.name + '/channels/' + penultimateViewedChannelName);
         }
         this.props.actions.deleteChannel(this.props.channel.id);
         this.onHide();
@@ -55,7 +55,7 @@ export default class DeleteChannelModal extends React.PureComponent<Props, State
                 dialogClassName='a11y__modal'
                 show={this.state.show}
                 onHide={this.onHide}
-                onExited={this.props.onHide}
+                onExited={this.props.onExited}
                 role='dialog'
                 aria-labelledby='deleteChannelModalLabel'
                 id='deleteChannelModal'

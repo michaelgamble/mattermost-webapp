@@ -4,7 +4,7 @@
 import {connect} from 'react-redux';
 import {ActionCreatorsMapObject, bindActionCreators, Dispatch} from 'redux';
 
-import {getCurrentUserId, getStatusForUserId, getUser} from 'mattermost-redux/selectors/entities/users';
+import {displayLastActiveLabel, getCurrentUserId, getLastActiveTimestampUnits, getLastActivityForUserId, getStatusForUserId, getUser} from 'mattermost-redux/selectors/entities/users';
 import {
     getCurrentTeam,
     getCurrentRelativeTeamUrl,
@@ -16,18 +16,21 @@ import {
     getCurrentChannelId,
 } from 'mattermost-redux/selectors/entities/channels';
 
-import {openDirectChannelToUserId} from 'actions/channel_actions.jsx';
+import {openDirectChannelToUserId} from 'actions/channel_actions';
 import {getMembershipForEntities} from 'actions/views/profile_popover';
 import {closeModal, openModal} from 'actions/views/modals';
 
 import {areTimezonesEnabledAndSupported, getCurrentUserTimezone} from 'selectors/general';
 import {getRhsState, getSelectedPost} from 'selectors/rhs';
+import {getIsMobileView} from 'selectors/views/browser';
 
 import {makeGetCustomStatus, isCustomStatusEnabled, isCustomStatusExpired} from 'selectors/views/custom_status';
-import {ActionFunc, GenericAction} from 'mattermost-redux/types/actions';
-import {GlobalState} from '../../types/store';
+import {Action} from 'mattermost-redux/types/actions';
 
-import {ServerError} from 'mattermost-redux/types/errors';
+import {ModalData} from 'types/actions';
+import {GlobalState} from 'types/store';
+
+import {ServerError} from '@mattermost/types/errors';
 
 import ProfilePopover from './profile_popover';
 
@@ -57,6 +60,12 @@ function makeMapStateToProps() {
         }
 
         const customStatus = getCustomStatus(state, userId);
+        const status = getStatusForUserId(state, userId);
+        const user = getUser(state, userId);
+
+        const lastActivityTimestamp = getLastActivityForUserId(state, userId);
+        const timestampUnits = getLastActiveTimestampUnits(state, userId);
+        const enableLastActiveTime = displayLastActiveLabel(state, userId);
         return {
             currentTeamId: team.id,
             currentUserId: getCurrentUserId(state),
@@ -65,33 +74,33 @@ function makeMapStateToProps() {
             isChannelAdmin,
             isInCurrentTeam: Boolean(teamMember) && teamMember?.delete_at === 0,
             canManageAnyChannelMembersInCurrentTeam: canManageAnyChannelMembersInCurrentTeam(state),
-            status: getStatusForUserId(state, userId),
+            status,
             teamUrl: getCurrentRelativeTeamUrl(state),
-            user: getUser(state, userId),
+            user,
             modals: state.views.modals,
             customStatus,
             isCustomStatusEnabled: isCustomStatusEnabled(state),
             isCustomStatusExpired: isCustomStatusExpired(state, customStatus),
             channelId,
             currentUserTimezone: getCurrentUserTimezone(state),
+            lastActivityTimestamp,
+            enableLastActiveTime,
+            timestampUnits,
+            isMobileView: getIsMobileView(state),
         };
     };
 }
 
 type Actions = {
-    openModal: (modalData: {modalId: string; dialogType: any; dialogProps?: any}) => Promise<{
-        data: boolean;
-    }>;
-    closeModal: (modalId: string) => Promise<{
-        data: boolean;
-    }>;
+    openModal: <P>(modalData: ModalData<P>) => void;
+    closeModal: (modalId: string) => void;
     openDirectChannelToUserId: (userId?: string) => Promise<{error: ServerError}>;
     getMembershipForEntities: (teamId: string, userId: string, channelId?: string) => Promise<void>;
 }
 
-function mapDispatchToProps(dispatch: Dispatch<GenericAction>) {
+function mapDispatchToProps(dispatch: Dispatch) {
     return {
-        actions: bindActionCreators<ActionCreatorsMapObject<ActionFunc>, Actions>({
+        actions: bindActionCreators<ActionCreatorsMapObject<Action>, Actions>({
             closeModal,
             openDirectChannelToUserId,
             openModal,

@@ -1,17 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Channel, ChannelMembership, ChannelNotifyProps, ChannelWithTeamData} from 'mattermost-redux/types/channels';
-import {Bot} from 'mattermost-redux/types/bots';
-import {Role} from 'mattermost-redux/types/roles';
-import {UserProfile, UserAccessToken} from 'mattermost-redux/types/users';
-import {Team, TeamMembership} from 'mattermost-redux/types/teams';
-import {Group} from 'mattermost-redux/types/groups';
-import {FileInfo} from 'mattermost-redux/types/files';
-import {Post} from 'mattermost-redux/types/posts';
-import {CategorySorting, ChannelCategory} from 'mattermost-redux/types/channel_categories';
-import {Command} from 'mattermost-redux/types/integrations';
+import {Channel, ChannelMembership, ChannelNotifyProps, ChannelWithTeamData} from '@mattermost/types/channels';
+import {Bot} from '@mattermost/types/bots';
+import {Role} from '@mattermost/types/roles';
+import {UserProfile, UserAccessToken} from '@mattermost/types/users';
+import {Team, TeamMembership} from '@mattermost/types/teams';
+import {Group} from '@mattermost/types/groups';
+import {FileInfo} from '@mattermost/types/files';
+import {Post} from '@mattermost/types/posts';
+import {CategorySorting, ChannelCategory} from '@mattermost/types/channel_categories';
+import {Command, IncomingWebhook} from '@mattermost/types/integrations';
 import {CategoryTypes} from 'mattermost-redux/constants/channel_categories';
-import {Session} from 'mattermost-redux/types/sessions';
+import {CustomEmoji} from '@mattermost/types/emojis';
+import {Session} from '@mattermost/types/sessions';
+import {ProductComponent} from 'types/store/plugins';
+import {ClientLicense} from '@mattermost/types/config';
+import {PreferenceType} from '@mattermost/types/preferences';
+import {getPreferenceKey} from 'mattermost-redux/utils/preference_utils';
+import {Invoice, Product, Subscription, CloudCustomer} from '@mattermost/types/cloud';
 
 export class TestHelper {
     public static getUserMock(override: Partial<UserProfile> = {}): UserProfile {
@@ -20,12 +26,10 @@ export class TestHelper {
             roles: '',
             username: 'some-user',
             password: '',
-            auth_data: '',
             auth_service: '',
             create_at: 0,
             delete_at: 0,
             email: '',
-            email_verified: true,
             first_name: '',
             last_name: '',
             locale: '',
@@ -35,7 +39,6 @@ export class TestHelper {
             terms_of_service_id: '',
             update_at: 0,
             is_bot: false,
-            allow_marketing: false,
             props: {},
             notify_props: {
                 channel: 'false',
@@ -51,12 +54,9 @@ export class TestHelper {
             },
             last_picture_update: 0,
             last_password_update: 0,
-            failed_attempts: 0,
             mfa_active: false,
-            mfa_secret: '',
             last_activity_at: 0,
             bot_description: '',
-            bot_last_icon_update: 0,
         };
         return Object.assign({}, defaultUser, override);
     }
@@ -99,9 +99,7 @@ export class TestHelper {
             header: 'header',
             purpose: 'purpose',
             last_post_at: 0,
-            total_msg_count: 0,
-            total_msg_count_root: 0,
-            extra_update_at: 0,
+            last_root_post_at: 0,
             creator_id: 'id',
             scheme_id: 'id',
             group_constrained: false,
@@ -122,9 +120,7 @@ export class TestHelper {
             header: 'header',
             purpose: 'purpose',
             last_post_at: 0,
-            total_msg_count: 0,
-            total_msg_count_root: 0,
-            extra_update_at: 0,
+            last_root_post_at: 0,
             creator_id: 'id',
             scheme_id: 'id',
             group_constrained: false,
@@ -150,7 +146,7 @@ export class TestHelper {
         return Object.assign({}, defaultCategory, override);
     }
 
-    public static getChannelMembershipMock(override: Partial<ChannelMembership>, overrideNotifyProps: Partial<ChannelNotifyProps>): ChannelMembership {
+    public static getChannelMembershipMock(override: Partial<ChannelMembership>, overrideNotifyProps?: Partial<ChannelNotifyProps>): ChannelMembership {
         const defaultNotifyProps = {
             desktop: 'default',
             email: 'default',
@@ -208,8 +204,9 @@ export class TestHelper {
             user_id: 'user_id',
             roles: 'team_user',
             delete_at: 0,
-            scheme_user: true,
             scheme_admin: false,
+            scheme_guest: false,
+            scheme_user: true,
         };
         return Object.assign({}, defaultMembership, override);
     }
@@ -236,7 +233,7 @@ export class TestHelper {
             name: 'group_name',
             display_name: 'group_display_name',
             description: '',
-            type: '',
+            source: '',
             remote_id: '',
             create_at: 1,
             update_at: 1,
@@ -247,6 +244,24 @@ export class TestHelper {
             allow_reference: true,
         };
         return Object.assign({}, defaultGroup, override);
+    }
+
+    public static getIncomingWebhookMock(override: Partial<IncomingWebhook> = {}): IncomingWebhook {
+        const defaultIncomingWebhook: IncomingWebhook = {
+            id: 'id',
+            create_at: 1,
+            update_at: 1,
+            delete_at: 1,
+            user_id: '',
+            channel_id: '',
+            team_id: '',
+            display_name: '',
+            description: '',
+            username: '',
+            icon_url: '',
+            channel_locked: false,
+        };
+        return Object.assign({}, defaultIncomingWebhook, override);
     }
 
     public static getPostMock(override: Partial<Post> = {}): Post {
@@ -269,7 +284,6 @@ export class TestHelper {
             id: 'id',
             is_pinned: false,
             message: 'post message',
-            parent_id: '',
             props: {},
             root_id: '',
             type: 'system_add_remove',
@@ -279,7 +293,7 @@ export class TestHelper {
         return Object.assign({}, defaultPost, override);
     }
 
-    public static getFileInfoMock(override: Partial<FileInfo>): FileInfo {
+    public static getFileInfoMock(override: Partial<FileInfo> = {}): FileInfo {
         const defaultFileInfo: FileInfo = {
             id: 'file_info_id',
             user_id: 'user_id',
@@ -294,6 +308,7 @@ export class TestHelper {
             width: 350,
             height: 200,
             clientId: 'client_id',
+            archived: false,
         };
         return Object.assign({}, defaultFileInfo, override);
     }
@@ -337,5 +352,145 @@ export class TestHelper {
             local: false,
         };
         return Object.assign({}, defaultSession, override);
+    }
+
+    public static makeProduct(name: string): ProductComponent {
+        return {
+            id: name,
+            pluginId: '',
+            switcherIcon: `product-${name.toLowerCase()}` as ProductComponent['switcherIcon'],
+            switcherText: name,
+            baseURL: '',
+            switcherLinkURL: '',
+            mainComponent: () => null,
+            headerCentreComponent: () => null,
+            headerRightComponent: () => null,
+            showTeamSidebar: false,
+            showAppBar: false,
+            wrapped: true,
+        };
+    }
+
+    public static getCustomEmojiMock(override: Partial<CustomEmoji>): CustomEmoji {
+        return {
+            id: 'emoji_id',
+            name: 'emoji',
+            category: 'custom',
+            create_at: 0,
+            update_at: 0,
+            delete_at: 0,
+            creator_id: 'user_id',
+            ...override,
+        };
+    }
+    public static getLicenseMock(override: ClientLicense = {}): ClientLicense {
+        return {
+            ...override,
+        };
+    }
+    public static getCloudLicenseMock(override: ClientLicense = {}): ClientLicense {
+        return {
+            ...this.getLicenseMock(override),
+            Cloud: 'true',
+            ...override,
+        };
+    }
+    public static getPreferencesMock(override: Array<{category: string; name: string; value: string}> = [], userId = ''): { [x: string]: PreferenceType } {
+        const preferences: { [x: string]: PreferenceType } = {};
+        override.forEach((p) => {
+            preferences[getPreferenceKey(p.category, p.name)] = {
+                category: p.category,
+                name: p.name,
+                value: p.value,
+                user_id: userId,
+            };
+        });
+        return preferences;
+    }
+    public static getSubscriptionMock(override: Partial<Subscription>): Subscription {
+        return {
+            id: '',
+            customer_id: '',
+            product_id: '',
+            add_ons: [],
+            start_at: 0,
+            end_at: 0,
+            create_at: 0,
+            seats: 0,
+            last_invoice: TestHelper.getInvoiceMock({subscription_id: override.id || ''}),
+            trial_end_at: 0,
+            is_free_trial: 'false',
+            ...override,
+        };
+    }
+    public static getInvoiceMock(override: Partial<Invoice>): Invoice {
+        return {
+            id: '',
+            number: '',
+            create_at: 0,
+            total: 0,
+            tax: 0,
+            status: '',
+            description: '',
+            period_start: 0,
+            period_end: 0,
+            subscription_id: '',
+            line_items: [],
+            current_product_name: '',
+            ...override,
+        };
+    }
+    public static getProductMock(override: Partial<Product>): Product {
+        return {
+            id: '',
+            name: '',
+            description: '',
+            price_per_seat: 0,
+            add_ons: [],
+            product_family: '',
+            sku: '',
+            billing_scheme: '',
+            recurring_interval: '',
+            cross_sells_to: '',
+            ...override,
+        };
+    }
+
+    public static getCloudCustomerMock(override: Partial<CloudCustomer> = {}): CloudCustomer {
+        return {
+            id: '',
+            billing_address: {
+                city: '',
+                state: '',
+                country: '',
+                postal_code: '',
+                line1: '',
+                line2: '',
+            },
+            company_address: {
+                city: '',
+                state: '',
+                country: '',
+                postal_code: '',
+                line1: '',
+                line2: '',
+            },
+            payment_method: {
+                type: '',
+                last_four: '',
+                exp_month: 0,
+                exp_year: 0,
+                card_brand: '',
+                name: '',
+            },
+            name: '',
+            email: '',
+            contact_first_name: '',
+            contact_last_name: '',
+            create_at: 0,
+            creator_id: '',
+            num_employees: 100,
+            ...override,
+        };
     }
 }

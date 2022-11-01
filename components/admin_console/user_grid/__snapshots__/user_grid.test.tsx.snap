@@ -61,16 +61,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
           "name": <UserGridName
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid1",
                 "is_bot": false,
@@ -80,7 +75,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -118,16 +112,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             removeUser={[Function]}
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid1",
                 "is_bot": false,
@@ -137,7 +126,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -173,6 +161,7 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "msg_count_root": 0,
                 "roles": "team_user",
                 "scheme_admin": false,
+                "scheme_guest": false,
                 "scheme_user": true,
                 "team_id": "team",
                 "user_id": "userId1",
@@ -181,16 +170,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             scope="team"
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid1",
                 "is_bot": false,
@@ -200,7 +184,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -233,16 +216,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
           "name": <UserGridName
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -252,7 +230,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -290,16 +267,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             removeUser={[Function]}
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -309,7 +281,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -345,6 +316,7 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "msg_count_root": 0,
                 "roles": "team_user",
                 "scheme_admin": false,
+                "scheme_guest": false,
                 "scheme_user": true,
                 "team_id": "team",
                 "user_id": "userId2",
@@ -353,16 +325,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             scope="team"
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -372,7 +339,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -474,16 +440,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
           "name": <UserGridName
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid-not-saved",
                 "is_bot": false,
@@ -493,7 +454,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -531,16 +491,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             removeUser={[Function]}
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid-not-saved",
                 "is_bot": false,
@@ -550,7 +505,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -587,16 +541,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             scope="team"
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid-not-saved",
                 "is_bot": false,
@@ -606,7 +555,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -639,16 +587,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
           "name": <UserGridName
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid1",
                 "is_bot": false,
@@ -658,7 +601,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -696,16 +638,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             removeUser={[Function]}
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid1",
                 "is_bot": false,
@@ -715,7 +652,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -751,6 +687,7 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "msg_count_root": 0,
                 "roles": "team_user",
                 "scheme_admin": false,
+                "scheme_guest": false,
                 "scheme_user": true,
                 "team_id": "team",
                 "user_id": "userId1",
@@ -759,16 +696,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             scope="team"
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid1",
                 "is_bot": false,
@@ -778,7 +710,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -811,16 +742,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
           "name": <UserGridName
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -830,7 +756,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -868,16 +793,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             removeUser={[Function]}
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -887,7 +807,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -923,6 +842,7 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "msg_count_root": 0,
                 "roles": "team_user",
                 "scheme_admin": false,
+                "scheme_guest": false,
                 "scheme_user": true,
                 "team_id": "team",
                 "user_id": "userId2",
@@ -931,16 +851,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             scope="team"
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -950,7 +865,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -1052,16 +966,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
           "name": <UserGridName
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -1071,7 +980,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -1109,16 +1017,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             removeUser={[Function]}
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -1128,7 +1031,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",
@@ -1164,6 +1066,7 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "msg_count_root": 0,
                 "roles": "team_user",
                 "scheme_admin": false,
+                "scheme_guest": false,
                 "scheme_user": true,
                 "team_id": "team",
                 "user_id": "userId2",
@@ -1172,16 +1075,11 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
             scope="team"
             user={
               Object {
-                "allow_marketing": false,
-                "auth_data": "",
                 "auth_service": "",
                 "bot_description": "",
-                "bot_last_icon_update": 0,
                 "create_at": 0,
                 "delete_at": 0,
                 "email": "",
-                "email_verified": true,
-                "failed_attempts": 0,
                 "first_name": "",
                 "id": "userid2",
                 "is_bot": false,
@@ -1191,7 +1089,6 @@ exports[`components/admin_console/user_grid/UserGrid should match snapshot with 
                 "last_picture_update": 0,
                 "locale": "",
                 "mfa_active": false,
-                "mfa_secret": "",
                 "nickname": "",
                 "notify_props": Object {
                   "channel": "false",

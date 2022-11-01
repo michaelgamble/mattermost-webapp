@@ -44,7 +44,6 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
             "keys": Array [
               "allow_open_invite",
               "invite_only",
-              "group_constrained",
             ],
             "name": <Memo(MemoizedFormattedMessage)
               defaultMessage="Management"
@@ -55,13 +54,6 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
                 "name": <Memo(MemoizedFormattedMessage)
                   defaultMessage="Anyone Can Join"
                   id="admin.team_settings.team_row.managementMethod.anyoneCanJoin"
-                />,
-                "value": false,
-              },
-              "group_constrained": Object {
-                "name": <Memo(MemoizedFormattedMessage)
-                  defaultMessage="Group Sync"
-                  id="admin.team_settings.team_row.managementMethod.groupSync"
                 />,
                 "value": false,
               },
@@ -121,7 +113,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN"
                   size="sm"
                   url={null}
@@ -200,7 +192,6 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
             "keys": Array [
               "allow_open_invite",
               "invite_only",
-              "group_constrained",
             ],
             "name": <Memo(MemoizedFormattedMessage)
               defaultMessage="Management"
@@ -211,13 +202,6 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
                 "name": <Memo(MemoizedFormattedMessage)
                   defaultMessage="Anyone Can Join"
                   id="admin.team_settings.team_row.managementMethod.anyoneCanJoin"
-                />,
-                "value": false,
-              },
-              "group_constrained": Object {
-                "name": <Memo(MemoizedFormattedMessage)
-                  defaultMessage="Group Sync"
-                  id="admin.team_settings.team_row.managementMethod.groupSync"
                 />,
                 "value": false,
               },
@@ -277,7 +261,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN0"
                   size="sm"
                   url={null}
@@ -328,7 +312,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN1"
                   size="sm"
                   url={null}
@@ -379,7 +363,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN2"
                   size="sm"
                   url={null}
@@ -430,7 +414,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN3"
                   size="sm"
                   url={null}
@@ -481,7 +465,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN4"
                   size="sm"
                   url={null}
@@ -532,7 +516,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN5"
                   size="sm"
                   url={null}
@@ -583,7 +567,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN6"
                   size="sm"
                   url={null}
@@ -634,7 +618,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN7"
                   size="sm"
                   url={null}
@@ -685,7 +669,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN8"
                   size="sm"
                   url={null}
@@ -736,7 +720,7 @@ exports[`admin_console/team_channel_settings/team/TeamList should match snapshot
               <div
                 className="TeamList__lowerOpacity"
               >
-                <TeamIcon
+                <injectIntl(TeamIcon)
                   content="DN9"
                   size="sm"
                   url={null}

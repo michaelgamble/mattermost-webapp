@@ -6,13 +6,13 @@ import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
 import {ActionResult} from 'mattermost-redux/types/actions';
-import {Channel} from 'mattermost-redux/types/channels';
+import {Channel} from '@mattermost/types/channels';
 
 import Constants from 'utils/constants';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 
 type Props = {
-    onHide: () => void;
+    onExited: () => void;
     channel: Channel;
     actions: ChannelDetailsActions;
 }
@@ -50,7 +50,7 @@ export default class UnarchiveChannelModal extends React.PureComponent<Props, St
                 dialogClassName='a11y__modal'
                 show={this.state.show}
                 onHide={this.onHide}
-                onExited={this.props.onHide}
+                onExited={this.props.onExited}
                 role='dialog'
                 aria-labelledby='unarchiveChannelModalLabel'
                 id='unarchiveChannelModal'

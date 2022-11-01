@@ -2,21 +2,24 @@
 // See LICENSE.txt for license information.
 
 import React from 'react';
-import {Tooltip} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import classNames from 'classnames';
 
-import {Channel} from 'mattermost-redux/types/channels';
+import Pluggable from 'plugins/pluggable';
+
+import {Channel} from '@mattermost/types/channels';
 
 import {mark, trackEvent} from 'actions/telemetry_actions';
 
 import CopyUrlContextMenu from 'components/copy_url_context_menu';
 import OverlayTrigger from 'components/overlay_trigger';
+import Tooltip from 'components/tooltip';
 
 import Constants from 'utils/constants';
 import {wrapEmojis} from 'utils/emoji_utils';
 import {isDesktopApp} from 'utils/user_agent';
 import {cmdOrCtrlPressed, localizeMessage} from 'utils/utils';
+import {ChannelsAndDirectMessagesTour} from 'components/onboarding_tour';
 
 import ChannelMentionBadge from '../channel_mention_badge';
 import SidebarChannelIcon from '../sidebar_channel_icon';
@@ -37,14 +40,9 @@ type Props = {
     unreadMentions: number;
 
     /**
-     * Number of unread messages in this channel
+     * Whether or not the channel is shown as unread
      */
-    unreadMsgs: number;
-
-    /**
-     * User preference of whether the channel can be marked unread
-     */
-    showUnreadForMsgs: boolean;
+    isUnread: boolean;
 
     /**
      * Checks if the current channel is muted
@@ -60,10 +58,15 @@ type Props = {
 
     teammateId?: string;
 
+    firstChannelName?: string;
+
+    showChannelsTutorialStep: boolean;
+
     actions: {
         clearChannelSelection: () => void;
         multiSelectChannelTo: (channelId: string) => void;
         multiSelectChannelAdd: (channelId: string) => void;
+        unsetEditingPost: () => void;
     };
 };
 
@@ -119,7 +122,7 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
             ariaLabel += ` ${unreadMentions} ${localizeMessage('accessibility.sidebar.types.mentions', 'mentions')}`;
         }
 
-        if (this.showChannelAsUnread() && unreadMentions === 0) {
+        if (this.props.isUnread && unreadMentions === 0) {
             ariaLabel += ` ${localizeMessage('accessibility.sidebar.types.unread', 'unread')}`;
         }
 
@@ -130,7 +133,7 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
     removeTooltipLink = (): void => this.gmItemRef.current?.removeAttribute?.('aria-describedby');
 
     handleChannelClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
-        mark('SidebarLink#click');
+        mark('SidebarChannelLink#click');
         trackEvent('ui', 'ui_channel_selected_v2');
 
         this.handleSelectChannel(event);
@@ -141,7 +144,7 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
             return;
         }
 
-        if (cmdOrCtrlPressed(event)) {
+        if (cmdOrCtrlPressed(event as unknown as React.KeyboardEvent)) {
             event.preventDefault();
             this.props.actions.multiSelectChannelAdd(this.props.channel.id);
         } else if (event.shiftKey) {
@@ -154,24 +157,30 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
 
     handleMenuToggle = (isMenuOpen: boolean): void => this.setState({isMenuOpen});
 
-    /**
-     * Show as unread if you have unread mentions
-     * OR if you have unread messages and the channel can be marked unread by preferences
-     */
-    showChannelAsUnread = (): boolean => this.props.unreadMentions > 0 || (this.props.unreadMsgs > 0 && this.props.showUnreadForMsgs);
-
     render(): JSX.Element {
-        const {link, label, channel, unreadMentions, icon, isMuted, isChannelSelected} = this.props;
+        const {
+            channel,
+            icon,
+            isChannelSelected,
+            isMuted,
+            isUnread,
+            label,
+            link,
+            unreadMentions,
+            firstChannelName,
+            showChannelsTutorialStep,
+        } = this.props;
+
+        let channelsTutorialTip: JSX.Element | null = null;
+
+        // firstChannelName is based on channel.name,
+        // but we want to display `display_name` to the user, so we check against `.name` for channel equality but pass in the .display_name value
+        if (firstChannelName === channel.name || (!firstChannelName && showChannelsTutorialStep && channel.name === Constants.DEFAULT_CHANNEL)) {
+            channelsTutorialTip = firstChannelName ? (<ChannelsAndDirectMessagesTour firstChannelName={channel.display_name}/>) : <ChannelsAndDirectMessagesTour/>;
+        }
 
         let labelElement: JSX.Element = (
-            <span
-                className={classNames(
-                    'SidebarChannelLinkLabel',
-                    {
-                        truncated: this.state.showTooltip,
-                    },
-                )}
-            >
+            <span className='SidebarChannelLinkLabel'>
                 {wrapEmojis(label)}
             </span>
         );
@@ -188,7 +197,10 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
                     overlay={displayNameToolTip}
                     onEntering={this.removeTooltipLink}
                 >
-                    <div ref={this.gmItemRef}>
+                    <div
+                        className='truncated'
+                        ref={this.gmItemRef}
+                    >
                         {labelElement}
                     </div>
                 </OverlayTrigger>
@@ -223,13 +235,17 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
                 >
                     {labelElement}
                     {customStatus}
+                    <Pluggable
+                        pluggableName='SidebarChannelLinkLabel'
+                        channel={this.props.channel}
+                    />
                 </div>
                 <ChannelMentionBadge
                     unreadMentions={unreadMentions}
                 />
                 <SidebarChannelMenu
                     channel={channel}
-                    isUnread={this.showChannelAsUnread()}
+                    isUnread={isUnread}
                     isCollapsed={this.props.isCollapsed}
                     closeHandler={this.props.closeHandler}
                     channelLink={link}
@@ -245,7 +261,7 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
             {
                 menuOpen: this.state.isMenuOpen,
                 muted: isMuted,
-                'unread-title': this.showChannelAsUnread(),
+                'unread-title': this.props.isUnread,
                 selected: isChannelSelected,
             },
         ]);
@@ -259,6 +275,7 @@ export default class SidebarChannelLink extends React.PureComponent<Props, State
                 tabIndex={this.props.isCollapsed ? -1 : 0}
             >
                 {content}
+                {channelsTutorialTip}
             </Link>
         );
 

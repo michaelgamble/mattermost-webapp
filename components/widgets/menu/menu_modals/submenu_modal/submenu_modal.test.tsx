@@ -5,8 +5,6 @@ import React from 'react';
 import {shallow, mount} from 'enzyme';
 import {Modal} from 'react-bootstrap';
 
-import {browserHistory} from 'utils/browser_history';
-
 import SubMenuModal from 'components/widgets/menu/menu_modals/submenu_modal/submenu_modal';
 
 (global as any).MutationObserver = class {
@@ -41,7 +39,7 @@ describe('components/submenu_modal', () => {
                 ],
             },
         ],
-        onHide: jest.fn(),
+        onExited: jest.fn(),
     };
 
     test('should match snapshot', () => {
@@ -62,7 +60,6 @@ describe('components/submenu_modal', () => {
     });
 
     test('should have called click function when button is clicked', async () => {
-        browserHistory.push = jest.fn();
         const props = {
             ...baseProps,
         };
@@ -86,14 +83,12 @@ describe('components/submenu_modal', () => {
         expect(wrapper.state('show')).toEqual(false);
     });
 
-    test('should have called props.onHide when Modal.onExited is called', () => {
-        const onHide = jest.fn();
-        const props = {...baseProps, onHide};
+    test('should have called props.onExited when Modal.onExited is called', () => {
         const wrapper = shallow(
-            <SubMenuModal {...props}/>,
+            <SubMenuModal {...baseProps}/>,
         );
 
         wrapper.find(Modal).props().onExited!(document.createElement('div'));
-        expect(onHide).toHaveBeenCalledTimes(1);
+        expect(baseProps.onExited).toHaveBeenCalledTimes(1);
     });
 });

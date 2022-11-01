@@ -1,25 +1,30 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
+import {batchActions} from 'redux-batched-actions';
+
 import {Client4} from 'mattermost-redux/client';
 import {SearchTypes} from 'mattermost-redux/action_types';
 import {getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
-import {getCurrentUserId, getCurrentUserMentionKeys} from 'mattermost-redux/selectors/entities/users';
+import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 
-import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'mattermost-redux/types/actions';
+import {ActionResult, DispatchFunc, GetStateFunc, ActionFunc} from 'mattermost-redux/types/actions';
 
-import {Post} from 'mattermost-redux/types/posts';
+import {PostList} from '@mattermost/types/posts';
 
-import {FileSearchResults, FileSearchResultItem} from 'mattermost-redux/types/files';
+import {FileSearchResults, FileSearchResultItem} from '@mattermost/types/files';
 
-import {SearchParameter} from 'mattermost-redux/types/search';
+import {SearchParameter} from '@mattermost/types/search';
 
 import {getChannelAndMyMember, getChannelMembers} from './channels';
 import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts, receivedPosts} from './posts';
 import {receivedFiles} from './files';
+
 const WEBAPP_SEARCH_PER_PAGE = 20;
-export function getMissingChannelsFromPosts(posts: Map<string, Post>): ActionFunc {
+
+export function getMissingChannelsFromPosts(posts: PostList['posts']): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
             channels,
@@ -201,21 +206,18 @@ export function getFlaggedPosts(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const userId = getCurrentUserId(state);
-        const teamId = getCurrentTeamId(state);
 
         dispatch({type: SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST});
 
         let posts;
         try {
-            posts = await Client4.getFlaggedPosts(userId, '', teamId);
+            posts = await Client4.getFlaggedPosts(userId);
 
             await Promise.all([getProfilesAndStatusesForPosts(posts.posts, dispatch, getState) as any, dispatch(getMissingChannelsFromPosts(posts.posts)) as any]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch({type: SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE, error});
+            dispatch(logError(error));
             return {error};
         }
 
@@ -248,10 +250,7 @@ export function getPinnedPosts(channelId: string): ActionFunc {
             await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_PINNED_POSTS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch({type: SearchTypes.SEARCH_PINNED_POSTS_FAILURE, error});
             return {error};
         }
 
@@ -283,44 +282,6 @@ export function clearPinnedPosts(channelId: string): ActionFunc {
         });
 
         return {data: true};
-    };
-}
-
-export function getRecentMentions(): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const state = getState();
-        const teamId = getCurrentTeamId(state);
-
-        let posts;
-        try {
-            const termKeys = getCurrentUserMentionKeys(state).filter(({key}) => {
-                return key !== '@channel' && key !== '@all' && key !== '@here';
-            });
-
-            const terms = termKeys.map(({key}) => key).join(' ').trim() + ' ';
-
-            Client4.trackEvent('api', 'api_posts_search_mention');
-            posts = await Client4.searchPosts(teamId, terms, true);
-
-            const profilesAndStatuses = getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
-            const missingChannels = dispatch(getMissingChannelsFromPosts(posts.posts));
-            const arr: [Promise<any>, Promise<any>] = [profilesAndStatuses, missingChannels];
-            await Promise.all(arr);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {
-                type: SearchTypes.RECEIVED_SEARCH_POSTS,
-                data: posts,
-            },
-            receivedPosts(posts),
-        ], 'SEARCH_RECENT_MENTIONS_BATCH'));
-
-        return {data: posts};
     };
 }
 

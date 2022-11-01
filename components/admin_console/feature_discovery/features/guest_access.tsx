@@ -4,6 +4,7 @@
 import React from 'react';
 
 import {t} from 'utils/i18n';
+import {LicenseSkus} from 'utils/constants';
 
 import FeatureDiscovery from '../index';
 
@@ -13,8 +14,9 @@ const GuestAccessFeatureDiscovery: React.FC = () => {
     return (
         <FeatureDiscovery
             featureName='guest_access'
+            minimumSKURequiredForFeature={LicenseSkus.Professional}
             titleID='admin.guest_access_feature_discovery.title'
-            titleDefault='Enable guest accounts with Mattermost Enterprise E10'
+            titleDefault='Enable guest accounts with Mattermost Professional'
             copyID='admin.guest_access_feature_discovery.copy'
             copyDefault={'Collaborate with users outside of your organization while tightly controlling their access channels and team members.'}
             learnMoreURL='https://docs.mattermost.com/deployment/guest-accounts.html'

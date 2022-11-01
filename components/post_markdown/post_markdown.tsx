@@ -4,8 +4,8 @@
 import React from 'react';
 import memoize from 'memoize-one';
 
-import {Post} from 'mattermost-redux/types/posts';
-import {Channel} from 'mattermost-redux/types/channels';
+import {Post} from '@mattermost/types/posts';
+import {Channel} from '@mattermost/types/channels';
 
 import Markdown from 'components/markdown';
 
@@ -59,11 +59,12 @@ export default class PostMarkdown extends React.PureComponent<Props> {
     };
 
     getOptions = memoize(
-        (options: TextFormattingOptions | undefined, disableGroupHighlight: boolean, mentionHighlight: boolean | undefined) => {
+        (options?: TextFormattingOptions, disableGroupHighlight?: boolean, mentionHighlight?: boolean, editedAt?: number) => {
             return {
                 ...options,
                 disableGroupHighlight,
                 mentionHighlight,
+                editedAt,
             };
         })
 
@@ -97,6 +98,7 @@ export default class PostMarkdown extends React.PureComponent<Props> {
             this.props.options,
             post?.props?.disable_group_highlight === true, // eslint-disable-line camelcase
             mentionHighlight,
+            post?.edit_at,
         );
 
         return (
@@ -109,8 +111,9 @@ export default class PostMarkdown extends React.PureComponent<Props> {
                 options={options}
                 channelNamesMap={channelNamesMap}
                 hasPluginTooltips={this.props.hasPluginTooltips}
-                imagesMetadata={this.props.post && this.props.post.metadata && this.props.post.metadata.images}
-                postId={this.props.post && this.props.post.id}
+                imagesMetadata={this.props.post?.metadata?.images}
+                postId={this.props.post?.id}
+                editedAt={this.props.post?.edit_at}
             />
         );
     }

@@ -7,7 +7,7 @@ exports[`components/channel_invite_modal should match snapshot for channel_invit
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
-  dialogClassName="a11y__modal channel-switcher"
+  dialogClassName="a11y__modal channel-invite"
   dialogComponentClass={[Function]}
   enforceFocus={true}
   id="addUsersToChannelModal"
@@ -44,7 +44,7 @@ exports[`components/channel_invite_modal should match snapshot for channel_invit
     role="application"
   >
     <div
-      className="channel-switcher__header"
+      className="channel-invite__header"
     >
       <h1>
         <MemoizedFormattedMessage
@@ -59,20 +59,25 @@ exports[`components/channel_invite_modal should match snapshot for channel_invit
       </h1>
     </div>
     <div
-      className="channel-switcher__content"
+      className="channel-invite__content"
     >
       <MultiSelect
         ariaLabelRenderer={[Function]}
+        backButtonClass="btn-cancel tertiary-button"
+        backButtonClick={[Function]}
+        backButtonText="Cancel"
         buttonSubmitLoadingText="Adding..."
         buttonSubmitText="Add"
+        customNoOptionsMessage={null}
+        focusOnLoad={true}
         handleAdd={[Function]}
+        handleCancel={[Function]}
         handleDelete={[Function]}
         handleInput={[Function]}
         handlePageChange={[Function]}
         handleSubmit={[Function]}
         key="addUsersToChannelKey"
         loading={true}
-        maxValues={20}
         optionRenderer={[Function]}
         options={
           Array [
@@ -94,6 +99,7 @@ exports[`components/channel_invite_modal should match snapshot for channel_invit
         placeholderText="Search for people"
         saveButtonPosition="bottom"
         saving={false}
+        savingEnabled={true}
         selectedItemRef={
           Object {
             "current": null,
@@ -117,6 +123,7 @@ exports[`components/channel_invite_modal should match snapshot for channel_invit
     hasMention={false}
     isEmoji={false}
     isRHS={false}
+    popoverPlacement="right"
     size="md"
     src="/api/v4/users/user-1/image"
     status="online"
@@ -128,24 +135,25 @@ exports[`components/channel_invite_modal should match snapshot for channel_invit
     <div
       className="more-modal__name"
     >
-      <span
-        id="displayedUserNameundefined"
-      >
-        @undefined
+      <span>
+        <BotBadge
+          className=""
+          show={false}
+        />
+        <GuestBadge
+          className=""
+          show={false}
+        />
         <span
           className="light"
-        >
-          
-        </span>
+          style={
+            Object {
+              "position": "absolute",
+              "right": 20,
+            }
+          }
+        />
       </span>
-      <BotBadge
-        className="badge-popoverlist"
-        show={false}
-      />
-      <GuestBadge
-        className="popoverlist"
-        show={false}
-      />
     </div>
   </div>
   <div
@@ -167,7 +175,7 @@ exports[`components/channel_invite_modal should match snapshot with exclude and 
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
-  dialogClassName="a11y__modal channel-switcher"
+  dialogClassName="a11y__modal channel-invite"
   dialogComponentClass={[Function]}
   enforceFocus={true}
   id="addUsersToChannelModal"
@@ -204,7 +212,7 @@ exports[`components/channel_invite_modal should match snapshot with exclude and 
     role="application"
   >
     <div
-      className="channel-switcher__header"
+      className="channel-invite__header"
     >
       <h1>
         <MemoizedFormattedMessage
@@ -219,20 +227,25 @@ exports[`components/channel_invite_modal should match snapshot with exclude and 
       </h1>
     </div>
     <div
-      className="channel-switcher__content"
+      className="channel-invite__content"
     >
       <MultiSelect
         ariaLabelRenderer={[Function]}
+        backButtonClass="btn-cancel tertiary-button"
+        backButtonClick={[Function]}
+        backButtonText="Cancel"
         buttonSubmitLoadingText="Adding..."
         buttonSubmitText="Add"
+        customNoOptionsMessage={null}
+        focusOnLoad={true}
         handleAdd={[Function]}
+        handleCancel={[Function]}
         handleDelete={[Function]}
         handleInput={[Function]}
         handlePageChange={[Function]}
         handleSubmit={[Function]}
         key="addUsersToChannelKey"
         loading={true}
-        maxValues={20}
         optionRenderer={[Function]}
         options={
           Array [
@@ -254,6 +267,7 @@ exports[`components/channel_invite_modal should match snapshot with exclude and 
         placeholderText="Search for people"
         saveButtonPosition="bottom"
         saving={false}
+        savingEnabled={true}
         selectedItemRef={
           Object {
             "current": null,

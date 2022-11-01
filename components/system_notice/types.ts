@@ -2,8 +2,7 @@
 // See LICENSE.txt for license information.
 import React from 'react';
 
-import {Dictionary} from 'mattermost-redux/types/utilities';
-import {AnalyticsRow} from 'mattermost-redux/types/admin';
+import {AnalyticsRow} from '@mattermost/types/admin';
 
 export type Notice = {
     name: string;
@@ -16,5 +15,5 @@ export type Notice = {
         serverVersion: string,
         config: any,
         license: any,
-        analytics?: Dictionary<number | AnalyticsRow[]>): boolean;
+        analytics?: Record<string, number | AnalyticsRow[]>): boolean;
 }

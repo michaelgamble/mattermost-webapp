@@ -5,11 +5,10 @@ import {connect} from 'react-redux';
 import {bindActionCreators, Dispatch, ActionCreatorsMapObject} from 'redux';
 import {withRouter} from 'react-router-dom';
 
-import {loadProfilesForDirect} from 'mattermost-redux/actions/users';
-import {fetchMyChannelsAndMembers, viewChannel} from 'mattermost-redux/actions/channels';
+import {fetchAllMyTeamsChannelsAndChannelMembersREST, fetchMyChannelsAndMembersREST, viewChannel} from 'mattermost-redux/actions/channels';
 import {getMyTeamUnreads, getTeamByName, selectTeam} from 'mattermost-redux/actions/teams';
-import {getGroups, getAllGroupsAssociatedToChannelsInTeam, getAllGroupsAssociatedToTeam, getGroupsByUserId} from 'mattermost-redux/actions/groups';
-import {getTheme, isCollapsedThreadsEnabled} from 'mattermost-redux/selectors/entities/preferences';
+import {getGroups, getAllGroupsAssociatedToChannelsInTeam, getAllGroupsAssociatedToTeam, getGroupsByUserIdPaginated} from 'mattermost-redux/actions/groups';
+import {isCollapsedThreadsEnabled, isCustomGroupsEnabled} from 'mattermost-redux/selectors/entities/preferences';
 import {getLicense, getConfig} from 'mattermost-redux/selectors/entities/general';
 import {getCurrentUser} from 'mattermost-redux/selectors/entities/users';
 import {getCurrentTeamId, getMyTeams} from 'mattermost-redux/selectors/entities/teams';
@@ -39,27 +38,28 @@ function mapStateToProps(state: GlobalState, ownProps: OwnProps) {
     const config = getConfig(state);
     const currentUser = getCurrentUser(state);
     const plugins = state.plugins.components.NeedsTeamComponent;
+    const isCustomUserGroupsEnabled = isCustomGroupsEnabled(state);
 
     return {
         license,
         collapsedThreads: isCollapsedThreadsEnabled(state),
-        theme: getTheme(state),
         mfaRequired: checkIfMFARequired(currentUser, license, config, ownProps.match.url),
         currentUser,
         currentTeamId: getCurrentTeamId(state),
         previousTeamId: getPreviousTeamId(state) as string,
         teamsList: getMyTeams(state),
         currentChannelId: getCurrentChannelId(state),
-        useLegacyLHS: config.EnableLegacySidebar === 'true',
         plugins,
         selectedThreadId: getSelectedThreadIdInCurrentTeam(state),
+        isCustomGroupsEnabled: isCustomUserGroupsEnabled,
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
     return {
         actions: bindActionCreators<ActionCreatorsMapObject<Action>, any>({
-            fetchMyChannelsAndMembers,
+            fetchMyChannelsAndMembersREST,
+            fetchAllMyTeamsChannelsAndChannelMembersREST,
             getMyTeamUnreads,
             viewChannel,
             markChannelAsReadOnFocus,
@@ -68,10 +68,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
             setPreviousTeamId,
             selectTeam,
             loadStatusesForChannelAndSidebar,
-            loadProfilesForDirect,
             getAllGroupsAssociatedToChannelsInTeam,
             getAllGroupsAssociatedToTeam,
-            getGroupsByUserId,
+            getGroupsByUserIdPaginated,
             getGroups,
         }, dispatch),
     };

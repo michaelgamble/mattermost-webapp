@@ -1,29 +1,19 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
-
 import {General, Posts, RequestStatus} from 'mattermost-redux/constants';
 import {leaveChannel, markChannelAsRead} from 'mattermost-redux/actions/channels';
 import * as UserActions from 'mattermost-redux/actions/users';
 import * as PostActions from 'mattermost-redux/actions/posts';
 
-import {browserHistory} from 'utils/browser_history';
+import {getHistory} from 'utils/browser_history';
 import * as Actions from 'actions/views/channel';
-import {openDirectChannelToUserId} from 'actions/channel_actions.jsx';
+import {closeRightHandSide} from 'actions/views/rhs';
+import mockStore from 'tests/test_store';
 import {ActionTypes, PostRequestTypes} from 'utils/constants';
 
-const mockStore = configureStore([thunk]);
-
-jest.mock('utils/browser_history', () => ({
-    browserHistory: {
-        push: jest.fn(),
-    },
-}));
-
-jest.mock('utils/channel_utils.jsx', () => {
-    const original = jest.requireActual('utils/channel_utils.jsx');
+jest.mock('utils/channel_utils.tsx', () => {
+    const original = jest.requireActual('utils/channel_utils.tsx');
 
     return {
         ...original,
@@ -31,16 +21,17 @@ jest.mock('utils/channel_utils.jsx', () => {
     };
 });
 
-jest.mock('actions/channel_actions.jsx', () => ({
-    openDirectChannelToUserId: jest.fn(() => ({type: ''})),
-}));
-
 jest.mock('mattermost-redux/actions/users');
 
 jest.mock('mattermost-redux/actions/channels', () => ({
     ...jest.requireActual('mattermost-redux/actions/channels'),
     markChannelAsRead: jest.fn(() => ({type: ''})),
     leaveChannel: jest.fn(() => ({type: ''})),
+}));
+
+jest.mock('actions/views/rhs', () => ({
+    ...jest.requireActual('actions/views/rhs'),
+    closeRightHandSide: jest.fn(() => ({type: ''})),
 }));
 
 jest.mock('mattermost-redux/actions/posts');
@@ -85,9 +76,7 @@ describe('channel view actions', () => {
                 },
             },
             general: {
-                config: {
-                    EnableLegacySidebar: 'true',
-                },
+                config: {},
                 serverVersion: '5.12.0',
             },
             roles: {
@@ -100,12 +89,19 @@ describe('channel view actions', () => {
             },
             posts: {
                 postsInChannel: {},
+                posts: {},
+            },
+            channelCategories: {
+                byId: {},
             },
         },
         views: {
             channel: {
                 loadingPosts: {},
                 postVisibility: {current_channel_id: 60},
+            },
+            rhs: {
+                selectedPostId: '',
             },
         },
     };
@@ -119,26 +115,36 @@ describe('channel view actions', () => {
     describe('switchToChannel', () => {
         test('switch to public channel', () => {
             store.dispatch(Actions.switchToChannel(channel1));
-            expect(browserHistory.push).toHaveBeenCalledWith(`/${team1.name}/channels/${channel1.name}`);
-        });
-
-        test('switch to fake direct channel', async () => {
-            await store.dispatch(Actions.switchToChannel({fake: true, userId: 'userid2', name: 'username2'}));
-            expect(openDirectChannelToUserId).toHaveBeenCalledWith('userid2');
-            expect(browserHistory.push).toHaveBeenCalledWith(`/${team1.name}/messages/@username2`);
+            expect(getHistory().push).toHaveBeenCalledWith(`/${team1.name}/channels/${channel1.name}`);
         });
 
         test('switch to gm channel', async () => {
             await store.dispatch(Actions.switchToChannel(gmChannel));
-            expect(browserHistory.push).toHaveBeenCalledWith(`/${team1.name}/channels/${gmChannel.name}`);
+            expect(getHistory().push).toHaveBeenCalledWith(`/${team1.name}/channels/${gmChannel.name}`);
         });
     });
 
     describe('leaveChannel', () => {
         test('leave a channel successfully', async () => {
             await store.dispatch(Actions.leaveChannel('channelid1'));
-            expect(browserHistory.push).toHaveBeenCalledWith(`/${team1.name}`);
+            expect(getHistory().push).toHaveBeenCalledWith(`/${team1.name}`);
             expect(leaveChannel).toHaveBeenCalledWith('channelid1');
+            expect(closeRightHandSide).not.toHaveBeenCalled();
+        });
+        test('leave a channel successfully with a thread open', async () => {
+            store = mockStore({
+                ...initialState,
+                views: {
+                    ...initialState.views,
+                    rhs: {
+                        selectedPostId: '1',
+                    },
+                },
+            });
+            await store.dispatch(Actions.leaveChannel('channelid1'));
+            expect(getHistory().push).toHaveBeenCalledWith(`/${team1.name}`);
+            expect(leaveChannel).toHaveBeenCalledWith('channelid1');
+            expect(closeRightHandSide).toHaveBeenCalled();
         });
         test('leave the last channel successfully', async () => {
             store = mockStore({
@@ -155,7 +161,7 @@ describe('channel view actions', () => {
             });
 
             await store.dispatch(Actions.leaveChannel('channelid1'));
-            expect(browserHistory.push).toHaveBeenCalledWith('/');
+            expect(getHistory().push).toHaveBeenCalledWith('/');
             expect(leaveChannel).toHaveBeenCalledWith('channelid1');
         });
     });
@@ -163,7 +169,7 @@ describe('channel view actions', () => {
     describe('goToLastViewedChannel', () => {
         test('should switch to town square if last viewed channel is current channel', async () => {
             await store.dispatch(Actions.goToLastViewedChannel());
-            expect(browserHistory.push).toHaveBeenCalledWith(`/${team1.name}/channels/${General.DEFAULT_CHANNEL}`);
+            expect(getHistory().push).toHaveBeenCalledWith(`/${team1.name}/channels/${General.DEFAULT_CHANNEL}`);
         });
     });
 

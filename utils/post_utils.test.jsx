@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-/* eslint-disable max-lines */
 
 import assert from 'assert';
 
@@ -8,7 +7,7 @@ import {createIntl} from 'react-intl';
 
 import {Preferences} from 'mattermost-redux/constants';
 
-import * as PostUtils from 'utils/post_utils.jsx';
+import * as PostUtils from 'utils/post_utils';
 import {PostListRowListIds, Constants} from 'utils/constants';
 import {TestHelper} from 'utils/test_helper';
 import EmojiMap from 'utils/emoji_map';
@@ -213,6 +212,196 @@ describe('PostUtils.containsAtChannel', () => {
             const containsAtChannel = PostUtils.containsAtChannel(data.text, data.options);
 
             assert.equal(containsAtChannel, data.result, data.text);
+        }
+    });
+});
+
+describe('PostUtils.specialMentionsInText', () => {
+    test('should return correct mentions', () => {
+        for (const data of [
+            {
+                text: '',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: 'all',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@allison',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@ALLISON',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@all123',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '123@all',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: 'hey@all',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: 'hey@all.com',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@all',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: '@ALL',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: '@all hey',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: 'hey @all',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: 'HEY @ALL',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: 'hey @all!',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: 'hey @all:+1:',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: 'hey @ALL:+1:',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: '`@all`',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@someone `@all`',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '``@all``',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '```@all```',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '```\n@all\n```',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '```````\n@all\n```````',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '```code\n@all\n```',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '~~~@all~~~',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: '~~~\n@all\n~~~',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: ' /not_cmd @all',
+                result: {all: true, channel: false, here: false},
+            },
+            {
+                text: '/cmd @all',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '/cmd @all test',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '/cmd test @all',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@channel',
+                result: {all: false, channel: true, here: false},
+            },
+            {
+                text: '@channel.',
+                result: {all: false, channel: true, here: false},
+            },
+            {
+                text: '@channel/test',
+                result: {all: false, channel: true, here: false},
+            },
+            {
+                text: 'test/@channel',
+                result: {all: false, channel: true, here: false},
+            },
+            {
+                text: '@all/@channel',
+                result: {all: true, channel: true, here: false},
+            },
+            {
+                text: '@cha*nnel*',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@cha**nnel**',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '*@cha*nnel',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '[@chan](https://google.com)nel',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@cha![](https://myimage)nnel',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '@here![](https://myimage)nnel',
+                result: {all: false, channel: false, here: true},
+            },
+            {
+                text: '@heree',
+                result: {all: false, channel: false, here: false},
+            },
+            {
+                text: '=@here=',
+                result: {all: false, channel: false, here: true},
+            },
+            {
+                text: '@HERE',
+                result: {all: false, channel: false, here: true},
+            },
+            {
+                text: '@all @here',
+                result: {all: true, channel: false, here: true},
+            },
+            {
+                text: 'message @all message @here message @channel',
+                result: {all: true, here: true, channel: true},
+            },
+        ]) {
+            const mentions = PostUtils.specialMentionsInText(data.text);
+            assert.deepEqual(mentions, data.result, data.text);
         }
     });
 });
@@ -669,6 +858,16 @@ describe('PostUtils.getLatestPostId', () => {
 
 describe('PostUtils.createAriaLabelForPost', () => {
     const emojiMap = new EmojiMap(new Map());
+    const users = {
+        'benjamin.cooke': {
+            username: 'benjamin.cooke',
+            nickname: 'sysadmin',
+            first_name: 'Benjamin',
+            last_name: 'Cooke',
+        },
+    };
+    const teammateNameDisplaySetting = 'username';
+
     test('Should show username, timestamp, message, attachments, reactions, flagged and pinned', () => {
         const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'});
 
@@ -683,21 +882,23 @@ describe('PostUtils.createAriaLabelForPost', () => {
                 ],
             },
             file_ids: ['test_file_id_1'],
+            is_pinned: true,
         };
         const author = 'test_author';
         const reactions = {
-            reaction1: 'reaction 1',
-            reaction2: 'reaction 2',
+            reaction1: {emoji_name: 'reaction 1'},
+            reaction2: {emoji_name: 'reaction 2'},
         };
         const isFlagged = true;
 
-        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap);
-        assert.ok(ariaLabel.indexOf(author));
-        assert.ok(ariaLabel.indexOf(testPost.message));
-        assert.ok(ariaLabel.indexOf('3 attachments'));
-        assert.ok(ariaLabel.indexOf('2 reactions'));
-        assert.ok(ariaLabel.indexOf('message is saved and pinned'));
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap, users, teammateNameDisplaySetting);
+        expect(ariaLabel.indexOf(author)).not.toBe(-1);
+        expect(ariaLabel.indexOf(testPost.message)).not.toBe(-1);
+        expect(ariaLabel.indexOf('3 attachments')).not.toBe(-1);
+        expect(ariaLabel.indexOf('2 reactions')).not.toBe(-1);
+        expect(ariaLabel.indexOf('message is saved and pinned')).not.toBe(-1);
     });
+
     test('Should show that message is a reply', () => {
         const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'});
 
@@ -710,9 +911,10 @@ describe('PostUtils.createAriaLabelForPost', () => {
         const reactions = {};
         const isFlagged = true;
 
-        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap);
-        assert.ok(ariaLabel.indexOf('reply'));
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap, users, teammateNameDisplaySetting);
+        expect(ariaLabel.indexOf('replied')).not.toBe(-1);
     });
+
     test('Should translate emoji into {emoji-name} emoji', () => {
         const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'});
 
@@ -724,13 +926,14 @@ describe('PostUtils.createAriaLabelForPost', () => {
         const reactions = {};
         const isFlagged = true;
 
-        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap);
-        assert.ok(ariaLabel.indexOf('smile emoji'));
-        assert.ok(ariaLabel.indexOf('+1 emoji'));
-        assert.ok(ariaLabel.indexOf('non-potable water emoji'));
-        assert.ok(ariaLabel.indexOf(':space emoji:'));
-        assert.ok(ariaLabel.indexOf(':not_an_emoji:'));
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap, users, teammateNameDisplaySetting);
+        expect(ariaLabel.indexOf('smile emoji')).not.toBe(-1);
+        expect(ariaLabel.indexOf('+1 emoji')).not.toBe(-1);
+        expect(ariaLabel.indexOf('non-potable water emoji')).not.toBe(-1);
+        expect(ariaLabel.indexOf(':space emoji:')).not.toBe(-1);
+        expect(ariaLabel.indexOf(':not_an_emoji:')).not.toBe(-1);
     });
+
     test('Generating aria label should not break if message is undefined', () => {
         const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'});
 
@@ -743,7 +946,55 @@ describe('PostUtils.createAriaLabelForPost', () => {
         const reactions = {};
         const isFlagged = true;
 
-        assert.doesNotThrow(() => PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap));
+        expect(() => PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap, users, teammateNameDisplaySetting)).not.toThrow();
+    });
+
+    test('Should not mention reactions if passed an empty object', () => {
+        const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'});
+
+        const testPost = {
+            message: 'test_message',
+            root_id: 'test_id',
+            create_at: (new Date().getTime() / 1000) || 0,
+        };
+        const author = 'test_author';
+        const reactions = {};
+        const isFlagged = true;
+
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap, users, teammateNameDisplaySetting);
+        expect(ariaLabel.indexOf('reaction')).toBe(-1);
+    });
+
+    test('Should show the username as mention name in the message', () => {
+        const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'});
+
+        const testPost = {
+            message: 'test_message @benjamin.cooke',
+            root_id: 'test_id',
+            create_at: (new Date().getTime() / 1000) || 0,
+        };
+        const author = 'test_author';
+        const reactions = {};
+        const isFlagged = true;
+
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap, users, teammateNameDisplaySetting);
+        expect(ariaLabel.indexOf('@benjamin.cooke')).not.toBe(-1);
+    });
+
+    test('Should show the nickname as mention name in the message', () => {
+        const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'});
+
+        const testPost = {
+            message: 'test_message @benjamin.cooke',
+            root_id: 'test_id',
+            create_at: (new Date().getTime() / 1000) || 0,
+        };
+        const author = 'test_author';
+        const reactions = {};
+        const isFlagged = true;
+
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap, users, 'nickname_full_name');
+        expect(ariaLabel.indexOf('@sysadmin')).not.toBe(-1);
     });
 });
 
@@ -757,6 +1008,21 @@ describe('PostUtils.splitMessageBasedOnCaretPosition', () => {
         const stringPieces = PostUtils.splitMessageBasedOnCaretPosition(state.caretPosition, message);
         assert.equal('Te', stringPieces.firstPiece);
         assert.equal('st Message', stringPieces.lastPiece);
+    });
+});
+
+describe('PostUtils.splitMessageBasedOnTextSelection', () => {
+    const cases = [
+        [0, 0, 'Test Replace Message', {firstPiece: '', lastPiece: 'Test Replace Message'}],
+        [20, 20, 'Test Replace Message', {firstPiece: 'Test Replace Message', lastPiece: ''}],
+        [0, 20, 'Test Replace Message', {firstPiece: '', lastPiece: ''}],
+        [0, 10, 'Test Replace Message', {firstPiece: '', lastPiece: 'ce Message'}],
+        [5, 12, 'Test Replace Message', {firstPiece: 'Test ', lastPiece: ' Message'}],
+        [7, 20, 'Test Replace Message', {firstPiece: 'Test Re', lastPiece: ''}],
+    ];
+
+    test.each(cases)('should return an object with two strings when given context and message', (start, end, message, expected) => {
+        expect(PostUtils.splitMessageBasedOnTextSelection(start, end, message)).toEqual(expected);
     });
 });
 

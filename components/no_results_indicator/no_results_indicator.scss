@@ -16,6 +16,25 @@
     margin: auto;
     text-align: center;
     word-break: break-word;
+
+    &.horizontal-layout {
+        flex-direction: row;
+
+        svg {
+            flex: 0 0 auto;
+            margin-right: 16px;
+        }
+
+        .no-results__text-container {
+            display: flex;
+            flex-direction: column;
+            text-align: start;
+        }
+
+        .no-results__title {
+            margin-bottom: 10px;
+        }
+    }
 }
 
 .no-results__variant-wrapper {
@@ -30,15 +49,12 @@
 }
 
 .no-results__title {
+    margin: 0;
     margin-bottom: 15px;
     color: var(--center-channel-color);
     font-size: 20px;
     font-weight: 600;
     line-height: 20px;
-
-    &.only-title {
-        font-size: 14px;
-    }
 }
 
 .no-results__icon {

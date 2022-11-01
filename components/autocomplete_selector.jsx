@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import SuggestionBox from 'components/suggestion/suggestion_box.jsx';
+import SuggestionBox from 'components/suggestion/suggestion_box';
 import SuggestionList from 'components/suggestion/suggestion_list';
 
 export default class AutocompleteSelector extends React.PureComponent {
@@ -21,7 +21,7 @@ export default class AutocompleteSelector extends React.PureComponent {
         disabled: PropTypes.bool,
         toggleFocus: PropTypes.func,
         listComponent: PropTypes.elementType,
-        listStyle: PropTypes.string,
+        listPosition: PropTypes.string,
     };
 
     static defaultProps = {
@@ -30,7 +30,7 @@ export default class AutocompleteSelector extends React.PureComponent {
         labelClassName: '',
         inputClassName: '',
         listComponent: SuggestionList,
-        listStyle: 'top',
+        listPosition: 'top',
     };
 
     constructor(props) {
@@ -95,7 +95,7 @@ export default class AutocompleteSelector extends React.PureComponent {
             value,
             disabled,
             listComponent,
-            listStyle,
+            listPosition,
         } = this.props;
 
         const {focused} = this.state;
@@ -145,13 +145,12 @@ export default class AutocompleteSelector extends React.PureComponent {
                         onBlur={this.onBlur}
                         providers={providers}
                         completeOnTab={true}
-                        renderDividers={false}
                         renderNoResults={true}
                         openOnFocus={true}
                         openWhenEmpty={true}
                         replaceAllInputOnSelect={true}
                         disabled={disabled}
-                        listStyle={listStyle}
+                        listPosition={listPosition}
                     />
                     {helpTextContent}
                     {footer}

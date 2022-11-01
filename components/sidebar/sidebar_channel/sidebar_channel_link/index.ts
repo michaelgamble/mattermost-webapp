@@ -4,17 +4,24 @@
 import {connect} from 'react-redux';
 import {bindActionCreators, Dispatch} from 'redux';
 
-import {getMyChannelMemberships} from 'mattermost-redux/selectors/entities/common';
-import {isCollapsedThreadsEnabled} from 'mattermost-redux/selectors/entities/preferences';
-
-import {Channel} from 'mattermost-redux/types/channels';
+import {getCurrentUserId, getMyChannelMemberships} from 'mattermost-redux/selectors/entities/common';
+import {getInt} from 'mattermost-redux/selectors/entities/preferences';
+import {Channel} from '@mattermost/types/channels';
 import {GenericAction} from 'mattermost-redux/types/actions';
-import {getMsgCountInChannel, isChannelMuted} from 'mattermost-redux/utils/channel_utils';
-
+import {isChannelMuted} from 'mattermost-redux/utils/channel_utils';
+import {makeGetChannelUnreadCount} from 'mattermost-redux/selectors/entities/channels';
+import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {clearChannelSelection, multiSelectChannelAdd, multiSelectChannelTo} from 'actions/views/channel_sidebar';
+import {getFirstChannelName} from 'selectors/onboarding';
+import {unsetEditingPost} from 'actions/post_actions';
 import {isChannelSelected} from 'selectors/views/channel_sidebar';
 import {GlobalState} from 'types/store';
-import {NotificationLevels} from 'utils/constants';
+import {
+    GenericTaskSteps,
+    OnboardingTaskCategory,
+    OnboardingTasksName,
+} from 'components/onboarding_tasks';
+import {FINISHED, OnboardingTourSteps, TutorialTourName} from 'components/onboarding_tour';
 
 import SidebarChannelLink from './sidebar_channel_link';
 
@@ -22,38 +29,38 @@ type OwnProps = {
     channel: Channel;
 }
 
-function mapStateToProps(state: GlobalState, ownProps: OwnProps) {
-    const member = getMyChannelMemberships(state)[ownProps.channel.id];
+function makeMapStateToProps() {
+    const getUnreadCount = makeGetChannelUnreadCount();
 
-    // Unread counts
-    let unreadMentions = 0;
-    let unreadMsgs = 0;
-    let showUnreadForMsgs = true;
-    const collapsed = isCollapsedThreadsEnabled(state);
-    if (member) {
-        unreadMentions = collapsed ? member.mention_count_root : member.mention_count;
-
-        if (ownProps.channel) {
-            unreadMsgs = getMsgCountInChannel(collapsed, ownProps.channel, member);
-        }
-
-        if (member.notify_props) {
-            showUnreadForMsgs = member.notify_props.mark_unread !== NotificationLevels.MENTION;
-        }
-    }
-
-    return {
-        unreadMentions,
-        unreadMsgs,
-        showUnreadForMsgs,
-        isMuted: isChannelMuted(member),
-        isChannelSelected: isChannelSelected(state, ownProps.channel.id),
+    return (state: GlobalState, ownProps: OwnProps) => {
+        const member = getMyChannelMemberships(state)[ownProps.channel.id];
+        const unreadCount = getUnreadCount(state, ownProps.channel.id);
+        const firstChannelName = getFirstChannelName(state);
+        const config = getConfig(state);
+        const enableTutorial = config.EnableTutorial === 'true';
+        const currentUserId = getCurrentUserId(state);
+        const tutorialStep = getInt(state, TutorialTourName.ONBOARDING_TUTORIAL_STEP, currentUserId, 0);
+        const triggerStep = getInt(state, OnboardingTaskCategory, OnboardingTasksName.CHANNELS_TOUR, FINISHED);
+        const channelTourTriggered = triggerStep === GenericTaskSteps.STARTED;
+        const isOnboardingFlowEnabled = config.EnableOnboardingFlow;
+        const showChannelsTour = enableTutorial && tutorialStep === OnboardingTourSteps.CHANNELS_AND_DIRECT_MESSAGES;
+        const showChannelsTutorialStep = showChannelsTour && channelTourTriggered && isOnboardingFlowEnabled === 'true';
+        return {
+            unreadMentions: unreadCount.mentions,
+            unreadMsgs: unreadCount.messages,
+            isUnread: unreadCount.showUnread,
+            isMuted: isChannelMuted(member),
+            isChannelSelected: isChannelSelected(state, ownProps.channel.id),
+            firstChannelName: showChannelsTutorialStep ? firstChannelName : '',
+            showChannelsTutorialStep,
+        };
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<GenericAction>) {
     return {
         actions: bindActionCreators({
+            unsetEditingPost,
             clearChannelSelection,
             multiSelectChannelTo,
             multiSelectChannelAdd,
@@ -61,4 +68,4 @@ function mapDispatchToProps(dispatch: Dispatch<GenericAction>) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SidebarChannelLink);
+export default connect(makeMapStateToProps, mapDispatchToProps)(SidebarChannelLink);

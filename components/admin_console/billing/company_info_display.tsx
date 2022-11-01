@@ -8,7 +8,8 @@ import {useSelector} from 'react-redux';
 import {trackEvent} from 'actions/telemetry_actions';
 import BlockableLink from 'components/admin_console/blockable_link';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message';
-import noCompanyInfoGraphic from 'images/no_company_info_graphic.svg';
+import CompanySvg from 'components/common/svg_images_components/company_svg';
+
 import {GlobalState} from 'types/store';
 
 import './company_info_display.scss';
@@ -31,9 +32,9 @@ const addInfoButton = (
 
 const noCompanyInfoSection = (
     <div className='CompanyInfoDisplay__noCompanyInfo'>
-        <img
-            className='ComapnyInfoDisplay__noCompanyInfo-graphic'
-            src={noCompanyInfoGraphic}
+        <CompanySvg
+            width={300}
+            height={210}
         />
         <div className='CompanyInfoDisplay__noCompanyInfo-message'>
             <FormattedMessage
@@ -63,7 +64,8 @@ const CompanyInfoDisplay: React.FC = () => {
 
     let body = noCompanyInfoSection;
     const address = companyInfo?.company_address?.line1 ? companyInfo.company_address : companyInfo?.billing_address;
-    if (address?.line1) {
+    const isCompanyBillingFilled = address?.line1 !== undefined;
+    if (isCompanyBillingFilled) {
         body = (
             <div className='CompanyInfoDisplay__companyInfo'>
                 <div className='CompanyInfoDisplay__companyInfo-text'>
@@ -116,10 +118,16 @@ const CompanyInfoDisplay: React.FC = () => {
                         />
                     </div>
                     <div className='CompanyInfoDisplay__headerText-bottom'>
-                        <FormattedMessage
-                            id='admin.billing.company_info_display.provideDetails'
-                            defaultMessage='Provide your company name and address'
-                        />
+                        {isCompanyBillingFilled &&
+                            <FormattedMessage
+                                id='admin.billing.company_info_display.detailsProvided'
+                                defaultMessage='Your company name and address'
+                            />}
+                        {!isCompanyBillingFilled &&
+                            <FormattedMessage
+                                id='admin.billing.company_info_display.provideDetails'
+                                defaultMessage='Provide your company name and address'
+                            />}
                     </div>
                 </div>
                 {!address?.line1 && addInfoButton}

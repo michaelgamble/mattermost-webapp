@@ -5,7 +5,7 @@ import React from 'react';
 import {ShallowWrapper} from 'enzyme';
 
 import {CategoryTypes} from 'mattermost-redux/constants/channel_categories';
-import {ChannelType} from 'mattermost-redux/types/channels';
+import {ChannelType} from '@mattermost/types/channels';
 
 import {shallowWithIntl} from 'tests/helpers/intl-test-helper';
 import Constants from 'utils/constants';
@@ -226,21 +226,6 @@ describe('components/sidebar/sidebar_channel/sidebar_channel_menu', () => {
         ) as ShallowWrapper<any, any, SidebarChannelMenuType>;
 
         expect(wrapper.instance().renderDropdownItems()).toMatchSnapshot();
-    });
-
-    test('should copy state from SidebarMenu when refCallback is called', () => {
-        const wrapper = shallowWithIntl(
-            <SidebarChannelMenu {...baseProps}/>,
-        ) as ShallowWrapper<typeof baseProps, any, SidebarChannelMenuType>;
-
-        const ref = {
-            state: {
-                openUp: false,
-            },
-        };
-
-        wrapper.instance().refCallback(ref as any);
-        expect(wrapper.instance().state.openUp).toEqual(ref.state.openUp);
     });
 
     test('should call the close handler when leave channel is clicked', () => {

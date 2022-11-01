@@ -3,16 +3,14 @@
 
 import React from 'react';
 import {FormattedDate, FormattedMessage, FormattedNumber} from 'react-intl';
-import {Tooltip} from 'react-bootstrap';
 
 import {BillingSchemes, CloudLinks, TrialPeriodDays} from 'utils/constants';
 
-import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 import BlockableLink from 'components/admin_console/blockable_link';
 import OverlayTrigger from 'components/overlay_trigger';
-
-import noBillingHistoryGraphic from 'images/no_billing_history_graphic.svg';
-import upgradeMattermostCloudImage from 'images/upgrade-mattermost-cloud-image.svg';
+import Tooltip from 'components/tooltip';
+import UpgradeSvg from 'components/common/svg_images_components/upgrade_svg';
+import EmptyBillingHistorySvg from 'components/common/svg_images_components/empty_billing_history_svg';
 
 import {trackEvent} from 'actions/telemetry_actions';
 
@@ -20,9 +18,9 @@ import {Client4} from 'mattermost-redux/client';
 
 export const noBillingHistory = (
     <div className='BillingSummary__noBillingHistory'>
-        <img
-            className='BillingSummary__noBillingHistory-graphic'
-            src={noBillingHistoryGraphic}
+        <EmptyBillingHistorySvg
+            height={167}
+            width={234}
         />
         <div className='BillingSummary__noBillingHistory-title'>
             <FormattedMessage
@@ -37,7 +35,7 @@ export const noBillingHistory = (
             />
         </div>
         <a
-            target='_new'
+            target='_blank'
             rel='noopener noreferrer'
             href={CloudLinks.BILLING_DOCS}
             className='BillingSummary__noBillingHistory-link'
@@ -51,40 +49,13 @@ export const noBillingHistory = (
     </div>
 );
 
-export const upgradeFreeTierMattermostCloud = (onUpgradeMattermostCloud: () => void) => (
+export const freeTrial = (onUpgradeMattermostCloud: (callerInfo: string) => void, daysLeftOnTrial: number) => (
     <div className='UpgradeMattermostCloud'>
         <div className='UpgradeMattermostCloud__image'>
-            <img src={upgradeMattermostCloudImage}/>
-        </div>
-        <div className='UpgradeMattermostCloud__title'>
-            <FormattedMessage
-                id='admin.billing.subscription.upgradeMattermostCloud.title'
-                defaultMessage='Need more users?'
+            <UpgradeSvg
+                height={167}
+                width={234}
             />
-        </div>
-        <div className='UpgradeMattermostCloud__description'>
-            <FormattedMarkdownMessage
-                id='admin.billing.subscription.upgradeMattermostCloud.description'
-                defaultMessage='The free tier is **limited to 10 users.** Get access to more users, teams and other great features'
-            />
-        </div>
-        <button
-            type='button'
-            onClick={onUpgradeMattermostCloud}
-            className='UpgradeMattermostCloud__upgradeButton'
-        >
-            <FormattedMessage
-                id='admin.billing.subscription.upgradeMattermostCloud.upgradeButton'
-                defaultMessage='Upgrade Mattermost Cloud'
-            />
-        </button>
-    </div>
-);
-
-export const freeTrial = (onUpgradeMattermostCloud: () => void, daysLeftOnTrial: number) => (
-    <div className='UpgradeMattermostCloud'>
-        <div className='UpgradeMattermostCloud__image'>
-            <img src={upgradeMattermostCloudImage}/>
         </div>
         <div className='UpgradeMattermostCloud__title'>
             {daysLeftOnTrial > TrialPeriodDays.TRIAL_1_DAY &&
@@ -102,21 +73,21 @@ export const freeTrial = (onUpgradeMattermostCloud: () => void, daysLeftOnTrial:
         </div>
         <div className='UpgradeMattermostCloud__description'>
             {daysLeftOnTrial > TrialPeriodDays.TRIAL_WARNING_THRESHOLD &&
-                <FormattedMarkdownMessage
+                <FormattedMessage
                     id='admin.billing.subscription.freeTrial.description'
                     defaultMessage='Your free trial will expire in {daysLeftOnTrial} days. Add your payment information to continue after the trial ends.'
                     values={{daysLeftOnTrial}}
                 />
             }
             {(daysLeftOnTrial > TrialPeriodDays.TRIAL_1_DAY && daysLeftOnTrial <= TrialPeriodDays.TRIAL_WARNING_THRESHOLD) &&
-                <FormattedMarkdownMessage
+                <FormattedMessage
                     id='admin.billing.subscription.freeTrial.lessThan3Days.description'
                     defaultMessage='Your free trial will end in {daysLeftOnTrial, number} {daysLeftOnTrial, plural, one {day} other {days}}. Add payment information to continue enjoying the benefits of Cloud Professional.'
                     values={{daysLeftOnTrial}}
                 />
             }
             {(daysLeftOnTrial === TrialPeriodDays.TRIAL_1_DAY || daysLeftOnTrial === TrialPeriodDays.TRIAL_0_DAYS) &&
-                <FormattedMarkdownMessage
+                <FormattedMessage
                     id='admin.billing.subscription.freeTrial.lastDay.description'
                     defaultMessage='Your free trial has ended. Add payment information to continue enjoying the benefits of Cloud Professional.'
                 />
@@ -124,12 +95,12 @@ export const freeTrial = (onUpgradeMattermostCloud: () => void, daysLeftOnTrial:
         </div>
         <button
             type='button'
-            onClick={onUpgradeMattermostCloud}
+            onClick={() => onUpgradeMattermostCloud('billing_summary_free_trial_upgrade_button')}
             className='UpgradeMattermostCloud__upgradeButton'
         >
             <FormattedMessage
                 id='admin.billing.subscription.cloudTrial.subscribeButton'
-                defaultMessage='Subscribe Now'
+                defaultMessage='Upgrade Now'
             />
         </button>
     </div>
@@ -213,7 +184,7 @@ export const lastInvoiceInfo = (invoice: any, product: any, fullCharges: any, pa
                                     style='currency'
                                     currency='USD'
                                 />
-                                <FormattedMarkdownMessage
+                                <FormattedMessage
                                     id='admin.billing.subscriptions.billing_summary.lastInvoice.userCount'
                                     defaultMessage=' x {users} users'
                                     values={{users: charge.quantity}}
@@ -271,7 +242,7 @@ export const lastInvoiceInfo = (invoice: any, product: any, fullCharges: any, pa
                     className='BillingSummary__lastInvoice-charge'
                 >
                     <div className='BillingSummary__lastInvoice-chargeDescription'>
-                        <FormattedMarkdownMessage
+                        <FormattedMessage
                             id='admin.billing.subscriptions.billing_summary.lastInvoice.userCountPartial'
                             defaultMessage='{users} users'
                             values={{users: charge.quantity}}
@@ -324,7 +295,7 @@ export const lastInvoiceInfo = (invoice: any, product: any, fullCharges: any, pa
             </div>
             <div className='BillingSummary__lastInvoice-download'>
                 <a
-                    target='_new'
+                    target='_self'
                     rel='noopener noreferrer'
                     href={Client4.getInvoicePdfUrl(invoice.id)}
                     className='BillingSummary__lastInvoice-downloadButton'

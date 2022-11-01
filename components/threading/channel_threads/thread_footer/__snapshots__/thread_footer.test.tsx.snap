@@ -52,11 +52,11 @@ exports[`components/threading/channel_threads/thread_footer should report total 
       size="sm"
       userIds={
         Array [
-          "1",
-          "2",
-          "3",
-          "4",
           "5",
+          "4",
+          "3",
+          "2",
+          "1",
         ]
       }
     >
@@ -65,7 +65,8 @@ exports[`components/threading/channel_threads/thread_footer should report total 
         onMouseLeave={[Function]}
       >
         <UserAvatar
-          key="1"
+          disableProfileOverlay={false}
+          key="5"
           overlayProps={
             Object {
               "animation": true,
@@ -76,138 +77,208 @@ exports[`components/threading/channel_threads/thread_footer should report total 
           size="sm"
           style={
             Object {
-              "background": "rgb(239, 239, 240)",
+              "background": "rgb(240, 240, 241)",
             }
           }
           tabIndex={0}
-          userId="1"
+          userId="5"
         >
-          <SimpleTooltip
-            animation={true}
-            content="first.last1"
-            id="name-1"
-            onEntered={[Function]}
+          <OverlayTrigger
+            defaultOverlayShown={false}
+            disabled={false}
+            overlay={
+              <Memo(Connect(injectIntl(ProfilePopover)))
+                className="user-profile-popover"
+                hide={[Function]}
+                src="/api/v4/users/5/image?_=0"
+                userId="5"
+              />
+            }
+            placement="right"
+            rootClose={true}
+            trigger="click"
           >
             <OverlayTrigger
-              animation={true}
               defaultOverlayShown={false}
-              delayShow={500}
-              onEntered={[Function]}
               overlay={
-                <Tooltip
-                  bsClass="tooltip"
-                  className="hidden-xs"
-                  id="name-1"
-                  placement="top"
-                >
-                  first.last1
-                </Tooltip>
-              }
-              placement="top"
-              trigger={
-                Array [
-                  "hover",
-                  "focus",
-                ]
-              }
-            >
-              <OverlayTrigger
-                animation={true}
-                defaultOverlayShown={false}
-                delayShow={500}
-                onEntered={[Function]}
-                overlay={
-                  <OverlayWrapper
-                    bsClass="tooltip"
-                    className="hidden-xs"
-                    id="name-1"
-                    intl={
-                      Object {
-                        "defaultFormats": Object {},
-                        "defaultLocale": "en",
-                        "defaultRichTextElements": undefined,
-                        "formatDate": [Function],
-                        "formatDateTimeRange": [Function],
-                        "formatDateToParts": [Function],
-                        "formatDisplayName": [Function],
-                        "formatList": [Function],
-                        "formatListToParts": [Function],
-                        "formatMessage": [Function],
-                        "formatNumber": [Function],
-                        "formatNumberToParts": [Function],
-                        "formatPlural": [Function],
-                        "formatRelativeTime": [Function],
-                        "formatTime": [Function],
-                        "formatTimeToParts": [Function],
-                        "formats": Object {},
-                        "formatters": Object {
-                          "getDateTimeFormat": [Function],
-                          "getDisplayNames": [Function],
-                          "getListFormat": [Function],
-                          "getMessageFormat": [Function],
-                          "getNumberFormat": [Function],
-                          "getPluralRules": [Function],
-                          "getRelativeTimeFormat": [Function],
-                        },
-                        "locale": "en",
-                        "messages": Object {},
-                        "onError": [Function],
-                        "textComponent": "span",
-                        "timeZone": "Etc/UTC",
-                        "wrapRichTextChunksInFragment": undefined,
-                      }
-                    }
-                    placement="top"
-                  >
-                    first.last1
-                  </OverlayWrapper>
-                }
-                placement="top"
-                trigger={
-                  Array [
-                    "hover",
-                    "focus",
-                  ]
-                }
-              >
-                <Memo(Avatar)
-                  onBlur={[Function]}
-                  onClick={null}
-                  onFocus={[Function]}
-                  onMouseOut={[Function]}
-                  onMouseOver={[Function]}
-                  size="sm"
-                  style={
+                <OverlayWrapper
+                  className="user-profile-popover"
+                  hide={[Function]}
+                  intl={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "defaultFormats": Object {},
+                      "defaultLocale": "en",
+                      "defaultRichTextElements": undefined,
+                      "formatDate": [Function],
+                      "formatDateTimeRange": [Function],
+                      "formatDateToParts": [Function],
+                      "formatDisplayName": [Function],
+                      "formatList": [Function],
+                      "formatListToParts": [Function],
+                      "formatMessage": [Function],
+                      "formatNumber": [Function],
+                      "formatNumberToParts": [Function],
+                      "formatPlural": [Function],
+                      "formatRelativeTime": [Function],
+                      "formatTime": [Function],
+                      "formatTimeToParts": [Function],
+                      "formats": Object {},
+                      "formatters": Object {
+                        "getDateTimeFormat": [Function],
+                        "getDisplayNames": [Function],
+                        "getListFormat": [Function],
+                        "getMessageFormat": [Function],
+                        "getNumberFormat": [Function],
+                        "getPluralRules": [Function],
+                        "getRelativeTimeFormat": [Function],
+                      },
+                      "locale": "en",
+                      "messages": Object {},
+                      "onError": [Function],
+                      "textComponent": "span",
+                      "timeZone": "Etc/UTC",
+                      "wrapRichTextChunksInFragment": undefined,
                     }
                   }
-                  tabIndex={0}
-                  url="/api/v4/users/1/image?_=0"
+                  src="/api/v4/users/5/image?_=0"
+                  userId="5"
+                />
+              }
+              placement="right"
+              rootClose={true}
+              trigger="click"
+            >
+              <SimpleTooltip
+                animation={true}
+                content="first.last5"
+                id="name-5"
+                onClick={[Function]}
+                onEntered={[Function]}
+              >
+                <OverlayTrigger
+                  animation={true}
+                  defaultOverlayShown={false}
+                  delayShow={500}
+                  onClick={[Function]}
+                  onEntered={[Function]}
+                  overlay={
+                    <Tooltip
+                      className="hidden-xs"
+                      id="name-5"
+                      placement="top"
+                    >
+                      first.last5
+                    </Tooltip>
+                  }
+                  placement="top"
+                  trigger={
+                    Array [
+                      "hover",
+                      "focus",
+                    ]
+                  }
                 >
-                  <img
-                    alt="user profile image"
-                    className="Avatar Avatar-sm"
-                    onBlur={[Function]}
-                    onClick={null}
-                    onFocus={[Function]}
-                    onMouseOut={[Function]}
-                    onMouseOver={[Function]}
-                    src="/api/v4/users/1/image?_=0"
-                    style={
-                      Object {
-                        "background": "rgb(239, 239, 240)",
-                      }
+                  <OverlayTrigger
+                    animation={true}
+                    defaultOverlayShown={false}
+                    delayShow={500}
+                    onClick={[Function]}
+                    onEntered={[Function]}
+                    overlay={
+                      <OverlayWrapper
+                        className="hidden-xs"
+                        id="name-5"
+                        intl={
+                          Object {
+                            "defaultFormats": Object {},
+                            "defaultLocale": "en",
+                            "defaultRichTextElements": undefined,
+                            "formatDate": [Function],
+                            "formatDateTimeRange": [Function],
+                            "formatDateToParts": [Function],
+                            "formatDisplayName": [Function],
+                            "formatList": [Function],
+                            "formatListToParts": [Function],
+                            "formatMessage": [Function],
+                            "formatNumber": [Function],
+                            "formatNumberToParts": [Function],
+                            "formatPlural": [Function],
+                            "formatRelativeTime": [Function],
+                            "formatTime": [Function],
+                            "formatTimeToParts": [Function],
+                            "formats": Object {},
+                            "formatters": Object {
+                              "getDateTimeFormat": [Function],
+                              "getDisplayNames": [Function],
+                              "getListFormat": [Function],
+                              "getMessageFormat": [Function],
+                              "getNumberFormat": [Function],
+                              "getPluralRules": [Function],
+                              "getRelativeTimeFormat": [Function],
+                            },
+                            "locale": "en",
+                            "messages": Object {},
+                            "onError": [Function],
+                            "textComponent": "span",
+                            "timeZone": "Etc/UTC",
+                            "wrapRichTextChunksInFragment": undefined,
+                          }
+                        }
+                        placement="top"
+                      >
+                        first.last5
+                      </OverlayWrapper>
                     }
-                    tabIndex={0}
-                  />
-                </Memo(Avatar)>
-              </OverlayTrigger>
+                    placement="top"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <button
+                      className="style--none"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      tabIndex={-1}
+                    >
+                      <Memo(Avatar)
+                        size="sm"
+                        style={
+                          Object {
+                            "background": "rgb(240, 240, 241)",
+                          }
+                        }
+                        tabIndex={0}
+                        url="/api/v4/users/5/image?_=0"
+                      >
+                        <img
+                          alt="user profile image"
+                          className="Avatar Avatar-sm"
+                          onError={[Function]}
+                          src="/api/v4/users/5/image?_=0"
+                          style={
+                            Object {
+                              "background": "rgb(240, 240, 241)",
+                            }
+                          }
+                          tabIndex={0}
+                        />
+                      </Memo(Avatar)>
+                    </button>
+                  </OverlayTrigger>
+                </OverlayTrigger>
+              </SimpleTooltip>
             </OverlayTrigger>
-          </SimpleTooltip>
+          </OverlayTrigger>
         </UserAvatar>
         <UserAvatar
-          key="2"
+          disableProfileOverlay={false}
+          key="4"
           overlayProps={
             Object {
               "animation": true,
@@ -218,137 +289,207 @@ exports[`components/threading/channel_threads/thread_footer should report total 
           size="sm"
           style={
             Object {
-              "background": "rgb(239, 239, 240)",
+              "background": "rgb(240, 240, 241)",
             }
           }
           tabIndex={0}
-          userId="2"
+          userId="4"
         >
-          <SimpleTooltip
-            animation={true}
-            content="first.last2"
-            id="name-2"
-            onEntered={[Function]}
+          <OverlayTrigger
+            defaultOverlayShown={false}
+            disabled={false}
+            overlay={
+              <Memo(Connect(injectIntl(ProfilePopover)))
+                className="user-profile-popover"
+                hide={[Function]}
+                src="/api/v4/users/4/image?_=0"
+                userId="4"
+              />
+            }
+            placement="right"
+            rootClose={true}
+            trigger="click"
           >
             <OverlayTrigger
-              animation={true}
               defaultOverlayShown={false}
-              delayShow={500}
-              onEntered={[Function]}
               overlay={
-                <Tooltip
-                  bsClass="tooltip"
-                  className="hidden-xs"
-                  id="name-2"
-                  placement="top"
-                >
-                  first.last2
-                </Tooltip>
-              }
-              placement="top"
-              trigger={
-                Array [
-                  "hover",
-                  "focus",
-                ]
-              }
-            >
-              <OverlayTrigger
-                animation={true}
-                defaultOverlayShown={false}
-                delayShow={500}
-                onEntered={[Function]}
-                overlay={
-                  <OverlayWrapper
-                    bsClass="tooltip"
-                    className="hidden-xs"
-                    id="name-2"
-                    intl={
-                      Object {
-                        "defaultFormats": Object {},
-                        "defaultLocale": "en",
-                        "defaultRichTextElements": undefined,
-                        "formatDate": [Function],
-                        "formatDateTimeRange": [Function],
-                        "formatDateToParts": [Function],
-                        "formatDisplayName": [Function],
-                        "formatList": [Function],
-                        "formatListToParts": [Function],
-                        "formatMessage": [Function],
-                        "formatNumber": [Function],
-                        "formatNumberToParts": [Function],
-                        "formatPlural": [Function],
-                        "formatRelativeTime": [Function],
-                        "formatTime": [Function],
-                        "formatTimeToParts": [Function],
-                        "formats": Object {},
-                        "formatters": Object {
-                          "getDateTimeFormat": [Function],
-                          "getDisplayNames": [Function],
-                          "getListFormat": [Function],
-                          "getMessageFormat": [Function],
-                          "getNumberFormat": [Function],
-                          "getPluralRules": [Function],
-                          "getRelativeTimeFormat": [Function],
-                        },
-                        "locale": "en",
-                        "messages": Object {},
-                        "onError": [Function],
-                        "textComponent": "span",
-                        "timeZone": "Etc/UTC",
-                        "wrapRichTextChunksInFragment": undefined,
-                      }
-                    }
-                    placement="top"
-                  >
-                    first.last2
-                  </OverlayWrapper>
-                }
-                placement="top"
-                trigger={
-                  Array [
-                    "hover",
-                    "focus",
-                  ]
-                }
-              >
-                <Memo(Avatar)
-                  onBlur={[Function]}
-                  onClick={null}
-                  onFocus={[Function]}
-                  onMouseOut={[Function]}
-                  onMouseOver={[Function]}
-                  size="sm"
-                  style={
+                <OverlayWrapper
+                  className="user-profile-popover"
+                  hide={[Function]}
+                  intl={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "defaultFormats": Object {},
+                      "defaultLocale": "en",
+                      "defaultRichTextElements": undefined,
+                      "formatDate": [Function],
+                      "formatDateTimeRange": [Function],
+                      "formatDateToParts": [Function],
+                      "formatDisplayName": [Function],
+                      "formatList": [Function],
+                      "formatListToParts": [Function],
+                      "formatMessage": [Function],
+                      "formatNumber": [Function],
+                      "formatNumberToParts": [Function],
+                      "formatPlural": [Function],
+                      "formatRelativeTime": [Function],
+                      "formatTime": [Function],
+                      "formatTimeToParts": [Function],
+                      "formats": Object {},
+                      "formatters": Object {
+                        "getDateTimeFormat": [Function],
+                        "getDisplayNames": [Function],
+                        "getListFormat": [Function],
+                        "getMessageFormat": [Function],
+                        "getNumberFormat": [Function],
+                        "getPluralRules": [Function],
+                        "getRelativeTimeFormat": [Function],
+                      },
+                      "locale": "en",
+                      "messages": Object {},
+                      "onError": [Function],
+                      "textComponent": "span",
+                      "timeZone": "Etc/UTC",
+                      "wrapRichTextChunksInFragment": undefined,
                     }
                   }
-                  tabIndex={0}
-                  url="/api/v4/users/2/image?_=0"
+                  src="/api/v4/users/4/image?_=0"
+                  userId="4"
+                />
+              }
+              placement="right"
+              rootClose={true}
+              trigger="click"
+            >
+              <SimpleTooltip
+                animation={true}
+                content="first.last4"
+                id="name-4"
+                onClick={[Function]}
+                onEntered={[Function]}
+              >
+                <OverlayTrigger
+                  animation={true}
+                  defaultOverlayShown={false}
+                  delayShow={500}
+                  onClick={[Function]}
+                  onEntered={[Function]}
+                  overlay={
+                    <Tooltip
+                      className="hidden-xs"
+                      id="name-4"
+                      placement="top"
+                    >
+                      first.last4
+                    </Tooltip>
+                  }
+                  placement="top"
+                  trigger={
+                    Array [
+                      "hover",
+                      "focus",
+                    ]
+                  }
                 >
-                  <img
-                    alt="user profile image"
-                    className="Avatar Avatar-sm"
-                    onBlur={[Function]}
-                    onClick={null}
-                    onFocus={[Function]}
-                    onMouseOut={[Function]}
-                    onMouseOver={[Function]}
-                    src="/api/v4/users/2/image?_=0"
-                    style={
-                      Object {
-                        "background": "rgb(239, 239, 240)",
-                      }
+                  <OverlayTrigger
+                    animation={true}
+                    defaultOverlayShown={false}
+                    delayShow={500}
+                    onClick={[Function]}
+                    onEntered={[Function]}
+                    overlay={
+                      <OverlayWrapper
+                        className="hidden-xs"
+                        id="name-4"
+                        intl={
+                          Object {
+                            "defaultFormats": Object {},
+                            "defaultLocale": "en",
+                            "defaultRichTextElements": undefined,
+                            "formatDate": [Function],
+                            "formatDateTimeRange": [Function],
+                            "formatDateToParts": [Function],
+                            "formatDisplayName": [Function],
+                            "formatList": [Function],
+                            "formatListToParts": [Function],
+                            "formatMessage": [Function],
+                            "formatNumber": [Function],
+                            "formatNumberToParts": [Function],
+                            "formatPlural": [Function],
+                            "formatRelativeTime": [Function],
+                            "formatTime": [Function],
+                            "formatTimeToParts": [Function],
+                            "formats": Object {},
+                            "formatters": Object {
+                              "getDateTimeFormat": [Function],
+                              "getDisplayNames": [Function],
+                              "getListFormat": [Function],
+                              "getMessageFormat": [Function],
+                              "getNumberFormat": [Function],
+                              "getPluralRules": [Function],
+                              "getRelativeTimeFormat": [Function],
+                            },
+                            "locale": "en",
+                            "messages": Object {},
+                            "onError": [Function],
+                            "textComponent": "span",
+                            "timeZone": "Etc/UTC",
+                            "wrapRichTextChunksInFragment": undefined,
+                          }
+                        }
+                        placement="top"
+                      >
+                        first.last4
+                      </OverlayWrapper>
                     }
-                    tabIndex={0}
-                  />
-                </Memo(Avatar)>
-              </OverlayTrigger>
+                    placement="top"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <button
+                      className="style--none"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      tabIndex={-1}
+                    >
+                      <Memo(Avatar)
+                        size="sm"
+                        style={
+                          Object {
+                            "background": "rgb(240, 240, 241)",
+                          }
+                        }
+                        tabIndex={0}
+                        url="/api/v4/users/4/image?_=0"
+                      >
+                        <img
+                          alt="user profile image"
+                          className="Avatar Avatar-sm"
+                          onError={[Function]}
+                          src="/api/v4/users/4/image?_=0"
+                          style={
+                            Object {
+                              "background": "rgb(240, 240, 241)",
+                            }
+                          }
+                          tabIndex={0}
+                        />
+                      </Memo(Avatar)>
+                    </button>
+                  </OverlayTrigger>
+                </OverlayTrigger>
+              </SimpleTooltip>
             </OverlayTrigger>
-          </SimpleTooltip>
+          </OverlayTrigger>
         </UserAvatar>
         <UserAvatar
+          disableProfileOverlay={false}
           key="3"
           overlayProps={
             Object {
@@ -360,139 +501,208 @@ exports[`components/threading/channel_threads/thread_footer should report total 
           size="sm"
           style={
             Object {
-              "background": "rgb(239, 239, 240)",
+              "background": "rgb(240, 240, 241)",
             }
           }
           tabIndex={0}
           userId="3"
         >
-          <SimpleTooltip
-            animation={true}
-            content="first.last3"
-            id="name-3"
-            onEntered={[Function]}
+          <OverlayTrigger
+            defaultOverlayShown={false}
+            disabled={false}
+            overlay={
+              <Memo(Connect(injectIntl(ProfilePopover)))
+                className="user-profile-popover"
+                hide={[Function]}
+                src="/api/v4/users/3/image?_=0"
+                userId="3"
+              />
+            }
+            placement="right"
+            rootClose={true}
+            trigger="click"
           >
             <OverlayTrigger
-              animation={true}
               defaultOverlayShown={false}
-              delayShow={500}
-              onEntered={[Function]}
               overlay={
-                <Tooltip
-                  bsClass="tooltip"
-                  className="hidden-xs"
-                  id="name-3"
-                  placement="top"
-                >
-                  first.last3
-                </Tooltip>
-              }
-              placement="top"
-              trigger={
-                Array [
-                  "hover",
-                  "focus",
-                ]
-              }
-            >
-              <OverlayTrigger
-                animation={true}
-                defaultOverlayShown={false}
-                delayShow={500}
-                onEntered={[Function]}
-                overlay={
-                  <OverlayWrapper
-                    bsClass="tooltip"
-                    className="hidden-xs"
-                    id="name-3"
-                    intl={
-                      Object {
-                        "defaultFormats": Object {},
-                        "defaultLocale": "en",
-                        "defaultRichTextElements": undefined,
-                        "formatDate": [Function],
-                        "formatDateTimeRange": [Function],
-                        "formatDateToParts": [Function],
-                        "formatDisplayName": [Function],
-                        "formatList": [Function],
-                        "formatListToParts": [Function],
-                        "formatMessage": [Function],
-                        "formatNumber": [Function],
-                        "formatNumberToParts": [Function],
-                        "formatPlural": [Function],
-                        "formatRelativeTime": [Function],
-                        "formatTime": [Function],
-                        "formatTimeToParts": [Function],
-                        "formats": Object {},
-                        "formatters": Object {
-                          "getDateTimeFormat": [Function],
-                          "getDisplayNames": [Function],
-                          "getListFormat": [Function],
-                          "getMessageFormat": [Function],
-                          "getNumberFormat": [Function],
-                          "getPluralRules": [Function],
-                          "getRelativeTimeFormat": [Function],
-                        },
-                        "locale": "en",
-                        "messages": Object {},
-                        "onError": [Function],
-                        "textComponent": "span",
-                        "timeZone": "Etc/UTC",
-                        "wrapRichTextChunksInFragment": undefined,
-                      }
-                    }
-                    placement="top"
-                  >
-                    first.last3
-                  </OverlayWrapper>
-                }
-                placement="top"
-                trigger={
-                  Array [
-                    "hover",
-                    "focus",
-                  ]
-                }
-              >
-                <Memo(Avatar)
-                  onBlur={[Function]}
-                  onClick={null}
-                  onFocus={[Function]}
-                  onMouseOut={[Function]}
-                  onMouseOver={[Function]}
-                  size="sm"
-                  style={
+                <OverlayWrapper
+                  className="user-profile-popover"
+                  hide={[Function]}
+                  intl={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "defaultFormats": Object {},
+                      "defaultLocale": "en",
+                      "defaultRichTextElements": undefined,
+                      "formatDate": [Function],
+                      "formatDateTimeRange": [Function],
+                      "formatDateToParts": [Function],
+                      "formatDisplayName": [Function],
+                      "formatList": [Function],
+                      "formatListToParts": [Function],
+                      "formatMessage": [Function],
+                      "formatNumber": [Function],
+                      "formatNumberToParts": [Function],
+                      "formatPlural": [Function],
+                      "formatRelativeTime": [Function],
+                      "formatTime": [Function],
+                      "formatTimeToParts": [Function],
+                      "formats": Object {},
+                      "formatters": Object {
+                        "getDateTimeFormat": [Function],
+                        "getDisplayNames": [Function],
+                        "getListFormat": [Function],
+                        "getMessageFormat": [Function],
+                        "getNumberFormat": [Function],
+                        "getPluralRules": [Function],
+                        "getRelativeTimeFormat": [Function],
+                      },
+                      "locale": "en",
+                      "messages": Object {},
+                      "onError": [Function],
+                      "textComponent": "span",
+                      "timeZone": "Etc/UTC",
+                      "wrapRichTextChunksInFragment": undefined,
                     }
                   }
-                  tabIndex={0}
-                  url="/api/v4/users/3/image?_=0"
+                  src="/api/v4/users/3/image?_=0"
+                  userId="3"
+                />
+              }
+              placement="right"
+              rootClose={true}
+              trigger="click"
+            >
+              <SimpleTooltip
+                animation={true}
+                content="first.last3"
+                id="name-3"
+                onClick={[Function]}
+                onEntered={[Function]}
+              >
+                <OverlayTrigger
+                  animation={true}
+                  defaultOverlayShown={false}
+                  delayShow={500}
+                  onClick={[Function]}
+                  onEntered={[Function]}
+                  overlay={
+                    <Tooltip
+                      className="hidden-xs"
+                      id="name-3"
+                      placement="top"
+                    >
+                      first.last3
+                    </Tooltip>
+                  }
+                  placement="top"
+                  trigger={
+                    Array [
+                      "hover",
+                      "focus",
+                    ]
+                  }
                 >
-                  <img
-                    alt="user profile image"
-                    className="Avatar Avatar-sm"
-                    onBlur={[Function]}
-                    onClick={null}
-                    onFocus={[Function]}
-                    onMouseOut={[Function]}
-                    onMouseOver={[Function]}
-                    src="/api/v4/users/3/image?_=0"
-                    style={
-                      Object {
-                        "background": "rgb(239, 239, 240)",
-                      }
+                  <OverlayTrigger
+                    animation={true}
+                    defaultOverlayShown={false}
+                    delayShow={500}
+                    onClick={[Function]}
+                    onEntered={[Function]}
+                    overlay={
+                      <OverlayWrapper
+                        className="hidden-xs"
+                        id="name-3"
+                        intl={
+                          Object {
+                            "defaultFormats": Object {},
+                            "defaultLocale": "en",
+                            "defaultRichTextElements": undefined,
+                            "formatDate": [Function],
+                            "formatDateTimeRange": [Function],
+                            "formatDateToParts": [Function],
+                            "formatDisplayName": [Function],
+                            "formatList": [Function],
+                            "formatListToParts": [Function],
+                            "formatMessage": [Function],
+                            "formatNumber": [Function],
+                            "formatNumberToParts": [Function],
+                            "formatPlural": [Function],
+                            "formatRelativeTime": [Function],
+                            "formatTime": [Function],
+                            "formatTimeToParts": [Function],
+                            "formats": Object {},
+                            "formatters": Object {
+                              "getDateTimeFormat": [Function],
+                              "getDisplayNames": [Function],
+                              "getListFormat": [Function],
+                              "getMessageFormat": [Function],
+                              "getNumberFormat": [Function],
+                              "getPluralRules": [Function],
+                              "getRelativeTimeFormat": [Function],
+                            },
+                            "locale": "en",
+                            "messages": Object {},
+                            "onError": [Function],
+                            "textComponent": "span",
+                            "timeZone": "Etc/UTC",
+                            "wrapRichTextChunksInFragment": undefined,
+                          }
+                        }
+                        placement="top"
+                      >
+                        first.last3
+                      </OverlayWrapper>
                     }
-                    tabIndex={0}
-                  />
-                </Memo(Avatar)>
-              </OverlayTrigger>
+                    placement="top"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <button
+                      className="style--none"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      tabIndex={-1}
+                    >
+                      <Memo(Avatar)
+                        size="sm"
+                        style={
+                          Object {
+                            "background": "rgb(240, 240, 241)",
+                          }
+                        }
+                        tabIndex={0}
+                        url="/api/v4/users/3/image?_=0"
+                      >
+                        <img
+                          alt="user profile image"
+                          className="Avatar Avatar-sm"
+                          onError={[Function]}
+                          src="/api/v4/users/3/image?_=0"
+                          style={
+                            Object {
+                              "background": "rgb(240, 240, 241)",
+                            }
+                          }
+                          tabIndex={0}
+                        />
+                      </Memo(Avatar)>
+                    </button>
+                  </OverlayTrigger>
+                </OverlayTrigger>
+              </SimpleTooltip>
             </OverlayTrigger>
-          </SimpleTooltip>
+          </OverlayTrigger>
         </UserAvatar>
         <SimpleTooltip
           animation={true}
-          content="first.last4, first.last5"
+          content="first.last2, first.last1"
           id="names-overflow"
           onEntered={[Function]}
         >
@@ -503,12 +713,11 @@ exports[`components/threading/channel_threads/thread_footer should report total 
             onEntered={[Function]}
             overlay={
               <Tooltip
-                bsClass="tooltip"
                 className="hidden-xs"
                 id="names-overflow"
                 placement="top"
               >
-                first.last4, first.last5
+                first.last2, first.last1
               </Tooltip>
             }
             placement="top"
@@ -526,7 +735,6 @@ exports[`components/threading/channel_threads/thread_footer should report total 
               onEntered={[Function]}
               overlay={
                 <OverlayWrapper
-                  bsClass="tooltip"
                   className="hidden-xs"
                   id="names-overflow"
                   intl={
@@ -567,7 +775,7 @@ exports[`components/threading/channel_threads/thread_footer should report total 
                   }
                   placement="top"
                 >
-                  first.last4, first.last5
+                  first.last2, first.last1
                 </OverlayWrapper>
               }
               placement="top"
@@ -587,7 +795,7 @@ exports[`components/threading/channel_threads/thread_footer should report total 
                 size="sm"
                 style={
                   Object {
-                    "background": "rgb(239, 239, 240)",
+                    "background": "rgb(240, 240, 241)",
                   }
                 }
                 tabIndex={0}
@@ -603,7 +811,7 @@ exports[`components/threading/channel_threads/thread_footer should report total 
                   onMouseOver={[Function]}
                   style={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "background": "rgb(240, 240, 241)",
                     }
                   }
                   tabIndex={0}
@@ -844,7 +1052,6 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
         delayShow={500}
         overlay={
           <Tooltip
-            bsClass="tooltip"
             className="hidden-xs"
             id="threadFooterIndicator"
             placement="top"
@@ -873,7 +1080,6 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
           delayShow={500}
           overlay={
             <OverlayWrapper
-              bsClass="tooltip"
               className="hidden-xs"
               id="threadFooterIndicator"
               intl={
@@ -953,11 +1159,11 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
       size="sm"
       userIds={
         Array [
-          "1",
-          "2",
-          "3",
-          "4",
           "5",
+          "4",
+          "3",
+          "2",
+          "1",
         ]
       }
     >
@@ -966,7 +1172,8 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
         onMouseLeave={[Function]}
       >
         <UserAvatar
-          key="1"
+          disableProfileOverlay={false}
+          key="5"
           overlayProps={
             Object {
               "animation": true,
@@ -977,138 +1184,208 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
           size="sm"
           style={
             Object {
-              "background": "rgb(239, 239, 240)",
+              "background": "rgb(240, 240, 241)",
             }
           }
           tabIndex={0}
-          userId="1"
+          userId="5"
         >
-          <SimpleTooltip
-            animation={true}
-            content="first.last1"
-            id="name-1"
-            onEntered={[Function]}
+          <OverlayTrigger
+            defaultOverlayShown={false}
+            disabled={false}
+            overlay={
+              <Memo(Connect(injectIntl(ProfilePopover)))
+                className="user-profile-popover"
+                hide={[Function]}
+                src="/api/v4/users/5/image?_=0"
+                userId="5"
+              />
+            }
+            placement="right"
+            rootClose={true}
+            trigger="click"
           >
             <OverlayTrigger
-              animation={true}
               defaultOverlayShown={false}
-              delayShow={500}
-              onEntered={[Function]}
               overlay={
-                <Tooltip
-                  bsClass="tooltip"
-                  className="hidden-xs"
-                  id="name-1"
-                  placement="top"
-                >
-                  first.last1
-                </Tooltip>
-              }
-              placement="top"
-              trigger={
-                Array [
-                  "hover",
-                  "focus",
-                ]
-              }
-            >
-              <OverlayTrigger
-                animation={true}
-                defaultOverlayShown={false}
-                delayShow={500}
-                onEntered={[Function]}
-                overlay={
-                  <OverlayWrapper
-                    bsClass="tooltip"
-                    className="hidden-xs"
-                    id="name-1"
-                    intl={
-                      Object {
-                        "defaultFormats": Object {},
-                        "defaultLocale": "en",
-                        "defaultRichTextElements": undefined,
-                        "formatDate": [Function],
-                        "formatDateTimeRange": [Function],
-                        "formatDateToParts": [Function],
-                        "formatDisplayName": [Function],
-                        "formatList": [Function],
-                        "formatListToParts": [Function],
-                        "formatMessage": [Function],
-                        "formatNumber": [Function],
-                        "formatNumberToParts": [Function],
-                        "formatPlural": [Function],
-                        "formatRelativeTime": [Function],
-                        "formatTime": [Function],
-                        "formatTimeToParts": [Function],
-                        "formats": Object {},
-                        "formatters": Object {
-                          "getDateTimeFormat": [Function],
-                          "getDisplayNames": [Function],
-                          "getListFormat": [Function],
-                          "getMessageFormat": [Function],
-                          "getNumberFormat": [Function],
-                          "getPluralRules": [Function],
-                          "getRelativeTimeFormat": [Function],
-                        },
-                        "locale": "en",
-                        "messages": Object {},
-                        "onError": [Function],
-                        "textComponent": "span",
-                        "timeZone": "Etc/UTC",
-                        "wrapRichTextChunksInFragment": undefined,
-                      }
-                    }
-                    placement="top"
-                  >
-                    first.last1
-                  </OverlayWrapper>
-                }
-                placement="top"
-                trigger={
-                  Array [
-                    "hover",
-                    "focus",
-                  ]
-                }
-              >
-                <Memo(Avatar)
-                  onBlur={[Function]}
-                  onClick={null}
-                  onFocus={[Function]}
-                  onMouseOut={[Function]}
-                  onMouseOver={[Function]}
-                  size="sm"
-                  style={
+                <OverlayWrapper
+                  className="user-profile-popover"
+                  hide={[Function]}
+                  intl={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "defaultFormats": Object {},
+                      "defaultLocale": "en",
+                      "defaultRichTextElements": undefined,
+                      "formatDate": [Function],
+                      "formatDateTimeRange": [Function],
+                      "formatDateToParts": [Function],
+                      "formatDisplayName": [Function],
+                      "formatList": [Function],
+                      "formatListToParts": [Function],
+                      "formatMessage": [Function],
+                      "formatNumber": [Function],
+                      "formatNumberToParts": [Function],
+                      "formatPlural": [Function],
+                      "formatRelativeTime": [Function],
+                      "formatTime": [Function],
+                      "formatTimeToParts": [Function],
+                      "formats": Object {},
+                      "formatters": Object {
+                        "getDateTimeFormat": [Function],
+                        "getDisplayNames": [Function],
+                        "getListFormat": [Function],
+                        "getMessageFormat": [Function],
+                        "getNumberFormat": [Function],
+                        "getPluralRules": [Function],
+                        "getRelativeTimeFormat": [Function],
+                      },
+                      "locale": "en",
+                      "messages": Object {},
+                      "onError": [Function],
+                      "textComponent": "span",
+                      "timeZone": "Etc/UTC",
+                      "wrapRichTextChunksInFragment": undefined,
                     }
                   }
-                  tabIndex={0}
-                  url="/api/v4/users/1/image?_=0"
+                  src="/api/v4/users/5/image?_=0"
+                  userId="5"
+                />
+              }
+              placement="right"
+              rootClose={true}
+              trigger="click"
+            >
+              <SimpleTooltip
+                animation={true}
+                content="first.last5"
+                id="name-5"
+                onClick={[Function]}
+                onEntered={[Function]}
+              >
+                <OverlayTrigger
+                  animation={true}
+                  defaultOverlayShown={false}
+                  delayShow={500}
+                  onClick={[Function]}
+                  onEntered={[Function]}
+                  overlay={
+                    <Tooltip
+                      className="hidden-xs"
+                      id="name-5"
+                      placement="top"
+                    >
+                      first.last5
+                    </Tooltip>
+                  }
+                  placement="top"
+                  trigger={
+                    Array [
+                      "hover",
+                      "focus",
+                    ]
+                  }
                 >
-                  <img
-                    alt="user profile image"
-                    className="Avatar Avatar-sm"
-                    onBlur={[Function]}
-                    onClick={null}
-                    onFocus={[Function]}
-                    onMouseOut={[Function]}
-                    onMouseOver={[Function]}
-                    src="/api/v4/users/1/image?_=0"
-                    style={
-                      Object {
-                        "background": "rgb(239, 239, 240)",
-                      }
+                  <OverlayTrigger
+                    animation={true}
+                    defaultOverlayShown={false}
+                    delayShow={500}
+                    onClick={[Function]}
+                    onEntered={[Function]}
+                    overlay={
+                      <OverlayWrapper
+                        className="hidden-xs"
+                        id="name-5"
+                        intl={
+                          Object {
+                            "defaultFormats": Object {},
+                            "defaultLocale": "en",
+                            "defaultRichTextElements": undefined,
+                            "formatDate": [Function],
+                            "formatDateTimeRange": [Function],
+                            "formatDateToParts": [Function],
+                            "formatDisplayName": [Function],
+                            "formatList": [Function],
+                            "formatListToParts": [Function],
+                            "formatMessage": [Function],
+                            "formatNumber": [Function],
+                            "formatNumberToParts": [Function],
+                            "formatPlural": [Function],
+                            "formatRelativeTime": [Function],
+                            "formatTime": [Function],
+                            "formatTimeToParts": [Function],
+                            "formats": Object {},
+                            "formatters": Object {
+                              "getDateTimeFormat": [Function],
+                              "getDisplayNames": [Function],
+                              "getListFormat": [Function],
+                              "getMessageFormat": [Function],
+                              "getNumberFormat": [Function],
+                              "getPluralRules": [Function],
+                              "getRelativeTimeFormat": [Function],
+                            },
+                            "locale": "en",
+                            "messages": Object {},
+                            "onError": [Function],
+                            "textComponent": "span",
+                            "timeZone": "Etc/UTC",
+                            "wrapRichTextChunksInFragment": undefined,
+                          }
+                        }
+                        placement="top"
+                      >
+                        first.last5
+                      </OverlayWrapper>
                     }
-                    tabIndex={0}
-                  />
-                </Memo(Avatar)>
-              </OverlayTrigger>
+                    placement="top"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <button
+                      className="style--none"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      tabIndex={-1}
+                    >
+                      <Memo(Avatar)
+                        size="sm"
+                        style={
+                          Object {
+                            "background": "rgb(240, 240, 241)",
+                          }
+                        }
+                        tabIndex={0}
+                        url="/api/v4/users/5/image?_=0"
+                      >
+                        <img
+                          alt="user profile image"
+                          className="Avatar Avatar-sm"
+                          onError={[Function]}
+                          src="/api/v4/users/5/image?_=0"
+                          style={
+                            Object {
+                              "background": "rgb(240, 240, 241)",
+                            }
+                          }
+                          tabIndex={0}
+                        />
+                      </Memo(Avatar)>
+                    </button>
+                  </OverlayTrigger>
+                </OverlayTrigger>
+              </SimpleTooltip>
             </OverlayTrigger>
-          </SimpleTooltip>
+          </OverlayTrigger>
         </UserAvatar>
         <UserAvatar
-          key="2"
+          disableProfileOverlay={false}
+          key="4"
           overlayProps={
             Object {
               "animation": true,
@@ -1119,137 +1396,207 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
           size="sm"
           style={
             Object {
-              "background": "rgb(239, 239, 240)",
+              "background": "rgb(240, 240, 241)",
             }
           }
           tabIndex={0}
-          userId="2"
+          userId="4"
         >
-          <SimpleTooltip
-            animation={true}
-            content="first.last2"
-            id="name-2"
-            onEntered={[Function]}
+          <OverlayTrigger
+            defaultOverlayShown={false}
+            disabled={false}
+            overlay={
+              <Memo(Connect(injectIntl(ProfilePopover)))
+                className="user-profile-popover"
+                hide={[Function]}
+                src="/api/v4/users/4/image?_=0"
+                userId="4"
+              />
+            }
+            placement="right"
+            rootClose={true}
+            trigger="click"
           >
             <OverlayTrigger
-              animation={true}
               defaultOverlayShown={false}
-              delayShow={500}
-              onEntered={[Function]}
               overlay={
-                <Tooltip
-                  bsClass="tooltip"
-                  className="hidden-xs"
-                  id="name-2"
-                  placement="top"
-                >
-                  first.last2
-                </Tooltip>
-              }
-              placement="top"
-              trigger={
-                Array [
-                  "hover",
-                  "focus",
-                ]
-              }
-            >
-              <OverlayTrigger
-                animation={true}
-                defaultOverlayShown={false}
-                delayShow={500}
-                onEntered={[Function]}
-                overlay={
-                  <OverlayWrapper
-                    bsClass="tooltip"
-                    className="hidden-xs"
-                    id="name-2"
-                    intl={
-                      Object {
-                        "defaultFormats": Object {},
-                        "defaultLocale": "en",
-                        "defaultRichTextElements": undefined,
-                        "formatDate": [Function],
-                        "formatDateTimeRange": [Function],
-                        "formatDateToParts": [Function],
-                        "formatDisplayName": [Function],
-                        "formatList": [Function],
-                        "formatListToParts": [Function],
-                        "formatMessage": [Function],
-                        "formatNumber": [Function],
-                        "formatNumberToParts": [Function],
-                        "formatPlural": [Function],
-                        "formatRelativeTime": [Function],
-                        "formatTime": [Function],
-                        "formatTimeToParts": [Function],
-                        "formats": Object {},
-                        "formatters": Object {
-                          "getDateTimeFormat": [Function],
-                          "getDisplayNames": [Function],
-                          "getListFormat": [Function],
-                          "getMessageFormat": [Function],
-                          "getNumberFormat": [Function],
-                          "getPluralRules": [Function],
-                          "getRelativeTimeFormat": [Function],
-                        },
-                        "locale": "en",
-                        "messages": Object {},
-                        "onError": [Function],
-                        "textComponent": "span",
-                        "timeZone": "Etc/UTC",
-                        "wrapRichTextChunksInFragment": undefined,
-                      }
-                    }
-                    placement="top"
-                  >
-                    first.last2
-                  </OverlayWrapper>
-                }
-                placement="top"
-                trigger={
-                  Array [
-                    "hover",
-                    "focus",
-                  ]
-                }
-              >
-                <Memo(Avatar)
-                  onBlur={[Function]}
-                  onClick={null}
-                  onFocus={[Function]}
-                  onMouseOut={[Function]}
-                  onMouseOver={[Function]}
-                  size="sm"
-                  style={
+                <OverlayWrapper
+                  className="user-profile-popover"
+                  hide={[Function]}
+                  intl={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "defaultFormats": Object {},
+                      "defaultLocale": "en",
+                      "defaultRichTextElements": undefined,
+                      "formatDate": [Function],
+                      "formatDateTimeRange": [Function],
+                      "formatDateToParts": [Function],
+                      "formatDisplayName": [Function],
+                      "formatList": [Function],
+                      "formatListToParts": [Function],
+                      "formatMessage": [Function],
+                      "formatNumber": [Function],
+                      "formatNumberToParts": [Function],
+                      "formatPlural": [Function],
+                      "formatRelativeTime": [Function],
+                      "formatTime": [Function],
+                      "formatTimeToParts": [Function],
+                      "formats": Object {},
+                      "formatters": Object {
+                        "getDateTimeFormat": [Function],
+                        "getDisplayNames": [Function],
+                        "getListFormat": [Function],
+                        "getMessageFormat": [Function],
+                        "getNumberFormat": [Function],
+                        "getPluralRules": [Function],
+                        "getRelativeTimeFormat": [Function],
+                      },
+                      "locale": "en",
+                      "messages": Object {},
+                      "onError": [Function],
+                      "textComponent": "span",
+                      "timeZone": "Etc/UTC",
+                      "wrapRichTextChunksInFragment": undefined,
                     }
                   }
-                  tabIndex={0}
-                  url="/api/v4/users/2/image?_=0"
+                  src="/api/v4/users/4/image?_=0"
+                  userId="4"
+                />
+              }
+              placement="right"
+              rootClose={true}
+              trigger="click"
+            >
+              <SimpleTooltip
+                animation={true}
+                content="first.last4"
+                id="name-4"
+                onClick={[Function]}
+                onEntered={[Function]}
+              >
+                <OverlayTrigger
+                  animation={true}
+                  defaultOverlayShown={false}
+                  delayShow={500}
+                  onClick={[Function]}
+                  onEntered={[Function]}
+                  overlay={
+                    <Tooltip
+                      className="hidden-xs"
+                      id="name-4"
+                      placement="top"
+                    >
+                      first.last4
+                    </Tooltip>
+                  }
+                  placement="top"
+                  trigger={
+                    Array [
+                      "hover",
+                      "focus",
+                    ]
+                  }
                 >
-                  <img
-                    alt="user profile image"
-                    className="Avatar Avatar-sm"
-                    onBlur={[Function]}
-                    onClick={null}
-                    onFocus={[Function]}
-                    onMouseOut={[Function]}
-                    onMouseOver={[Function]}
-                    src="/api/v4/users/2/image?_=0"
-                    style={
-                      Object {
-                        "background": "rgb(239, 239, 240)",
-                      }
+                  <OverlayTrigger
+                    animation={true}
+                    defaultOverlayShown={false}
+                    delayShow={500}
+                    onClick={[Function]}
+                    onEntered={[Function]}
+                    overlay={
+                      <OverlayWrapper
+                        className="hidden-xs"
+                        id="name-4"
+                        intl={
+                          Object {
+                            "defaultFormats": Object {},
+                            "defaultLocale": "en",
+                            "defaultRichTextElements": undefined,
+                            "formatDate": [Function],
+                            "formatDateTimeRange": [Function],
+                            "formatDateToParts": [Function],
+                            "formatDisplayName": [Function],
+                            "formatList": [Function],
+                            "formatListToParts": [Function],
+                            "formatMessage": [Function],
+                            "formatNumber": [Function],
+                            "formatNumberToParts": [Function],
+                            "formatPlural": [Function],
+                            "formatRelativeTime": [Function],
+                            "formatTime": [Function],
+                            "formatTimeToParts": [Function],
+                            "formats": Object {},
+                            "formatters": Object {
+                              "getDateTimeFormat": [Function],
+                              "getDisplayNames": [Function],
+                              "getListFormat": [Function],
+                              "getMessageFormat": [Function],
+                              "getNumberFormat": [Function],
+                              "getPluralRules": [Function],
+                              "getRelativeTimeFormat": [Function],
+                            },
+                            "locale": "en",
+                            "messages": Object {},
+                            "onError": [Function],
+                            "textComponent": "span",
+                            "timeZone": "Etc/UTC",
+                            "wrapRichTextChunksInFragment": undefined,
+                          }
+                        }
+                        placement="top"
+                      >
+                        first.last4
+                      </OverlayWrapper>
                     }
-                    tabIndex={0}
-                  />
-                </Memo(Avatar)>
-              </OverlayTrigger>
+                    placement="top"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <button
+                      className="style--none"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      tabIndex={-1}
+                    >
+                      <Memo(Avatar)
+                        size="sm"
+                        style={
+                          Object {
+                            "background": "rgb(240, 240, 241)",
+                          }
+                        }
+                        tabIndex={0}
+                        url="/api/v4/users/4/image?_=0"
+                      >
+                        <img
+                          alt="user profile image"
+                          className="Avatar Avatar-sm"
+                          onError={[Function]}
+                          src="/api/v4/users/4/image?_=0"
+                          style={
+                            Object {
+                              "background": "rgb(240, 240, 241)",
+                            }
+                          }
+                          tabIndex={0}
+                        />
+                      </Memo(Avatar)>
+                    </button>
+                  </OverlayTrigger>
+                </OverlayTrigger>
+              </SimpleTooltip>
             </OverlayTrigger>
-          </SimpleTooltip>
+          </OverlayTrigger>
         </UserAvatar>
         <UserAvatar
+          disableProfileOverlay={false}
           key="3"
           overlayProps={
             Object {
@@ -1261,139 +1608,208 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
           size="sm"
           style={
             Object {
-              "background": "rgb(239, 239, 240)",
+              "background": "rgb(240, 240, 241)",
             }
           }
           tabIndex={0}
           userId="3"
         >
-          <SimpleTooltip
-            animation={true}
-            content="first.last3"
-            id="name-3"
-            onEntered={[Function]}
+          <OverlayTrigger
+            defaultOverlayShown={false}
+            disabled={false}
+            overlay={
+              <Memo(Connect(injectIntl(ProfilePopover)))
+                className="user-profile-popover"
+                hide={[Function]}
+                src="/api/v4/users/3/image?_=0"
+                userId="3"
+              />
+            }
+            placement="right"
+            rootClose={true}
+            trigger="click"
           >
             <OverlayTrigger
-              animation={true}
               defaultOverlayShown={false}
-              delayShow={500}
-              onEntered={[Function]}
               overlay={
-                <Tooltip
-                  bsClass="tooltip"
-                  className="hidden-xs"
-                  id="name-3"
-                  placement="top"
-                >
-                  first.last3
-                </Tooltip>
-              }
-              placement="top"
-              trigger={
-                Array [
-                  "hover",
-                  "focus",
-                ]
-              }
-            >
-              <OverlayTrigger
-                animation={true}
-                defaultOverlayShown={false}
-                delayShow={500}
-                onEntered={[Function]}
-                overlay={
-                  <OverlayWrapper
-                    bsClass="tooltip"
-                    className="hidden-xs"
-                    id="name-3"
-                    intl={
-                      Object {
-                        "defaultFormats": Object {},
-                        "defaultLocale": "en",
-                        "defaultRichTextElements": undefined,
-                        "formatDate": [Function],
-                        "formatDateTimeRange": [Function],
-                        "formatDateToParts": [Function],
-                        "formatDisplayName": [Function],
-                        "formatList": [Function],
-                        "formatListToParts": [Function],
-                        "formatMessage": [Function],
-                        "formatNumber": [Function],
-                        "formatNumberToParts": [Function],
-                        "formatPlural": [Function],
-                        "formatRelativeTime": [Function],
-                        "formatTime": [Function],
-                        "formatTimeToParts": [Function],
-                        "formats": Object {},
-                        "formatters": Object {
-                          "getDateTimeFormat": [Function],
-                          "getDisplayNames": [Function],
-                          "getListFormat": [Function],
-                          "getMessageFormat": [Function],
-                          "getNumberFormat": [Function],
-                          "getPluralRules": [Function],
-                          "getRelativeTimeFormat": [Function],
-                        },
-                        "locale": "en",
-                        "messages": Object {},
-                        "onError": [Function],
-                        "textComponent": "span",
-                        "timeZone": "Etc/UTC",
-                        "wrapRichTextChunksInFragment": undefined,
-                      }
-                    }
-                    placement="top"
-                  >
-                    first.last3
-                  </OverlayWrapper>
-                }
-                placement="top"
-                trigger={
-                  Array [
-                    "hover",
-                    "focus",
-                  ]
-                }
-              >
-                <Memo(Avatar)
-                  onBlur={[Function]}
-                  onClick={null}
-                  onFocus={[Function]}
-                  onMouseOut={[Function]}
-                  onMouseOver={[Function]}
-                  size="sm"
-                  style={
+                <OverlayWrapper
+                  className="user-profile-popover"
+                  hide={[Function]}
+                  intl={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "defaultFormats": Object {},
+                      "defaultLocale": "en",
+                      "defaultRichTextElements": undefined,
+                      "formatDate": [Function],
+                      "formatDateTimeRange": [Function],
+                      "formatDateToParts": [Function],
+                      "formatDisplayName": [Function],
+                      "formatList": [Function],
+                      "formatListToParts": [Function],
+                      "formatMessage": [Function],
+                      "formatNumber": [Function],
+                      "formatNumberToParts": [Function],
+                      "formatPlural": [Function],
+                      "formatRelativeTime": [Function],
+                      "formatTime": [Function],
+                      "formatTimeToParts": [Function],
+                      "formats": Object {},
+                      "formatters": Object {
+                        "getDateTimeFormat": [Function],
+                        "getDisplayNames": [Function],
+                        "getListFormat": [Function],
+                        "getMessageFormat": [Function],
+                        "getNumberFormat": [Function],
+                        "getPluralRules": [Function],
+                        "getRelativeTimeFormat": [Function],
+                      },
+                      "locale": "en",
+                      "messages": Object {},
+                      "onError": [Function],
+                      "textComponent": "span",
+                      "timeZone": "Etc/UTC",
+                      "wrapRichTextChunksInFragment": undefined,
                     }
                   }
-                  tabIndex={0}
-                  url="/api/v4/users/3/image?_=0"
+                  src="/api/v4/users/3/image?_=0"
+                  userId="3"
+                />
+              }
+              placement="right"
+              rootClose={true}
+              trigger="click"
+            >
+              <SimpleTooltip
+                animation={true}
+                content="first.last3"
+                id="name-3"
+                onClick={[Function]}
+                onEntered={[Function]}
+              >
+                <OverlayTrigger
+                  animation={true}
+                  defaultOverlayShown={false}
+                  delayShow={500}
+                  onClick={[Function]}
+                  onEntered={[Function]}
+                  overlay={
+                    <Tooltip
+                      className="hidden-xs"
+                      id="name-3"
+                      placement="top"
+                    >
+                      first.last3
+                    </Tooltip>
+                  }
+                  placement="top"
+                  trigger={
+                    Array [
+                      "hover",
+                      "focus",
+                    ]
+                  }
                 >
-                  <img
-                    alt="user profile image"
-                    className="Avatar Avatar-sm"
-                    onBlur={[Function]}
-                    onClick={null}
-                    onFocus={[Function]}
-                    onMouseOut={[Function]}
-                    onMouseOver={[Function]}
-                    src="/api/v4/users/3/image?_=0"
-                    style={
-                      Object {
-                        "background": "rgb(239, 239, 240)",
-                      }
+                  <OverlayTrigger
+                    animation={true}
+                    defaultOverlayShown={false}
+                    delayShow={500}
+                    onClick={[Function]}
+                    onEntered={[Function]}
+                    overlay={
+                      <OverlayWrapper
+                        className="hidden-xs"
+                        id="name-3"
+                        intl={
+                          Object {
+                            "defaultFormats": Object {},
+                            "defaultLocale": "en",
+                            "defaultRichTextElements": undefined,
+                            "formatDate": [Function],
+                            "formatDateTimeRange": [Function],
+                            "formatDateToParts": [Function],
+                            "formatDisplayName": [Function],
+                            "formatList": [Function],
+                            "formatListToParts": [Function],
+                            "formatMessage": [Function],
+                            "formatNumber": [Function],
+                            "formatNumberToParts": [Function],
+                            "formatPlural": [Function],
+                            "formatRelativeTime": [Function],
+                            "formatTime": [Function],
+                            "formatTimeToParts": [Function],
+                            "formats": Object {},
+                            "formatters": Object {
+                              "getDateTimeFormat": [Function],
+                              "getDisplayNames": [Function],
+                              "getListFormat": [Function],
+                              "getMessageFormat": [Function],
+                              "getNumberFormat": [Function],
+                              "getPluralRules": [Function],
+                              "getRelativeTimeFormat": [Function],
+                            },
+                            "locale": "en",
+                            "messages": Object {},
+                            "onError": [Function],
+                            "textComponent": "span",
+                            "timeZone": "Etc/UTC",
+                            "wrapRichTextChunksInFragment": undefined,
+                          }
+                        }
+                        placement="top"
+                      >
+                        first.last3
+                      </OverlayWrapper>
                     }
-                    tabIndex={0}
-                  />
-                </Memo(Avatar)>
-              </OverlayTrigger>
+                    placement="top"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <button
+                      className="style--none"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      tabIndex={-1}
+                    >
+                      <Memo(Avatar)
+                        size="sm"
+                        style={
+                          Object {
+                            "background": "rgb(240, 240, 241)",
+                          }
+                        }
+                        tabIndex={0}
+                        url="/api/v4/users/3/image?_=0"
+                      >
+                        <img
+                          alt="user profile image"
+                          className="Avatar Avatar-sm"
+                          onError={[Function]}
+                          src="/api/v4/users/3/image?_=0"
+                          style={
+                            Object {
+                              "background": "rgb(240, 240, 241)",
+                            }
+                          }
+                          tabIndex={0}
+                        />
+                      </Memo(Avatar)>
+                    </button>
+                  </OverlayTrigger>
+                </OverlayTrigger>
+              </SimpleTooltip>
             </OverlayTrigger>
-          </SimpleTooltip>
+          </OverlayTrigger>
         </UserAvatar>
         <SimpleTooltip
           animation={true}
-          content="first.last4, first.last5"
+          content="first.last2, first.last1"
           id="names-overflow"
           onEntered={[Function]}
         >
@@ -1404,12 +1820,11 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
             onEntered={[Function]}
             overlay={
               <Tooltip
-                bsClass="tooltip"
                 className="hidden-xs"
                 id="names-overflow"
                 placement="top"
               >
-                first.last4, first.last5
+                first.last2, first.last1
               </Tooltip>
             }
             placement="top"
@@ -1427,7 +1842,6 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
               onEntered={[Function]}
               overlay={
                 <OverlayWrapper
-                  bsClass="tooltip"
                   className="hidden-xs"
                   id="names-overflow"
                   intl={
@@ -1468,7 +1882,7 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
                   }
                   placement="top"
                 >
-                  first.last4, first.last5
+                  first.last2, first.last1
                 </OverlayWrapper>
               }
               placement="top"
@@ -1488,7 +1902,7 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
                 size="sm"
                 style={
                   Object {
-                    "background": "rgb(239, 239, 240)",
+                    "background": "rgb(240, 240, 241)",
                   }
                 }
                 tabIndex={0}
@@ -1504,7 +1918,7 @@ exports[`components/threading/channel_threads/thread_footer should show unread i
                   onMouseOver={[Function]}
                   style={
                     Object {
-                      "background": "rgb(239, 239, 240)",
+                      "background": "rgb(240, 240, 241)",
                     }
                   }
                   tabIndex={0}

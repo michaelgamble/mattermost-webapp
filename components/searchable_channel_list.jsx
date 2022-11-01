@@ -2,20 +2,19 @@
 // See LICENSE.txt for license information.
 /* eslint-disable react/no-string-refs */
 
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {FormattedMessage} from 'react-intl';
+
+import {ArchiveOutlineIcon} from '@mattermost/compass-icons/components';
 
 import LoadingScreen from 'components/loading_screen';
 import LoadingWrapper from 'components/widgets/loading/loading_wrapper';
 import QuickInput from 'components/quick_input';
 import * as UserAgent from 'utils/user_agent';
-import {localizeMessage} from 'utils/utils.jsx';
+import {localizeMessage} from 'utils/utils';
 import LocalizedInput from 'components/localized_input/localized_input';
 
-import ArchiveIcon from 'components/widgets/icons/archive_icon';
 import SharedChannelIndicator from 'components/shared_channel_indicator';
 
 import {t} from 'utils/i18n';
@@ -70,9 +69,10 @@ export default class SearchableChannelList extends React.PureComponent {
 
         if (shouldShowArchivedChannels) {
             archiveIcon = (
-                <div className='more-modal__icon-container'>
-                    <ArchiveIcon className='icon icon__archive'/>
-                </div>
+                <ArchiveOutlineIcon
+                    size={20}
+                    color={'currentColor'}
+                />
             );
         }
 
@@ -115,7 +115,7 @@ export default class SearchableChannelList extends React.PureComponent {
                             text={localizeMessage('more_channels.joining', 'Joining...')}
                         >
                             <FormattedMessage
-                                id={shouldShowArchivedChannels ? 'more_channels.view' : 'more_channels.join'}
+                                id={shouldShowArchivedChannels ? t('more_channels.view') : t('more_channels.join')}
                                 defaultMessage={shouldShowArchivedChannels ? 'View' : 'Join'}
                             />
                         </LoadingWrapper>
@@ -130,13 +130,13 @@ export default class SearchableChannelList extends React.PureComponent {
         this.setState({page: this.state.page + 1, nextDisabled: true});
         this.nextTimeoutId = setTimeout(() => this.setState({nextDisabled: false}), NEXT_BUTTON_TIMEOUT_MILLISECONDS);
         this.props.nextPage(this.state.page + 1);
-        $(ReactDOM.findDOMNode(this.channelListScroll.current)).scrollTop(0);
+        this.channelListScroll.current?.scrollTo({top: 0});
     }
 
     previousPage = (e) => {
         e.preventDefault();
         this.setState({page: this.state.page - 1});
-        $(ReactDOM.findDOMNode(this.channelListScroll.current)).scrollTop(0);
+        this.channelListScroll.current?.scrollTo({top: 0});
     }
 
     doSearch = () => {
@@ -164,12 +164,13 @@ export default class SearchableChannelList extends React.PureComponent {
         } else if (channels.length === 0) {
             listContent = (
                 <div className='no-channel-message'>
-                    <p className='primary-message'>
+                    <h3 className='primary-message'>
                         <FormattedMessage
                             id='more_channels.noMore'
+                            tagName='strong'
                             defaultMessage='No more channels to join'
                         />
-                    </p>
+                    </h3>
                     {this.props.noResultsText}
                 </div>
             );

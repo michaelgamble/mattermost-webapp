@@ -1,11 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-/* eslint-disable max-lines */
+import mockStore from 'tests/test_store';
 
 import {
-    thunk,
-    configureStore,
     Client4,
     AppBinding,
     checkForExecuteSuggestion,
@@ -13,7 +11,6 @@ import {
 
 import {
     AppCallResponseTypes,
-    AppCallTypes,
     AutocompleteSuggestion,
 } from './app_command_parser_dependencies';
 
@@ -28,15 +25,32 @@ import {
     testBindings,
 } from './tests/app_command_parser_test_data';
 
-const mockStore = configureStore([thunk]);
-
+const getOpenInModalOption = (command: string) => {
+    return {
+        Complete: command.substr(1) + '_open_command_in_modal',
+        Description: 'Select this option to open the current command in a modal.',
+        Hint: '',
+        IconData: '_open_command_in_modal',
+        Suggestion: 'Open in modal',
+    };
+};
 describe('AppCommandParser', () => {
     const makeStore = async (bindings: AppBinding[]) => {
         const initialState = {
             ...reduxTestState,
             entities: {
                 ...reduxTestState.entities,
-                apps: {bindings},
+                apps: {
+                    main: {
+                        bindings,
+                        forms: {},
+                    },
+                    rhs: {
+                        bindings,
+                        forms: {},
+                    },
+                    pluginEnabled: true,
+                },
             },
         } as any;
         const testStore = await mockStore(initialState);
@@ -242,7 +256,7 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.incomplete).toBe('epic2');
                     expect(parsed.incompleteStart).toBe(75);
                     expect(parsed.values?.project).toBe('P 1');
@@ -253,7 +267,7 @@ describe('AppCommandParser', () => {
                 submit: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.values?.project).toBe('P 1');
                     expect(parsed.values?.epic).toBe('epic2');
                     expect(parsed.values?.summary).toBe('SUM MA RY');
@@ -266,7 +280,7 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.incomplete).toBe('epic2');
                     expect(parsed.incompleteStart).toBe(75);
                     expect(parsed.values?.project).toBe('P 1');
@@ -277,7 +291,7 @@ describe('AppCommandParser', () => {
                 submit: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.values?.project).toBe('P 1');
                     expect(parsed.values?.epic).toBe('epic2');
                     expect(parsed.values?.summary).toBe('SUM MA RY');
@@ -290,7 +304,7 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.incomplete).toBe('M');
                     expect(parsed.incompleteStart).toBe(65);
                     expect(parsed.values?.project).toBe('KT');
@@ -299,7 +313,7 @@ describe('AppCommandParser', () => {
                 submit: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.values?.epic).toBe('M');
                 }},
             },
@@ -309,7 +323,7 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('view');
-                    expect(parsed.form?.call?.path).toBe('/view-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/view-issue');
                     expect(parsed.incomplete).toBe('MM-123');
                     expect(parsed.incompleteStart).toBe(33);
                     expect(parsed.values?.project).toBe('P 1');
@@ -318,7 +332,7 @@ describe('AppCommandParser', () => {
                 submit: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('view');
-                    expect(parsed.form?.call?.path).toBe('/view-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/view-issue');
                     expect(parsed.values?.project).toBe('P 1');
                     expect(parsed.values?.issue).toBe('MM-123');
                 }},
@@ -329,7 +343,7 @@ describe('AppCommandParser', () => {
                 submit: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.StartParameter);
                     expect(parsed.binding?.label).toBe('view');
-                    expect(parsed.form?.call?.path).toBe('/view-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/view-issue');
                     expect(parsed.incomplete).toBe('');
                     expect(parsed.incompleteStart).toBe(17);
                     expect(parsed.values).toEqual({});
@@ -341,14 +355,14 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.FlagValueSeparator);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.incomplete).toBe('');
                     expect(parsed.values).toEqual({});
                 }},
                 submit: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndValue);
                     expect(parsed.binding?.label).toBe('create');
-                    expect(parsed.form?.call?.path).toBe('/create-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/create-issue');
                     expect(parsed.incomplete).toBe('');
                     expect(parsed.values).toEqual({
                         summary: '',
@@ -361,7 +375,7 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.TickValue);
                     expect(parsed.binding?.label).toBe('view');
-                    expect(parsed.form?.call?.path).toBe('/view-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/view-issue');
                     expect(parsed.incomplete).toBe('P 1');
                     expect(parsed.incompleteStart).toBe(27);
                     expect(parsed.values?.project).toBe(undefined);
@@ -375,7 +389,7 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.QuotedValue);
                     expect(parsed.binding?.label).toBe('view');
-                    expect(parsed.form?.call?.path).toBe('/view-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/view-issue');
                     expect(parsed.incomplete).toBe('P 1');
                     expect(parsed.incompleteStart).toBe(27);
                     expect(parsed.values?.project).toBe(undefined);
@@ -389,7 +403,7 @@ describe('AppCommandParser', () => {
                 autocomplete: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndQuotedValue);
                     expect(parsed.binding?.label).toBe('view');
-                    expect(parsed.form?.call?.path).toBe('/view-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/view-issue');
                     expect(parsed.incomplete).toBe('P 1');
                     expect(parsed.incompleteStart).toBe(27);
                     expect(parsed.values?.project).toBe(undefined);
@@ -398,7 +412,7 @@ describe('AppCommandParser', () => {
                 submit: {verify: (parsed: ParsedCommand): void => {
                     expect(parsed.state).toBe(ParseState.EndQuotedValue);
                     expect(parsed.binding?.label).toBe('view');
-                    expect(parsed.form?.call?.path).toBe('/view-issue');
+                    expect(parsed.resolvedForm?.submit?.path).toBe('/view-issue');
                     expect(parsed.values?.project).toBe('P 1');
                     expect(parsed.values?.issue).toBe(undefined);
                 }},
@@ -417,6 +431,60 @@ describe('AppCommandParser', () => {
                 title: 'error: multiple equal signs',
                 command: '/jira issue create --project == test',
                 submit: {expectError: 'Multiple `=` signs are not allowed.'},
+            },
+            {
+                title: 'rest field',
+                command: '/jira issue rest hello world',
+                autocomplete: {verify: (parsed: ParsedCommand): void => {
+                    expect(parsed.state).toBe(ParseState.Rest);
+                    expect(parsed.binding?.label).toBe('rest');
+                    expect(parsed.incomplete).toBe('hello world');
+                    expect(parsed.values?.summary).toBe(undefined);
+                }},
+                submit: {verify: (parsed: ParsedCommand): void => {
+                    expect(parsed.state).toBe(ParseState.Rest);
+                    expect(parsed.binding?.label).toBe('rest');
+                    expect(parsed.values?.summary).toBe('hello world');
+                }},
+            },
+            {
+                title: 'rest field with other field',
+                command: '/jira issue rest --verbose true hello world',
+                autocomplete: {verify: (parsed: ParsedCommand): void => {
+                    expect(parsed.state).toBe(ParseState.Rest);
+                    expect(parsed.binding?.label).toBe('rest');
+                    expect(parsed.incomplete).toBe('hello world');
+                    expect(parsed.values?.summary).toBe(undefined);
+                    expect(parsed.values?.verbose).toBe('true');
+                }},
+                submit: {verify: (parsed: ParsedCommand): void => {
+                    expect(parsed.state).toBe(ParseState.Rest);
+                    expect(parsed.binding?.label).toBe('rest');
+                    expect(parsed.values?.summary).toBe('hello world');
+                    expect(parsed.values?.verbose).toBe('true');
+                }},
+            },
+            {
+                title: 'rest field as flag with other field',
+                command: '/jira issue rest --summary "hello world" --verbose true',
+                autocomplete: {verify: (parsed: ParsedCommand): void => {
+                    expect(parsed.state).toBe(ParseState.EndValue);
+                    expect(parsed.binding?.label).toBe('rest');
+                    expect(parsed.incomplete).toBe('true');
+                    expect(parsed.values?.summary).toBe('hello world');
+                    expect(parsed.values?.verbose).toBe(undefined);
+                }},
+                submit: {verify: (parsed: ParsedCommand): void => {
+                    expect(parsed.state).toBe(ParseState.EndValue);
+                    expect(parsed.binding?.label).toBe('rest');
+                    expect(parsed.values?.summary).toBe('hello world');
+                    expect(parsed.values?.verbose).toBe('true');
+                }},
+            },
+            {
+                title: 'error: rest after rest field flag',
+                command: '/jira issue rest --summary "hello world" --verbose true hello world',
+                submit: {expectError: 'Unable to identify argument.'},
             },
         ];
 
@@ -507,6 +575,13 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Description: 'Create a new Jira issue',
                 },
+                {
+                    Suggestion: 'rest',
+                    Complete: 'jira issue rest',
+                    Hint: 'rest hint',
+                    IconData: 'rest icon',
+                    Description: 'rest description',
+                },
             ]);
         });
 
@@ -527,6 +602,14 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Description: 'Create a new Jira issue',
                 },
+                {
+                    Suggestion: 'rest',
+                    Complete: 'JiRa IsSuE rest',
+                    Hint: 'rest hint',
+                    IconData: 'rest icon',
+                    Description: 'rest description',
+                },
+
             ]);
         });
 
@@ -566,6 +649,7 @@ describe('AppCommandParser', () => {
                     IconData: '',
                     Suggestion: 'issue: ""',
                 },
+                getOpenInModalOption('/jira issue view '),
             ]);
         });
 
@@ -579,6 +663,7 @@ describe('AppCommandParser', () => {
                     IconData: '',
                     Suggestion: '--project',
                 },
+                getOpenInModalOption('/jira issue view -'),
             ]);
 
             suggestions = await parser.getSuggestions('/jira issue view --');
@@ -590,6 +675,7 @@ describe('AppCommandParser', () => {
                     IconData: '',
                     Suggestion: '--project',
                 },
+                getOpenInModalOption('/jira issue view --'),
             ]);
         });
 
@@ -639,6 +725,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: '--epic',
                 },
+                getOpenInModalOption('/jira issue create '),
             ]);
         });
 
@@ -681,6 +768,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: '--epic',
                 },
+                getOpenInModalOption('/jira issue create --project KT '),
             ]);
         });
 
@@ -694,6 +782,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: '--summary',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summ'),
             ]);
 
             const full = await parser.getSuggestions('/jira issue create --project KT --summary');
@@ -705,6 +794,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: '--summary',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary'),
             ]);
         });
 
@@ -718,6 +808,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: 'summary: ""',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary '),
             ]);
         });
 
@@ -731,6 +822,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: 'summary: "Sum"',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary Sum'),
             ]);
         });
 
@@ -744,6 +836,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: 'summary: "Sum"',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary "Sum'),
             ]);
         });
 
@@ -757,6 +850,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: 'summary: `Sum`',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary `Sum'),
             ]);
         });
 
@@ -770,6 +864,7 @@ describe('AppCommandParser', () => {
                     IconData: 'Create icon',
                     Suggestion: 'summary: ""',
                 },
+                getOpenInModalOption('/jira issue create --summary '),
             ]);
         });
 
@@ -788,6 +883,7 @@ describe('AppCommandParser', () => {
                     Hint: '',
                     IconData: 'Create icon',
                 },
+                getOpenInModalOption('/jira issue create --project '),
             ]);
         });
 
@@ -808,6 +904,7 @@ describe('AppCommandParser', () => {
                     Hint: 'The thing is working great!',
                     IconData: 'Create icon',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary "great feature" --epic '),
             ]);
 
             suggestions = await parser.getSuggestions('/jira issue create --project KT --summary "great feature" --epic M');
@@ -819,6 +916,7 @@ describe('AppCommandParser', () => {
                     Hint: 'The thing is working great!',
                     IconData: 'Create icon',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary "great feature" --epic M'),
             ]);
 
             suggestions = await parser.getSuggestions('/jira issue create --project KT --summary "great feature" --epic Nope');
@@ -830,6 +928,7 @@ describe('AppCommandParser', () => {
                     Hint: 'No matching options.',
                     IconData: 'error',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary "great feature" --epic Nope'),
             ]);
         });
 
@@ -849,16 +948,17 @@ describe('AppCommandParser', () => {
                     IconData: '_execute_current_command',
                     Hint: '',
                 },
+                getOpenInModalOption('/jira issue create --project KT --summary "great feature" --epic epicvalue --verbose true '),
             ]);
         });
     });
 
-    describe('composeCallFromCommand', () => {
+    describe('composeCommandSubmitCall', () => {
         const base = {
             context: {
                 app_id: 'jira',
                 channel_id: 'current_channel_id',
-                location: '/command',
+                location: '/command/jira/issue/create',
                 root_id: 'root_id',
                 team_id: 'team_id',
             },
@@ -869,8 +969,8 @@ describe('AppCommandParser', () => {
             const cmd = '/jira issue create';
             const values = {};
 
-            const {call} = await parser.composeCallFromCommand(cmd);
-            expect(call).toEqual({
+            const {creq} = await parser.composeCommandSubmitCall(cmd);
+            expect(creq).toEqual({
                 ...base,
                 raw_command: cmd,
                 expand: {},
@@ -888,12 +988,12 @@ describe('AppCommandParser', () => {
                     label: 'Dylan Epic',
                     value: 'epic1',
                 },
-                verbose: 'true',
+                verbose: true,
                 project: '',
             };
 
-            const {call} = await parser.composeCallFromCommand(cmd);
-            expect(call).toEqual({
+            const {creq} = await parser.composeCommandSubmitCall(cmd);
+            expect(creq).toEqual({
                 ...base,
                 expand: {},
                 selected_field: undefined,
@@ -920,18 +1020,19 @@ describe('AppCommandParser', () => {
                     Hint: '',
                     IconData: 'Create icon',
                 },
+                getOpenInModalOption('/jira issue create --summary "The summary" --epic epic1 --project special'),
             ]);
 
             expect(mockedExecute).toHaveBeenCalledWith({
                 context: {
                     app_id: 'jira',
                     channel_id: 'current_channel_id',
-                    location: '/command',
+                    location: '/command/jira/issue/create',
                     root_id: 'root_id',
                     team_id: 'team_id',
                 },
                 expand: {},
-                path: '/create-issue',
+                path: '/create-issue-lookup',
                 query: 'special',
                 raw_command: '/jira issue create --summary "The summary" --epic epic1 --project special',
                 selected_field: 'project',
@@ -942,7 +1043,7 @@ describe('AppCommandParser', () => {
                         value: 'epic1',
                     },
                 },
-            }, AppCallTypes.LOOKUP);
+            }, false);
         });
     });
 });

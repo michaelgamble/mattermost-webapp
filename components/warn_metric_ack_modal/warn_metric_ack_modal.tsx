@@ -5,11 +5,10 @@ import React, {CSSProperties} from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import {UserProfile} from 'mattermost-redux/types/users';
-import {Dictionary} from 'mattermost-redux/types/utilities';
-import {AnalyticsRow} from 'mattermost-redux/types/admin';
-import {ActionFunc} from 'mattermost-redux/types/actions';
-import {WarnMetricStatus} from 'mattermost-redux/types/config';
+import {UserProfile} from '@mattermost/types/users';
+import {AnalyticsRow} from '@mattermost/types/admin';
+import {ActionResult} from 'mattermost-redux/types/actions';
+import {WarnMetricStatus} from '@mattermost/types/config';
 
 import {getSiteURL} from 'utils/url';
 import {t} from 'utils/i18n';
@@ -20,7 +19,7 @@ import * as AdminActions from 'actions/admin_actions.jsx';
 
 const StatTypes = Constants.StatTypes;
 
-import * as Utils from 'utils/utils.jsx';
+import * as Utils from 'utils/utils';
 
 import LoadingWrapper from 'components/widgets/loading/loading_wrapper';
 import ErrorLink from 'components/error_page/error_link';
@@ -30,12 +29,12 @@ type Props = {
     telemetryId?: string;
     show: boolean;
     closeParentComponent?: () => Promise<void>;
-    stats?: Dictionary<number | AnalyticsRow[]>;
+    stats?: Record<string, number | AnalyticsRow[]>;
     warnMetricStatus: WarnMetricStatus;
     actions: {
-        closeModal: (arg: string) => void;
-        getStandardAnalytics: () => any;
-        sendWarnMetricAck: (arg0: string, arg1: boolean) => ActionFunc & Partial<{error?: string}>;
+        closeModal: (modalId: string) => void;
+        getStandardAnalytics: () => void;
+        sendWarnMetricAck: (warnMetricId: string, forceAck: boolean) => Promise<ActionResult>;
     };
 }
 

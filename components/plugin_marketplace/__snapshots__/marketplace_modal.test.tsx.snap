@@ -179,6 +179,7 @@ exports[`components/marketplace/ MarketplaceModal should render with error banne
   <injectIntl(FullScreenModal)
     ariaLabel="Marketplace"
     onClose={[Function]}
+    overrideTargetEvent={true}
     show={true}
   >
     <div
@@ -188,7 +189,7 @@ exports[`components/marketplace/ MarketplaceModal should render with error banne
       <div
         className="error-bar__content"
       >
-        <injectIntl(FormattedMarkdownMessage)
+        <FormattedMarkdownMessage
           defaultMessage="Error connecting to the marketplace server. Please check your settings in the [System Console]({siteURL}/admin_console/plugins/plugin_management)."
           id="app.plugin.marketplace_plugins.app_error"
           values={
@@ -220,7 +221,6 @@ exports[`components/marketplace/ MarketplaceModal should render with error banne
           <QuickInput
             className="form-control filter-textbox search_input"
             clearable={true}
-            delayInputUpdate={false}
             id="searchMarketplaceTextbox"
             inputComponent={
               Object {
@@ -237,7 +237,6 @@ exports[`components/marketplace/ MarketplaceModal should render with error banne
                 "id": "marketplace_modal.search",
               }
             }
-            tooltipPosition="bottom"
             value=""
           />
         </div>
@@ -279,6 +278,7 @@ exports[`components/marketplace/ MarketplaceModal should render with no plugins 
   <injectIntl(FullScreenModal)
     ariaLabel="Marketplace"
     onClose={[Function]}
+    overrideTargetEvent={true}
     show={true}
   >
     <div
@@ -302,7 +302,6 @@ exports[`components/marketplace/ MarketplaceModal should render with no plugins 
           <QuickInput
             className="form-control filter-textbox search_input"
             clearable={true}
-            delayInputUpdate={false}
             id="searchMarketplaceTextbox"
             inputComponent={
               Object {
@@ -319,7 +318,6 @@ exports[`components/marketplace/ MarketplaceModal should render with no plugins 
                 "id": "marketplace_modal.search",
               }
             }
-            tooltipPosition="bottom"
             value=""
           />
         </div>
@@ -361,6 +359,7 @@ exports[`components/marketplace/ MarketplaceModal should render with plugins ins
   <injectIntl(FullScreenModal)
     ariaLabel="Marketplace"
     onClose={[Function]}
+    overrideTargetEvent={true}
     show={true}
   >
     <div
@@ -384,7 +383,6 @@ exports[`components/marketplace/ MarketplaceModal should render with plugins ins
           <QuickInput
             className="form-control filter-textbox search_input"
             clearable={true}
-            delayInputUpdate={false}
             id="searchMarketplaceTextbox"
             inputComponent={
               Object {
@@ -401,7 +399,6 @@ exports[`components/marketplace/ MarketplaceModal should render with plugins ins
                 "id": "marketplace_modal.search",
               }
             }
-            tooltipPosition="bottom"
             value=""
           />
         </div>

@@ -4,14 +4,16 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import {Channel} from 'mattermost-redux/types/channels';
-import {UserProfile} from 'mattermost-redux/types/users';
-import {Post} from 'mattermost-redux/types/posts';
-import {UserThread} from 'mattermost-redux/types/threads';
+import {Channel} from '@mattermost/types/channels';
+import {Post} from '@mattermost/types/posts';
+import {UserThread} from '@mattermost/types/threads';
 
 import {TestHelper} from 'utils/test_helper';
+import {fakeDate} from 'tests/helpers/date';
 
-import ThreadViewer from './thread_viewer';
+import {FakePost} from 'types/store/rhs';
+
+import ThreadViewer, {Props} from './thread_viewer';
 
 describe('components/threading/ThreadViewer', () => {
     const post: Post = TestHelper.getPostMock({
@@ -22,6 +24,15 @@ describe('components/threading/ThreadViewer', () => {
         reply_count: 3,
     });
 
+    const fakePost: FakePost = {
+        id: post.id,
+        exists: true,
+        type: post.type,
+        user_id: post.user_id,
+        channel_id: post.channel_id,
+        message: post.message,
+    };
+
     const channel: Channel = TestHelper.getChannelMock({
         display_name: '',
         name: '',
@@ -29,44 +40,43 @@ describe('components/threading/ThreadViewer', () => {
         purpose: '',
         creator_id: '',
         scheme_id: '',
-        isCurrent: false,
         teammate_id: '',
         status: '',
-        fake: false,
     });
 
     const actions = {
         removePost: jest.fn(),
         selectPostCard: jest.fn(),
+        getNewestPostThread: jest.fn(),
         getPostThread: jest.fn(),
         getThread: jest.fn(),
         updateThreadRead: jest.fn(),
         updateThreadLastOpened: jest.fn(),
+        fetchRHSAppsBindings: jest.fn(),
     };
 
-    const directTeammate: UserProfile = TestHelper.getUserMock();
-
-    const baseProps = {
-        posts: [post],
+    const baseProps: Props = {
         selected: post,
         channel,
         currentUserId: 'user_id',
         currentTeamId: 'team_id',
-        previewCollapsed: 'false',
-        previewEnabled: true,
         socketConnectionStatus: true,
         actions,
-        directTeammate,
         isCollapsedThreadsEnabled: false,
+        postIds: [post.id],
+        appsEnabled: true,
     };
 
     test('should match snapshot', async () => {
+        const reset = fakeDate(new Date(1502715365000));
+
         const wrapper = shallow(
             <ThreadViewer {...baseProps}/>,
         );
 
         await new Promise((resolve) => setTimeout(resolve));
         expect(wrapper).toMatchSnapshot();
+        reset();
     });
 
     test('should make api call to get thread posts on socket reconnect', () => {
@@ -77,104 +87,13 @@ describe('components/threading/ThreadViewer', () => {
         wrapper.setProps({socketConnectionStatus: false});
         wrapper.setProps({socketConnectionStatus: true});
 
-        return expect(actions.getPostThread).toHaveBeenCalledWith(post.id, false);
+        return expect(actions.getPostThread).toHaveBeenCalledWith(post.id, true);
     });
 
-    test('should update openTime state when selected prop updated', async () => {
-        jest.useRealTimers();
-        const wrapper = shallow(
-            <ThreadViewer {...baseProps}/>,
-        );
-
-        const waitMilliseconds = 100;
-        const originalOpenTimeState = wrapper.state('openTime');
-
-        await new Promise((resolve) => setTimeout(resolve, waitMilliseconds));
-
-        wrapper.setProps({selected: {...post, id: `${post.id}_new`}});
-        expect(wrapper.state('openTime')).not.toEqual(originalOpenTimeState);
-    });
-
-    test('should scroll to the bottom when the current user makes a new post in the thread', () => {
-        const scrollToBottom = jest.fn();
-
-        const wrapper = shallow(
-            <ThreadViewer {...baseProps}/>,
-        );
-        const instance = wrapper.instance() as ThreadViewer;
-        instance.scrollToBottom = scrollToBottom;
-
-        expect(scrollToBottom).not.toHaveBeenCalled();
-        wrapper.setProps({
-            posts: [
-                {
-                    id: 'newpost',
-                    root_id: post.id,
-                    user_id: 'user_id',
-                },
-                post,
-            ],
-        });
-
-        expect(scrollToBottom).toHaveBeenCalled();
-    });
-
-    test('should not scroll to the bottom when another user makes a new post in the thread', () => {
-        const scrollToBottom = jest.fn();
-
-        const wrapper = shallow(
-            <ThreadViewer {...baseProps}/>,
-        );
-        const instance = wrapper.instance() as ThreadViewer;
-        instance.scrollToBottom = scrollToBottom;
-
-        expect(scrollToBottom).not.toHaveBeenCalled();
-
-        wrapper.setProps({
-            posts: [
-                {
-                    id: 'newpost',
-                    root_id: post.id,
-                    user_id: 'other_user_id',
-                },
-                post,
-            ],
-        });
-
-        expect(scrollToBottom).not.toHaveBeenCalled();
-    });
-
-    test('should not scroll to the bottom when there is a highlighted reply', () => {
-        const scrollToBottom = jest.fn();
-
-        const wrapper = shallow(
-            <ThreadViewer
-                {...baseProps}
-                highlightedPostId='42'
-            />,
-        );
-
-        const instance = wrapper.instance() as ThreadViewer;
-        instance.scrollToBottom = scrollToBottom;
-
-        wrapper.setProps({
-            posts: [
-                {
-                    id: 'newpost',
-                    root_id: post.id,
-                    user_id: 'user_id',
-                },
-                post,
-            ],
-        });
-
-        expect(scrollToBottom).not.toHaveBeenCalled();
-    });
-
-    test('should not break if root post is missing', () => {
+    test('should not break if root post is a fake post', () => {
         const props = {
             ...baseProps,
-            posts: [{...baseProps.posts[0], root_id: 'something'}],
+            selected: fakePost,
         };
 
         expect(() => {
@@ -282,5 +201,30 @@ describe('components/threading/ThreadViewer', () => {
             Date.now = dateNowOrig;
             done();
         });
+    });
+
+    test('should call fetchRHSAppsBindings on mount if appsEnabled', () => {
+        const {actions} = baseProps;
+
+        shallow(
+            <ThreadViewer
+                {...baseProps}
+            />,
+        );
+
+        expect(actions.fetchRHSAppsBindings).toHaveBeenCalledWith('channel_id', 'id');
+    });
+
+    test('should not call fetchRHSAppsBindings on mount if not appsEnabled', () => {
+        const {actions} = baseProps;
+
+        shallow(
+            <ThreadViewer
+                {...baseProps}
+                appsEnabled={false}
+            />,
+        );
+
+        expect(actions.fetchRHSAppsBindings).not.toHaveBeenCalledWith('channel_id', 'id');
     });
 });

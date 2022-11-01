@@ -5,9 +5,8 @@ import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import {ClientConfig, ClientLicense} from 'mattermost-redux/types/config';
+import {ClientConfig, ClientLicense} from '@mattermost/types/config';
 
-import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 import MattermostLogo from 'components/widgets/icons/mattermost_logo';
 import Nbsp from 'components/html_entities/nbsp';
 
@@ -18,9 +17,9 @@ import AboutBuildModalCloud from './about_build_modal_cloud/about_build_modal_cl
 type Props = {
 
     /**
-     * Function that is called when the modal is dismissed
+     * Function called after the modal has been hidden
      */
-    onHide: () => void;
+    onExited: () => void;
 
     /**
      * Global config object
@@ -36,8 +35,6 @@ type Props = {
      * Webapp build hash override. By default, webpack sets this (so it must be overridden in tests).
      */
     webappBuildHash?: string;
-
-    show?: boolean;
 };
 
 type State = {
@@ -45,10 +42,6 @@ type State = {
 };
 
 export default class AboutBuildModal extends React.PureComponent<Props, State> {
-    // static defaultProps = {
-    //     show: false,
-    // };
-
     constructor(props: Props) {
         super(props);
 
@@ -59,10 +52,6 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
 
     doHide = () => {
         this.setState({show: false});
-    }
-
-    handleExit = () => {
-        this.props.onHide();
     }
 
     render() {
@@ -102,9 +91,9 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
                 <a
                     target='_blank'
                     rel='noopener noreferrer'
-                    href='http://www.mattermost.org/'
+                    href='https://mattermost.com/community/'
                 >
-                    {'mattermost.org'}
+                    {'mattermost.com/community/'}
                 </a>
             </div>
         );
@@ -134,9 +123,9 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
                     <a
                         target='_blank'
                         rel='noopener noreferrer'
-                        href='http://about.mattermost.com/'
+                        href='https://mattermost.com/'
                     >
-                        {'about.mattermost.com'}
+                        {'mattermost.com'}
                     </a>
                 </div>
             );
@@ -169,7 +158,7 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
             >
                 <FormattedMessage
                     id='about.tos'
-                    defaultMessage='Terms of Service'
+                    defaultMessage='Terms of Use'
                 />
             </a>
         );
@@ -212,7 +201,7 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
                 dialogClassName='a11y__modal about-modal'
                 show={this.state.show}
                 onHide={this.doHide}
-                onExited={this.handleExit}
+                onExited={this.props.onExited}
                 role='dialog'
                 aria-labelledby='aboutModalLabel'
             >
@@ -234,7 +223,9 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
                             <MattermostLogo/>
                         </div>
                         <div>
-                            <h3 className='about-modal__title'>{'Mattermost'} {title}</h3>
+                            <h3 className='about-modal__title'>
+                                <strong>{'Mattermost'} {title}</strong>
+                            </h3>
                             <p className='about-modal__subtitle pb-2'>{subTitle}</p>
                             <div className='form-group less'>
                                 <div>
@@ -249,7 +240,7 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
                                         id='about.dbversion'
                                         defaultMessage='Database Schema Version:'
                                     />
-                                    <span id='dbversionString'>{'\u00a0' + config.Version}</span>
+                                    <span id='dbversionString'>{'\u00a0' + config.SchemaVersion}</span>
                                 </div>
                                 {buildnumber}
                                 <div>
@@ -284,9 +275,38 @@ export default class AboutBuildModal extends React.PureComponent<Props, State> {
                     </div>
                     <div className='about-modal__notice form-group pt-3'>
                         <p>
-                            <FormattedMarkdownMessage
+                            <FormattedMessage
                                 id='about.notice'
-                                defaultMessage='Mattermost is made possible by the open source software used in our [server](!https://about.mattermost.com/platform-notice-txt/), [desktop](!https://about.mattermost.com/desktop-notice-txt/) and [mobile](!https://about.mattermost.com/mobile-notice-txt/) apps.'
+                                defaultMessage='Mattermost is made possible by the open source software used in our <linkServer>server</linkServer>, <linkDesktop>desktop</linkDesktop> and <linkMobile>mobile</linkMobile> apps.'
+                                values={{
+                                    linkServer: (msg: React.ReactNode) => (
+                                        <a
+                                            href='https://github.com/mattermost/mattermost-server/blob/master/NOTICE.txt'
+                                            target='_blank'
+                                            rel='noreferrer'
+                                        >
+                                            {msg}
+                                        </a>
+                                    ),
+                                    linkDesktop: (msg: React.ReactNode) => (
+                                        <a
+                                            href='https://github.com/mattermost/desktop/blob/master/NOTICE.txt'
+                                            target='_blank'
+                                            rel='noreferrer'
+                                        >
+                                            {msg}
+                                        </a>
+                                    ),
+                                    linkMobile: (msg: React.ReactNode) => (
+                                        <a
+                                            href='https://github.com/mattermost/mattermost-mobile/blob/master/NOTICE.txt'
+                                            target='_blank'
+                                            rel='noreferrer'
+                                        >
+                                            {msg}
+                                        </a>
+                                    ),
+                                }}
                             />
                         </p>
                     </div>

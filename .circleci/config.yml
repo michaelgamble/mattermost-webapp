@@ -7,18 +7,22 @@ orbs:
 executors:
   default:
     docker:
-      - image: mattermost/mattermost-build-webapp:20210524_node-16
+      - image: mattermost/mattermost-build-webapp:20220802_node-16.10.0@sha256:3272aa759f10c2ef1719ed08cc82ddb07224bec5be86f09800c72f5e2a623c3d
     resource_class: "xlarge"
 
 aliases:
   - &restore_cache
     restore_cache:
-      key: dependencies-{{ .Branch }}-{{ checksum "package-lock.json" }}-6
+      key: dependencies-{{ .Branch }}-{{ checksum "package-lock.json" }}-10
   - &save_cache
     save_cache:
-      key: dependencies-{{ .Branch }}-{{ checksum "package-lock.json" }}-6
+      key: dependencies-{{ .Branch }}-{{ checksum "package-lock.json" }}-10
       paths:
         - ~/mattermost/mattermost-webapp/node_modules
+        - ~/mattermost/mattermost-webapp/packages/client/lib
+        - ~/mattermost/mattermost-webapp/packages/components/dist
+        - ~/mattermost/mattermost-webapp/packages/components/node_modules
+        - ~/mattermost/mattermost-webapp/packages/types/lib
 
 jobs:
   install:
@@ -28,9 +32,8 @@ jobs:
     steps:
       - checkout
       - run: |
-          npm ci
+          make node_modules
       - *save_cache
-
   check-deps:
     parameters:
       cve_data_directory:
@@ -136,7 +139,8 @@ jobs:
     steps:
       - checkout
       - *restore_cache
-      - run: npm run test-ci
+      - run: |
+          npm run test-ci
       - store_test_results:
           path: build/
 
@@ -151,44 +155,13 @@ jobs:
       - run: |
           node --version
           npm version
-          make package-ci
+          make dist
       - store_artifacts:
           path: ~/mattermost/mattermost-webapp/mattermost-webapp.tar.gz
       - persist_to_workspace:
           root: ~/mattermost
           paths:
             - mattermost-webapp/mattermost-webapp.tar.gz
-
-  build-storybook:
-    executor:
-      name: default
-    working_directory: ~/mattermost/mattermost-webapp
-    steps:
-      - checkout
-      - *restore_cache
-      - run: npm run build-storybook
-      - store_artifacts:
-          path: ~/mattermost/mattermost-webapp/storybook-static
-      - persist_to_workspace:
-          root: ~/mattermost
-          paths:
-            - mattermost-webapp/storybook-static
-
-  upload-storybook:
-    docker:
-      - image: circleci/python:3.6
-    working_directory: ~/mattermost/mattermost-webapp
-    steps:
-      - attach_workspace:
-          at: ~/mattermost/
-      - aws-s3/sync:
-          from: storybook-static
-          to: s3://alpha-storybook.mattermost.com/$(echo "${CIRCLE_BRANCH}" | sed 's/pull\//PR-/g')/
-          arguments: --cache-control no-cache
-      - aws-s3/sync:
-          from: storybook-static
-          to: s3://alpha-storybook.mattermost.com/commit/${CIRCLE_SHA1}/
-          arguments: --cache-control no-cache
 
   upload-s3:
     docker:
@@ -232,22 +205,26 @@ jobs:
   build-docker:
     working_directory: ~/mattermost/
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: cimg/base:stable
     steps:
       - attach_workspace:
           at: ~/mattermost/
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
       - run:
           command: |
             export TAG="${CIRCLE_SHA1:0:7}"
 
-            git clone https://github.com/mattermost/mattermost-server.git
+            mkdir -p ./docker-build
+            cd ./docker-build
+            wget https://raw.githubusercontent.com/mattermost/mattermost-server/master/build/Dockerfile
+            wget https://raw.githubusercontent.com/mattermost/mattermost-server/master/build/entrypoint.sh
+            chmod +x entrypoint.sh
 
-            cd mattermost-server
-            export MM_PACKAGE=https://pr-builds.mattermost.com/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}/mattermost-enterprise-linux-amd64.tar.gz
-            docker build --build-arg MM_PACKAGE=$MM_PACKAGE -t mattermost/mattermost-enterprise-edition:${TAG} build
+            export DOCKER_CLI_EXPERIMENTAL=enabled
             echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-            docker push mattermost/mattermost-enterprise-edition:${TAG}
+            export MM_PACKAGE=https://pr-builds.mattermost.com/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}/mattermost-enterprise-linux-amd64.tar.gz
+            docker buildx build --push --build-arg MM_PACKAGE=$MM_PACKAGE -t mattermost/mm-ee-test:${TAG} .
 
 workflows:
   version: 2
@@ -284,13 +261,6 @@ workflows:
           context: matterbuild-docker
           requires:
             - prepare-docker-build
-      - build-storybook:
-          requires:
-            - build
-      - upload-storybook:
-          context: mattermost-s3-storybook-alpha
-          requires:
-            - build-storybook
       - test:
           requires:
             - type-check

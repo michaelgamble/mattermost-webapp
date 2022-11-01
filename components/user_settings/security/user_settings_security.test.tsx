@@ -4,12 +4,14 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import {UserProfile} from 'mattermost-redux/types/users';
+import {UserProfile} from '@mattermost/types/users';
+
+import * as Utils from 'utils/utils';
 
 import UserSettingsSecurity from './user_settings_security';
 
-jest.mock('utils/utils.jsx', () => {
-    const original = jest.requireActual('utils/utils.jsx');
+jest.mock('utils/utils', () => {
+    const original = jest.requireActual('utils/utils');
     return {...original, isValidPassword: () => ({valid: true})};
 });
 
@@ -41,7 +43,7 @@ describe('components/user_settings/display/UserSettingsDisplay', () => {
         enableSaml: true,
         enableSignUpWithOffice365: false,
         experimentalEnableAuthenticationTransfer: true,
-        passwordConfig: {},
+        passwordConfig: {} as ReturnType<typeof Utils.getPasswordConfig>,
         militaryTime: false,
     };
 

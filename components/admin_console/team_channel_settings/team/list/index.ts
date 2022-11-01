@@ -11,7 +11,7 @@ import {getTeams} from 'mattermost-redux/selectors/entities/teams';
 
 import {ActionFunc} from 'mattermost-redux/types/actions';
 
-import {TeamSearchOpts, TeamsWithCount} from 'mattermost-redux/types/teams';
+import {TeamSearchOpts, TeamsWithCount} from '@mattermost/types/teams';
 
 import {GlobalState} from 'types/store';
 
@@ -31,6 +31,7 @@ function mapStateToProps(state: GlobalState) {
     return {
         data: getSortedListOfTeams(state),
         total: state.entities.teams.totalCount || 0,
+        isLicensedForLDAPGroups: state.entities.general.license.LDAPGroups === 'true',
     };
 }
 

@@ -5,9 +5,9 @@ import React from 'react';
 import {shallow} from 'enzyme';
 import {Modal} from 'react-bootstrap';
 
-import {Channel, ChannelType} from 'mattermost-redux/types/channels';
+import {Channel, ChannelType} from '@mattermost/types/channels';
 
-import {browserHistory} from 'utils/browser_history';
+import {getHistory} from 'utils/browser_history';
 
 import DeleteChannelModal, {Props} from 'components/delete_channel_modal/delete_channel_modal';
 
@@ -24,9 +24,7 @@ describe('components/delete_channel_modal', () => {
         header: 'test',
         purpose: 'test',
         last_post_at: 1508265709635,
-        total_msg_count: 0,
-        total_msg_count_root: 0,
-        extra_update_at: 1508265709628,
+        last_root_post_at: 1508265709635,
         creator_id: 'zaktnt8bpbgu8mb6ez9k64r7sa',
         scheme_id: '',
         group_constrained: false,
@@ -44,7 +42,7 @@ describe('components/delete_channel_modal', () => {
                 return {data: true};
             }),
         },
-        onHide: jest.fn(),
+        onExited: jest.fn(),
         penultimateViewedChannelName: 'my-prev-channel',
     };
 
@@ -66,7 +64,6 @@ describe('components/delete_channel_modal', () => {
     });
 
     test('should have called actions.deleteChannel when handleDelete is called', () => {
-        browserHistory.push = jest.fn();
         const actions = {deleteChannel: jest.fn()};
         const props = {...baseProps, actions};
         const wrapper = shallow<DeleteChannelModal>(
@@ -78,17 +75,16 @@ describe('components/delete_channel_modal', () => {
 
         expect(actions.deleteChannel).toHaveBeenCalledTimes(1);
         expect(actions.deleteChannel).toHaveBeenCalledWith(props.channel.id);
-        expect(browserHistory.push).toHaveBeenCalledWith('/mattermostDev/channels/my-prev-channel');
+        expect(getHistory().push).toHaveBeenCalledWith('/mattermostDev/channels/my-prev-channel');
         expect(wrapper.state('show')).toEqual(false);
     });
 
-    test('should have called props.onHide when Modal.onExited is called', () => {
-        const props = {...baseProps};
+    test('should have called props.onExited when Modal.onExited is called', () => {
         const wrapper = shallow(
-            <DeleteChannelModal {...props}/>,
+            <DeleteChannelModal {...baseProps}/>,
         );
 
         wrapper.find(Modal).props().onExited!(document.createElement('div'));
-        expect(props.onHide).toHaveBeenCalledTimes(1);
+        expect(baseProps.onExited).toHaveBeenCalledTimes(1);
     });
 });

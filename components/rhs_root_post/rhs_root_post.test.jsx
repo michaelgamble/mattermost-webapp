@@ -1,22 +1,20 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {shallow} from 'enzyme';
 import React from 'react';
 
 import {Posts} from 'mattermost-redux/constants';
 
-import {shallowWithIntl} from 'tests/helpers/intl-test-helper';
-
 import RhsRootPost from 'components/rhs_root_post/rhs_root_post.jsx';
 import EmojiMap from 'utils/emoji_map';
-import PostFlagIcon from 'components/post_view/post_flag_icon';
 import PostPreHeader from 'components/post_view/post_pre_header';
-import {Locations} from 'utils/constants';
 
-jest.mock('utils/post_utils.jsx', () => ({
+jest.mock('utils/post_utils', () => ({
     isEdited: jest.fn().mockReturnValue(true),
     isSystemMessage: jest.fn().mockReturnValue(false),
     fromAutoResponder: jest.fn().mockReturnValue(false),
+    isFromWebhook: jest.fn().mockReturnValue(false),
 }));
 
 describe('components/RhsRootPost', () => {
@@ -29,7 +27,6 @@ describe('components/RhsRootPost', () => {
         is_pinned: false,
         message: 'post message',
         original_id: '',
-        parent_id: '',
         pending_post_id: '',
         props: {},
         root_id: '',
@@ -64,10 +61,12 @@ describe('components/RhsRootPost', () => {
         },
         emojiMap: new EmojiMap(new Map()),
         collapsedThreadsEnabled: false,
+        isMobileView: false,
+        isPostPriorityEnabled: true,
     };
 
     test('should match snapshot', () => {
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...baseProps}/>,
         );
 
@@ -79,7 +78,7 @@ describe('components/RhsRootPost', () => {
             ...baseProps,
             isFlagged: true,
         };
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...props}/>,
         );
 
@@ -94,7 +93,7 @@ describe('components/RhsRootPost', () => {
                 state: Posts.POST_DELETED,
             },
         };
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...props}/>,
         );
 
@@ -110,7 +109,7 @@ describe('components/RhsRootPost', () => {
                 isFlagged: true,
             },
         };
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...props}/>,
         );
 
@@ -118,7 +117,7 @@ describe('components/RhsRootPost', () => {
     });
 
     test('should match snapshot on CRT enabled', () => {
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost
                 {...baseProps}
                 collapsedThreadsEnabled={true}
@@ -129,7 +128,7 @@ describe('components/RhsRootPost', () => {
     });
 
     test('should show pointer when alt is held down', () => {
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...baseProps}/>,
         );
 
@@ -146,7 +145,7 @@ describe('components/RhsRootPost', () => {
             channelIsArchived: true,
         };
 
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...props}/>,
         );
 
@@ -158,7 +157,7 @@ describe('components/RhsRootPost', () => {
     });
 
     test('should call markPostAsUnread when post is alt+clicked on', () => {
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...baseProps}/>,
         );
 
@@ -177,7 +176,7 @@ describe('components/RhsRootPost', () => {
             channelIsArchived: true,
         };
 
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...props}/>,
         );
 
@@ -190,20 +189,18 @@ describe('components/RhsRootPost', () => {
         expect(props.actions.markPostAsUnread).not.toHaveBeenCalled();
     });
 
-    test('should pass props correctly to PostFlagIcon', () => {
-        const wrapper = shallowWithIntl(
+    test('should match snapshot hovered', () => {
+        const wrapper = shallow(
             <RhsRootPost {...baseProps}/>,
         );
 
-        const flagIcon = wrapper.find(PostFlagIcon);
-        expect(flagIcon).toHaveLength(1);
-        expect(flagIcon.prop('location')).toEqual(Locations.RHS_ROOT);
-        expect(flagIcon.prop('postId')).toEqual(baseProps.post.id);
-        expect(flagIcon.prop('isFlagged')).toEqual(baseProps.isFlagged);
+        wrapper.setState({hover: true});
+
+        expect(wrapper).toMatchSnapshot();
     });
 
     test('should pass props correctly to PostPreHeader', () => {
-        const wrapper = shallowWithIntl(
+        const wrapper = shallow(
             <RhsRootPost {...baseProps}/>,
         );
 
@@ -212,5 +209,23 @@ describe('components/RhsRootPost', () => {
         expect(postPreHeader.prop('isFlagged')).toEqual(baseProps.isFlagged);
         expect(postPreHeader.prop('isPinned')).toEqual(baseProps.post.is_pinned);
         expect(postPreHeader.prop('channelId')).toEqual(baseProps.post.channel_id);
+    });
+
+    test('should match snapshot when post priority is enabled', () => {
+        const props = {
+            ...baseProps,
+            post: {
+                ...baseProps.post,
+                props: {
+                    ...baseProps.post.props,
+                    priority: 'important',
+                },
+            },
+        };
+        const wrapper = shallow(
+            <RhsRootPost {...props}/>,
+        );
+
+        expect(wrapper).toMatchSnapshot();
     });
 });

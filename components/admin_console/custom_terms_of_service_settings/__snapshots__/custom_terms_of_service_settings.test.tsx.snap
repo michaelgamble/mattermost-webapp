@@ -11,7 +11,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
   >
     <AdminHeader>
       <MemoizedFormattedMessage
-        defaultMessage="Custom Terms of Service (Beta)"
+        defaultMessage="Custom Terms of Service"
         id="admin.support.termsOfServiceTitle"
       />
     </AdminHeader>
@@ -54,9 +54,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
         target={null}
       >
         <Tooltip
-          bsClass="tooltip"
           id="error-tooltip"
-          placement="right"
         />
       </Overlay>
     </div>
@@ -75,7 +73,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
   >
     <AdminHeader>
       <MemoizedFormattedMessage
-        defaultMessage="Custom Terms of Service (Beta)"
+        defaultMessage="Custom Terms of Service"
         id="admin.support.termsOfServiceTitle"
       />
     </AdminHeader>
@@ -118,9 +116,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
         target={null}
       >
         <Tooltip
-          bsClass="tooltip"
           id="error-tooltip"
-          placement="right"
         />
       </Overlay>
     </div>
@@ -139,7 +135,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
   >
     <AdminHeader>
       <MemoizedFormattedMessage
-        defaultMessage="Custom Terms of Service (Beta)"
+        defaultMessage="Custom Terms of Service"
         id="admin.support.termsOfServiceTitle"
       />
     </AdminHeader>
@@ -182,9 +178,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
         target={null}
       >
         <Tooltip
-          bsClass="tooltip"
           id="error-tooltip"
-          placement="right"
         />
       </Overlay>
     </div>
@@ -203,7 +197,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
   >
     <AdminHeader>
       <MemoizedFormattedMessage
-        defaultMessage="Custom Terms of Service (Beta)"
+        defaultMessage="Custom Terms of Service"
         id="admin.support.termsOfServiceTitle"
       />
     </AdminHeader>
@@ -246,9 +240,7 @@ exports[`components/admin_console/CustomTermsOfServiceSettings should match snap
         target={null}
       >
         <Tooltip
-          bsClass="tooltip"
           id="error-tooltip"
-          placement="right"
         />
       </Overlay>
     </div>

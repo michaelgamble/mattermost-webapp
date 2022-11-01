@@ -1,5 +1,3 @@
-@import 'compass/utilities';
-@import 'compass/css3';
 @import 'utils/variables';
 
 .modal-marketplace {
@@ -51,9 +49,20 @@
 
         > li {
             > a {
-                @include single-transition(all, 0.15s, ease);
-
                 padding: 10px 16px;
+                background: transparent;
+                transition: all 0.15s ease;
+
+                &:hover,
+                &:active,
+                &:focus {
+                    background: transparent;
+                    color: var(--center-channel-color);
+                }
+            }
+
+            &.active > a {
+                color: var(--center-channel-color);
             }
         }
     }
@@ -61,10 +70,6 @@
     h1 {
         margin: 8px 0 24px;
         font-size: 28px;
-
-        strong {
-            font-weight: 400;
-        }
     }
 
     h2 {
@@ -193,7 +198,7 @@
     }
 
     .item_error {
-        background-color: var(--error-text-08);
+        background-color: rgba(var(--error-text-rgb), 0.08);
     }
 
     .error_text {
@@ -223,6 +228,6 @@
         height: 100%;
         align-items: center;
         justify-content: center;
-        background-color: var(--error-text-12);
+        background-color: rgba(var(--error-text-rgb), 0.12);
     }
 }

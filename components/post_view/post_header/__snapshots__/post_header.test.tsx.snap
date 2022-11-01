@@ -25,7 +25,7 @@ exports[`components/post_view/post_header should match snapshot 1`] = `
     />
   </div>
   <div
-    className="col"
+    className="col d-flex align-items-center"
   >
     <Connect(PostInfo)
       handleCardClick={[MockFunction]}
@@ -50,7 +50,6 @@ exports[`components/post_view/post_header should match snapshot 1`] = `
             "reactions": Array [],
           },
           "original_id": "",
-          "parent_id": "",
           "pending_post_id": "",
           "props": Object {},
           "reply_count": 0,
@@ -91,7 +90,7 @@ exports[`components/post_view/post_header should match snapshot when custom stat
     />
   </div>
   <div
-    className="col"
+    className="col d-flex align-items-center"
   >
     <Connect(PostInfo)
       handleCardClick={[MockFunction]}
@@ -116,7 +115,6 @@ exports[`components/post_view/post_header should match snapshot when custom stat
             "reactions": Array [],
           },
           "original_id": "",
-          "parent_id": "",
           "pending_post_id": "",
           "props": Object {},
           "reply_count": 0,
@@ -157,7 +155,7 @@ exports[`components/post_view/post_header should match snapshot when custom stat
     />
   </div>
   <div
-    className="col"
+    className="col d-flex align-items-center"
   >
     <Connect(PostInfo)
       handleCardClick={[MockFunction]}
@@ -182,7 +180,6 @@ exports[`components/post_view/post_header should match snapshot when custom stat
             "reactions": Array [],
           },
           "original_id": "",
-          "parent_id": "",
           "pending_post_id": "",
           "props": Object {},
           "reply_count": 0,

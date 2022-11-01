@@ -1,16 +1,22 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Channel} from 'mattermost-redux/types/channels';
-import {MarketplaceApp, MarketplacePlugin} from 'mattermost-redux/types/marketplace';
-import {Dictionary, RelationOneToOne, $ID} from 'mattermost-redux/types/utilities';
-import {Team} from 'mattermost-redux/types/teams';
-import {UserThread} from 'mattermost-redux/types/threads';
+import {Channel} from '@mattermost/types/channels';
+import {MarketplaceApp, MarketplacePlugin} from '@mattermost/types/marketplace';
+import {RelationOneToOne} from '@mattermost/types/utilities';
+import {Team} from '@mattermost/types/teams';
+import {UserThread} from '@mattermost/types/threads';
 
 import {I18nState} from './i18n';
 import {RhsViewState} from './rhs';
 
 import {DraggingState} from '.';
+
+export type ModalFilters = {
+    roles?: string[];
+    channel_roles?: string[];
+    team_roles?: string[];
+};
 
 export type ViewsState = {
     admin: {
@@ -19,10 +25,18 @@ export type ViewsState = {
             onNavigationConfirmed: () => void;
             showNavigationPrompt: boolean;
         };
+        needsLoggedInLimitReachedCheck: boolean;
+    };
+
+    announcementBar: {
+        announcementBarState: {
+            announcementBarCount: number;
+        };
     };
 
     browser: {
         focused: boolean;
+        windowSize: string;
     };
 
     channel: {
@@ -44,6 +58,7 @@ export type ViewsState = {
         channelPrefetchStatus: {
             [channelId: string]: string;
         };
+        toastStatus: boolean;
     };
 
     rhs: RhsViewState;
@@ -52,7 +67,9 @@ export type ViewsState = {
 
     posts: {
         editingPost: {
+            postId: string;
             show: boolean;
+            isRHS: boolean;
         };
         menuActions: {
             [postId: string]: {
@@ -65,15 +82,19 @@ export type ViewsState = {
     };
 
     modals: {
-        [modalId: string]: {
-            open: boolean;
-            dialogProps: Dictionary<any>;
-            dialogType: React.Component;
+        modalState: {
+            [modalId: string]: {
+                open: boolean;
+                dialogProps: Record<string, any>;
+                dialogType: React.ComponentType;
+            };
         };
+        showLaunchingWorkspace: boolean;
     };
 
     emoji: {
-        emojiPickerCustomPage: 0;
+        emojiPickerCustomPage: number;
+        shortcutReactToLastPostEmittedFrom: string;
     };
 
     i18n: I18nState;
@@ -84,11 +105,8 @@ export type ViewsState = {
 
     search: {
         modalSearch: string;
-        modalFilters: {
-            roles?: string[];
-            channel_roles?: string[];
-            team_roles?: string[];
-        };
+        channelMembersRhsSearch: string;
+        modalFilters: ModalFilters;
         systemUsersSearch: {
             term: string;
             team: string;
@@ -121,11 +139,11 @@ export type ViewsState = {
     };
 
     system: {
-        websocketConnectErrorCount: number;
+        websocketConnectionErrorCount: number;
     };
 
     channelSelectorModal: {
-        channels: Channel[];
+        channels: string[];
     };
 
     settings: {
@@ -141,23 +159,44 @@ export type ViewsState = {
         filter: string;
     };
 
+    productMenu: {
+        switcherOpen: boolean;
+    };
+
     channelSidebar: {
         unreadFilterEnabled: boolean;
         draggingState: DraggingState;
         newCategoryIds: string[];
         multiSelectedChannelIds: string[];
         lastSelectedChannel: string;
+        firstChannelName: string;
     };
 
-    nextSteps: {
-        show: boolean;
-    };
     statusDropdown: {
         isOpen: boolean;
     };
+
+    addChannelDropdown: {
+        isOpen: boolean;
+    };
+
+    onboardingTasks: {
+        isShowOnboardingTaskCompletion: boolean;
+        isShowOnboardingCompleteProfileTour: boolean;
+        isShowOnboardingVisitConsoleTour: boolean;
+    };
+
     threads: {
-        selectedThreadIdInTeam: RelationOneToOne<Team, $ID<UserThread> | null>;
+        selectedThreadIdInTeam: RelationOneToOne<Team, UserThread['id'] | null>;
         lastViewedAt: {[id: string]: number};
         manuallyUnread: {[id: string]: boolean};
+        toastStatus: boolean;
+    };
+
+    textbox: {
+        shouldShowPreviewOnCreateComment: boolean;
+        shouldShowPreviewOnCreatePost: boolean;
+        shouldShowPreviewOnEditChannelHeaderModal: boolean;
+        shouldShowPreviewOnEditPostModal: boolean;
     };
 };

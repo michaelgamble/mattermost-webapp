@@ -4,8 +4,8 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import {UserProfile} from 'mattermost-redux/types/users';
-import {Team} from 'mattermost-redux/types/teams';
+import {UserProfile} from '@mattermost/types/users';
+import {Team} from '@mattermost/types/teams';
 
 import {TestHelper} from 'utils/test_helper';
 
@@ -49,7 +49,7 @@ describe('components/admin_console/add_users_to_team_modal/AddUsersToTeamModal',
         includeUsers: {},
 
         onAddCallback: jest.fn(),
-        onHide: jest.fn(),
+        onExited: jest.fn(),
 
         actions: {
             getProfilesNotInTeam: jest.fn(),
@@ -77,7 +77,7 @@ describe('components/admin_console/add_users_to_team_modal/AddUsersToTeamModal',
         expect(wrapper).toMatchSnapshot();
     });
 
-    test('should match state when onHide is called', () => {
+    test('should match state when handleHide is called', () => {
         const wrapper = shallow(
             <AddUsersToTeamModal {...baseProps}/>,
         );

@@ -1,10 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import configureStore from 'redux-mock-store';
-
-import thunk from 'redux-thunk';
-
 import {Client4} from 'mattermost-redux/client';
 
 import * as Channels from 'mattermost-redux/selectors/entities/channels';
@@ -12,14 +8,17 @@ import * as Teams from 'mattermost-redux/selectors/entities/teams';
 
 import {AppCallResponseTypes} from 'mattermost-redux/constants/apps';
 
-import {ActionTypes, Constants} from 'utils/constants';
-import * as UserAgent from 'utils/user_agent';
 import * as GlobalActions from 'actions/global_actions';
-import * as Utils from 'utils/utils.jsx';
+
+import mockStore from 'tests/test_store';
+
+import {ActionTypes, Constants, ModalIdentifiers} from 'utils/constants';
+import * as UserAgent from 'utils/user_agent';
+import * as Utils from 'utils/utils';
+
 import UserSettingsModal from 'components/user_settings/modal';
 
 import {executeCommand} from './command';
-const mockStore = configureStore([thunk]);
 
 const currentChannelId = '123';
 const currentTeamId = '321';
@@ -36,7 +35,6 @@ const initialState = {
         general: {
             config: {
                 ExperimentalViewArchivedChannels: 'false',
-                EnableLegacySidebar: 'true',
             },
         },
         posts: {
@@ -53,6 +51,15 @@ const initialState = {
         preferences: {
             myPreferences: {},
         },
+        roles: {
+            roles: {
+                custom_role: {
+                    permissions: [
+                        'sysconsole_read_plugins',
+                    ],
+                },
+            },
+        },
         teams: {
             currentTeamId,
         },
@@ -60,6 +67,7 @@ const initialState = {
             currentUserId,
             profiles: {
                 user123: {
+                    roles: 'custom_role',
                     timezone: {
                         useAutomaticTimezone: true,
                         automaticTimezone: '',
@@ -69,44 +77,54 @@ const initialState = {
             },
         },
         apps: {
-            bindings: [{
-                location: '/command',
-                bindings: [{
-                    app_id: 'appid',
-                    label: 'appid',
-                    bindings: [
-                        {
-                            app_id: 'appid',
-                            label: 'custom',
-                            description: 'Run the command.',
-                            call: {
-                                path: 'https://someserver.com/command',
-                            },
-                            form: {
-                                fields: [
+            main: {
+                bindings: [
+                    {
+                        location: '/command',
+                        bindings: [
+                            {
+                                location: '/command/appid',
+                                app_id: 'appid',
+                                label: 'appid',
+                                bindings: [
                                     {
-                                        name: 'key1',
-                                        label: 'key1',
-                                        type: 'text',
-                                        position: 1,
-                                    },
-                                    {
-                                        name: 'key2',
-                                        label: 'key2',
-                                        type: 'static_select',
-                                        options: [
-                                            {
-                                                label: 'Value 2',
-                                                value: 'value2',
+                                        location: '/command/appid/custom',
+                                        app_id: 'appid',
+                                        label: 'custom',
+                                        description: 'Run the command.',
+                                        form: {
+                                            submit: {
+                                                path: 'https://someserver.com/command',
                                             },
-                                        ],
+                                            fields: [
+                                                {
+                                                    name: 'key1',
+                                                    label: 'key1',
+                                                    type: 'text',
+                                                    position: 1,
+                                                },
+                                                {
+                                                    name: 'key2',
+                                                    label: 'key2',
+                                                    type: 'static_select',
+                                                    options: [
+                                                        {
+                                                            label: 'Value 2',
+                                                            value: 'value2',
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
                                     },
                                 ],
                             },
-                        },
-                    ],
-                }],
-            }],
+                        ],
+                    },
+                ],
+                forms: {},
+            },
+            pluginEnabled: true,
         },
     },
     views: {
@@ -155,12 +173,18 @@ describe('executeCommand', () => {
             });
         });
 
-        test('should call toggleShortcutsModal in case of no mobile', async () => {
+        test('should open shortcut modal in case of no mobile', async () => {
             UserAgent.isMobile.mockReturnValueOnce(false);
 
             const result = await store.dispatch(executeCommand('/shortcuts', []));
 
-            expect(GlobalActions.toggleShortcutsModal).toHaveBeenCalled();
+            const actionDispatch = store.getActions()[0];
+
+            expect(actionDispatch).toMatchObject({
+                type: ActionTypes.MODAL_OPEN,
+                modalId: ModalIdentifiers.KEYBOARD_SHORTCUTS_MODAL,
+            });
+
             expect(result).toEqual({data: true});
         });
     });
@@ -171,6 +195,7 @@ describe('executeCommand', () => {
             expect(store.getActions()).toEqual([
                 {
                     type: ActionTypes.MODAL_OPEN,
+                    dialogProps: {isContentProductSettings: true},
                     dialogType: UserSettingsModal,
                     modalId: 'user_settings',
                 },
@@ -191,22 +216,27 @@ describe('executeCommand', () => {
         test('should send message when command typed in reply threads', async () => {
             GlobalActions.sendEphemeralPost = jest.fn().mockReturnValue({type: 'someaction'});
 
-            const result = await store.dispatch(executeCommand('/leave', {channel_id: 'channel_id', parent_id: 'parent_id'}));
+            const result = await store.dispatch(executeCommand('/leave', {channel_id: 'channel_id', root_id: 'root_id'}));
 
             expect(GlobalActions.sendEphemeralPost).
                 toHaveBeenCalledWith('/leave is not supported in reply threads. Use it in the center channel instead.',
-                    'channel_id', 'parent_id');
+                    'channel_id', 'root_id');
 
             expect(result).toEqual({data: true});
         });
 
         test('should show private modal if channel is private', async () => {
-            GlobalActions.showLeavePrivateChannelModal = jest.fn();
             Channels.getCurrentChannel = jest.fn(() => ({type: Constants.PRIVATE_CHANNEL}));
 
             const result = await store.dispatch(executeCommand('/leave', {}));
 
-            expect(GlobalActions.showLeavePrivateChannelModal).toHaveBeenCalledWith({type: Constants.PRIVATE_CHANNEL});
+            const actionDispatch = store.getActions()[0];
+
+            expect(actionDispatch).toMatchObject({
+                type: ActionTypes.MODAL_OPEN,
+                modalId: ModalIdentifiers.LEAVE_PRIVATE_CHANNEL_MODAL,
+                dialogProps: {channel: {type: Constants.PRIVATE_CHANNEL}},
+            });
 
             expect(result).toEqual({data: true});
         });
@@ -236,6 +266,92 @@ describe('executeCommand', () => {
         });
     });
 
+    describe('marketplace command', () => {
+        test('it is a local command, it should not call the server', async () => {
+            const state = {
+                ...initialState,
+                entities: {
+                    ...initialState.entities,
+                    general: {
+                        ...initialState.entities.general,
+                        config: {
+                            ...initialState.entities.general.config,
+                            EnableMarketplace: 'true',
+                            PluginsEnabled: 'true',
+                        },
+                    },
+                },
+            };
+
+            store = await mockStore(state);
+
+            Client4.executeCommand = jest.fn().mockResolvedValue({});
+            const result = await store.dispatch(executeCommand('/marketplace', []));
+
+            // Make sure the server was not called
+            expect(Client4.executeCommand).not.toHaveBeenCalled();
+
+            // Make sure we opened the modal
+            const actionDispatch = store.getActions()[0];
+            expect(actionDispatch).toMatchObject({
+                type: ActionTypes.MODAL_OPEN,
+                modalId: ModalIdentifiers.PLUGIN_MARKETPLACE,
+            });
+            expect(result).toEqual({data: true});
+        });
+
+        test('should show error when marketpace is not enabled', async () => {
+            const state = {
+                ...initialState,
+                entities: {
+                    ...initialState.entities,
+                    general: {
+                        ...initialState.entities.general,
+                        config: {
+                            ...initialState.entities.general.config,
+                            EnableMarketplace: 'false',
+                            PluginsEnabled: 'false',
+                        },
+                    },
+                },
+            };
+
+            store = await mockStore(state);
+            const res = await store.dispatch(executeCommand('/marketplace', []));
+            expect(res.error).not.toBeUndefined();
+        });
+
+        test('should show error when user does not have permission', async () => {
+            const state = {
+                ...initialState,
+                entities: {
+                    ...initialState.entities,
+                    general: {
+                        ...initialState.entities.general,
+                        config: {
+                            ...initialState.entities.general.config,
+                            EnableMarketplace: 'true',
+                            PluginsEnabled: 'true',
+                        },
+                    },
+                    roles: {
+                        ...initialState.entities.roles,
+                        roles: {
+                            ...initialState.entities.roles.roles,
+                            custom_role: {
+                                permissions: [],
+                            },
+                        },
+                    },
+                },
+            };
+
+            store = await mockStore(state);
+            const res = await store.dispatch(executeCommand('/marketplace', []));
+            expect(res.error).not.toBeUndefined();
+        });
+    });
+
     describe('app command', () => {
         test('should call executeAppCall', async () => {
             const state = {
@@ -259,16 +375,17 @@ describe('executeCommand', () => {
             }));
             Client4.executeAppCall = mocked;
 
-            const result = await store.dispatch(executeCommand('/appid custom value1 --key2 value2', {channel_id: '123', root_id: 'root_id'}));
+            const result = await store.dispatch(executeCommand('/appid custom value1 --key2 value2', {channel_id: '123'}));
             Client4.executeAppCall = f;
 
             expect(mocked).toHaveBeenCalledWith({
                 context: {
                     app_id: 'appid',
                     channel_id: '123',
-                    location: '/command',
-                    root_id: 'root_id',
+                    location: '/command/appid/custom',
+                    root_id: '',
                     team_id: '456',
+                    track_as_submit: true,
                 },
                 raw_command: '/appid custom value1 --key2 value2',
                 path: 'https://someserver.com/command',
@@ -279,7 +396,7 @@ describe('executeCommand', () => {
                 expand: {},
                 query: undefined,
                 selected_field: undefined,
-            }, 'submit');
+            }, true);
             expect(result).toEqual({data: true});
         });
     });

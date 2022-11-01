@@ -1,6 +1,8 @@
 @charset "UTF-8";
 
 .emoji-picker {
+    pointer-events: auto;
+
     li.custom-emoji-tab:not(.active) {
         a {
             width: max-content;
@@ -8,15 +10,15 @@
 
             svg,
             div {
-                color: var(--center-channel-color-56);
-                fill: var(--center-channel-color-56);
+                color: rgba(var(--center-channel-color-rgb), 0.56);
+                fill: rgba(var(--center-channel-color-rgb), 0.56);
             }
 
             &:hover {
                 svg,
                 div {
-                    color: var(--center-channel-color-72);
-                    fill: var(--center-channel-color-72);
+                    color: rgba(var(--center-channel-color-rgb), 0.72);
+                    fill: rgba(var(--center-channel-color-rgb), 0.72);
                 }
             }
         }

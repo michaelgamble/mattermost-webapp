@@ -1,10 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-/* eslint-disable max-lines */
-
 import {combineReducers} from 'redux';
 import shallowEquals from 'shallow-equals';
+import {isEqual} from 'lodash';
 
 import {AdminTypes, ChannelTypes, UserTypes, SchemeTypes, GroupTypes, PostTypes} from 'mattermost-redux/action_types';
 
@@ -18,18 +17,20 @@ import {
     ChannelStats,
     ChannelMemberCountByGroup,
     ChannelMemberCountsByGroup,
-} from 'mattermost-redux/types/channels';
+    ServerChannel,
+} from '@mattermost/types/channels';
 import {
     RelationOneToMany,
     RelationOneToOne,
     IDMappedObjects,
-    UserIDMappedObjects,
-} from 'mattermost-redux/types/utilities';
+} from '@mattermost/types/utilities';
 
-import {Team} from 'mattermost-redux/types/teams';
+import {Team} from '@mattermost/types/teams';
 import {channelListToMap, splitRoles} from 'mattermost-redux/utils/channel_utils';
 
-function removeMemberFromChannels(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>, action: GenericAction) {
+import messageCounts from './channels/message_counts';
+
+function removeMemberFromChannels(state: RelationOneToOne<Channel, Record<string, ChannelMembership>>, action: GenericAction) {
     const nextState = {...state};
     Object.keys(state).forEach((channel) => {
         nextState[channel] = {...nextState[channel]};
@@ -73,29 +74,49 @@ function currentChannelId(state = '', action: GenericAction) {
 
 function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     switch (action.type) {
-    case ChannelTypes.RECEIVED_CHANNEL:
-        if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
-            action.data.display_name = action.data.display_name || state[action.data.id].display_name;
+    case ChannelTypes.RECEIVED_CHANNEL: {
+        const channel: Channel = toClientChannel(action.data);
+
+        if (state[channel.id] && channel.type === General.DM_CHANNEL) {
+            channel.display_name = channel.display_name || state[channel.id].display_name;
         }
+
         return {
             ...state,
-            [action.data.id]: action.data,
+            [channel.id]: channel,
         };
+    }
     case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS: {
-        return Object.assign({}, state, channelListToMap(action.data.channels));
+        const channels: Channel[] = action.data.channels.map(toClientChannel);
+
+        if (channels.length === 0) {
+            return state;
+        }
+
+        return {
+            ...state,
+            ...channelListToMap(channels),
+        };
     }
     case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SEARCH:
     case ChannelTypes.RECEIVED_CHANNELS:
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
+        const channels: Channel[] = action.data.map(toClientChannel);
+
+        if (channels.length === 0) {
+            return state;
+        }
+
         const nextState = {...state};
 
-        for (let channel of action.data) {
+        for (let channel of channels) {
             if (state[channel.id] && channel.type === General.DM_CHANNEL && !channel.display_name) {
                 channel = {...channel, display_name: state[channel.id].display_name};
             }
             nextState[channel.id] = channel;
         }
+
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
@@ -159,7 +180,7 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
         };
     }
     case ChannelTypes.LEAVE_CHANNEL: {
-        if (action.data && action.data.type === General.PRIVATE_CHANNEL) {
+        if (action.data) {
             const nextState = {...state};
             Reflect.deleteProperty(nextState, action.data.id);
             return nextState;
@@ -167,37 +188,24 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
         return state;
     }
 
-    case ChannelTypes.INCREMENT_TOTAL_MSG_COUNT: {
-        const {channelId, amount, amountRoot} = action.data;
+    case PostTypes.RECEIVED_NEW_POST: {
+        const {channel_id: channelId, create_at: createAt, root_id: rootId} = action.data;
+        const isCrtReply = action.features?.crtEnabled && rootId !== '';
+
         const channel = state[channelId];
 
         if (!channel) {
             return state;
         }
 
+        const lastRootPostAt = isCrtReply ? channel.last_root_post_at : Math.max(createAt, channel.last_root_post_at);
+
         return {
             ...state,
             [channelId]: {
                 ...channel,
-                total_msg_count: channel.total_msg_count + amount,
-                total_msg_count_root: channel.total_msg_count_root + amountRoot,
-            },
-        };
-    }
-
-    case PostTypes.RECEIVED_NEW_POST: {
-        const {channel_id, create_at} = action.data; //eslint-disable-line @typescript-eslint/naming-convention
-        const channel = state[channel_id];
-
-        if (!channel) {
-            return state;
-        }
-
-        return {
-            ...state,
-            [channel_id]: {
-                ...channel,
-                last_post_at: Math.max(create_at, channel.last_post_at),
+                last_post_at: Math.max(createAt, channel.last_post_at),
+                last_root_post_at: lastRootPostAt,
             },
         };
     }
@@ -211,21 +219,6 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
         }
 
         return {...state, [channelId]: {...channel, scheme_id: schemeId}};
-    }
-
-    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
-        const nextState = {...state};
-        const myChannels: Channel[] = action.data.channels;
-        let hasNewValues = false;
-
-        if (myChannels && myChannels.length) {
-            hasNewValues = true;
-            myChannels.forEach((c: Channel) => {
-                nextState[c.id] = c;
-            });
-        }
-
-        return hasNewValues ? nextState : state;
     }
 
     case AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SUCCESS: {
@@ -250,6 +243,15 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     }
 }
 
+function toClientChannel(serverChannel: ServerChannel): Channel {
+    const channel = {...serverChannel};
+
+    Reflect.deleteProperty(channel, 'total_msg_count');
+    Reflect.deleteProperty(channel, 'total_msg_count_root');
+
+    return channel;
+}
+
 function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL: {
@@ -264,19 +266,10 @@ function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: Ge
         return channelListToSet(state, action);
     }
     case ChannelTypes.LEAVE_CHANNEL: {
-        if (action.data && action.data.type === General.PRIVATE_CHANNEL) {
+        if (action.data) {
             return removeChannelFromSet(state, action);
         }
         return state;
-    }
-    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
-        const values: GenericAction = {
-            type: action.type,
-            teamId: action.data.teamId,
-            sync: action.data.sync,
-            data: action.data.channels,
-        };
-        return channelListToSet(state, values);
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -285,14 +278,12 @@ function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: Ge
     }
 }
 
-function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, action: GenericAction) {
+export function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER: {
-        const channelMember = action.data;
-        return {
-            ...state,
-            [channelMember.channel_id]: channelMember,
-        };
+        const channelMember: ChannelMembership = action.data;
+
+        return receiveChannelMember(state, channelMember);
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS: {
         const nextState = {...state};
@@ -303,11 +294,9 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
             });
         }
 
-        for (const cm of action.data) {
-            nextState[cm.channel_id] = cm;
-        }
+        const channelMembers: ChannelMembership[] = action.data;
 
-        return nextState;
+        return channelMembers.reduce(receiveChannelMember, state);
     }
     case ChannelTypes.RECEIVED_CHANNEL_PROPS: {
         const member = {...state[action.data.channel_id]};
@@ -346,6 +335,10 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         } = action.data;
         const member = state[channelId];
 
+        if (amount === 0 && amountRoot === 0) {
+            return state;
+        }
+
         if (!member) {
             // Don't keep track of unread posts until we've loaded the actual channel member
             return state;
@@ -373,6 +366,10 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
     case ChannelTypes.DECREMENT_UNREAD_MSG_COUNT: {
         const {channelId, amount, amountRoot} = action.data;
 
+        if (amount === 0 && amountRoot === 0) {
+            return state;
+        }
+
         const member = state[channelId];
 
         if (!member) {
@@ -396,6 +393,11 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
             amountRoot,
             fetchedChannelMember,
         } = action.data;
+
+        if (amount === 0 && amountRoot === 0) {
+            return state;
+        }
+
         const member = state[channelId];
 
         if (!member) {
@@ -419,6 +421,11 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
     }
     case ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT: {
         const {channelId, amount, amountRoot} = action.data;
+
+        if (amount === 0 && amountRoot === 0) {
+            return state;
+        }
+
         const member = state[channelId];
 
         if (!member) {
@@ -438,6 +445,10 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
     case ChannelTypes.RECEIVED_LAST_VIEWED_AT: {
         const {data} = action;
         let member = state[data.channel_id];
+
+        if (member.last_viewed_at === data.last_viewed_at) {
+            return state;
+        }
 
         member = {
             ...member,
@@ -468,36 +479,18 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         if (!channelState) {
             return state;
         }
-        return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, msg_count_root: data.msgCountRoot, mention_count_root: data.mentionCountRoot, last_viewed_at: data.lastViewedAt}};
-    }
 
-    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
-        const nextState = {...state};
-        const current = Object.values(nextState);
-        const {sync, channelMembers} = action.data;
-        let hasNewValues = channelMembers && channelMembers.length > 0;
-
-        // Remove existing channel memberships when the user is no longer a member
-        if (sync) {
-            current.forEach((member: ChannelMembership) => {
-                const id = member.channel_id;
-                if (channelMembers.find((cm: ChannelMembership) => cm.channel_id === id)) {
-                    delete nextState[id];
-                    hasNewValues = true;
-                }
-            });
-        }
-
-        if (hasNewValues) {
-            channelMembers.forEach((cm: ChannelMembership) => {
-                const id: string = cm.channel_id;
-                nextState[id] = cm;
-            });
-
-            return nextState;
-        }
-
-        return state;
+        return {
+            ...state,
+            [data.channelId]: {
+                ...channelState,
+                msg_count: data.msgCount,
+                mention_count: data.mentionCount,
+                msg_count_root: data.msgCountRoot,
+                mention_count_root: data.mentionCountRoot,
+                last_viewed_at: data.lastViewedAt,
+            },
+        };
     }
 
     case UserTypes.LOGOUT_SUCCESS:
@@ -507,7 +500,39 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
     }
 }
 
-function membersInChannel(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>> = {}, action: GenericAction) {
+function receiveChannelMember(state: RelationOneToOne<Channel, ChannelMembership>, received: ChannelMembership) {
+    const existingChannelMember = state[received.channel_id];
+    let updatedChannelMember = {...received};
+
+    if (isEqual(existingChannelMember, updatedChannelMember)) {
+        return state;
+    }
+
+    // https://github.com/mattermost/mattermost-webapp/pull/10589 and
+    // https://github.com/mattermost/mattermost-webapp/pull/11094
+    if (existingChannelMember &&
+        updatedChannelMember.last_viewed_at < existingChannelMember.last_viewed_at &&
+        updatedChannelMember.last_update_at <= existingChannelMember.last_update_at) {
+        // The last_viewed_at should almost never decrease upon receiving a member, so if it does, assume that the
+        // unread state of the existing channel member is correct. See MM-44900 for more information.
+        updatedChannelMember = {
+            ...received,
+            last_viewed_at: Math.max(existingChannelMember.last_viewed_at, received.last_viewed_at),
+            last_update_at: Math.max(existingChannelMember.last_update_at, received.last_update_at),
+            msg_count: Math.max(existingChannelMember.msg_count, received.msg_count),
+            msg_count_root: Math.max(existingChannelMember.msg_count_root, received.msg_count_root),
+            mention_count: Math.min(existingChannelMember.mention_count, received.mention_count),
+            mention_count_root: Math.min(existingChannelMember.mention_count_root, received.mention_count_root),
+        };
+    }
+
+    return {
+        ...state,
+        [updatedChannelMember.channel_id]: updatedChannelMember,
+    };
+}
+
+function membersInChannel(state: RelationOneToOne<Channel, Record<string, ChannelMembership>> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
@@ -644,6 +669,23 @@ function stats(state: RelationOneToOne<Channel, ChannelStats> = {}, action: Gene
                 [id]: {
                     ...nextStat,
                     pinnedpost_count: count,
+                },
+            };
+        }
+
+        return state;
+    }
+    case ChannelTypes.INCREMENT_FILE_COUNT: {
+        const nextState = {...state};
+        const id = action.id;
+        const nextStat = nextState[id];
+        if (nextStat) {
+            const count = nextStat.files_count + action.amount;
+            return {
+                ...nextState,
+                [id]: {
+                    ...nextStat,
+                    files_count: count,
                 },
             };
         }
@@ -915,4 +957,7 @@ export default combineReducers({
 
     // object where every key is the channel id containing map of <group_id: ChannelMemberCountByGroup>
     channelMemberCountsByGroup,
+
+    // object where every key is the channel id mapping to an object containing the number of messages in the channel
+    messageCounts,
 });

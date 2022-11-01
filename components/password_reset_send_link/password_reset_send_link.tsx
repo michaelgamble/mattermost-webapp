@@ -4,13 +4,13 @@
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import {ServerError} from 'mattermost-redux/types/errors';
+import {ServerError} from '@mattermost/types/errors';
 import {isEmail} from 'mattermost-redux/utils/helpers';
 
 import BackButton from 'components/common/back_button';
 import LocalizedInput from 'components/localized_input/localized_input';
 
-import {t} from 'utils/i18n.jsx';
+import {t} from 'utils/i18n';
 
 interface Props {
     actions: {
@@ -105,12 +105,11 @@ export default class PasswordResetSendLink extends React.PureComponent<Props, St
                 <BackButton/>
                 <div className='col-sm-12'>
                     <div className='signup-team__container'>
-                        <h3>
-                            <FormattedMessage
-                                id='password_send.title'
-                                defaultMessage='Password Reset'
-                            />
-                        </h3>
+                        <FormattedMessage
+                            id='password_send.title'
+                            tagName='h1'
+                            defaultMessage='Password Reset'
+                        />
                         {this.state.updateText}
                         <form
                             onSubmit={this.handleSendLink}

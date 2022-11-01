@@ -5,11 +5,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import SuggestionList from 'components/suggestion/suggestion_list.jsx';
-import {getClosestParent} from 'utils/utils.jsx';
+import {getClosestParent} from 'utils/utils';
 
 export default class ModalSuggestionList extends React.PureComponent {
     static propTypes = {
-        location: PropTypes.string.isRequired,
+        position: PropTypes.string.isRequired,
         open: PropTypes.bool.isRequired,
         cleared: PropTypes.bool.isRequired,
         inputRef: PropTypes.object.isRequired,
@@ -23,7 +23,7 @@ export default class ModalSuggestionList extends React.PureComponent {
             scroll: 0,
             modalBounds: {top: 0, bottom: 0},
             inputBounds: {top: 0, bottom: 0, width: 0},
-            location: props.location,
+            position: props.position,
         };
 
         this.container = React.createRef();
@@ -33,7 +33,7 @@ export default class ModalSuggestionList extends React.PureComponent {
 
     calculateInputRect = () => {
         if (this.props.inputRef.current) {
-            const rect = this.props.inputRef.current.getInput().getBoundingClientRect();
+            const rect = this.props.inputRef.current.getBoundingClientRect();
             return {top: rect.top, bottom: rect.bottom, width: rect.width};
         }
         return {top: 0, bottom: 0, width: 0};
@@ -73,7 +73,7 @@ export default class ModalSuggestionList extends React.PureComponent {
             prevState.modalBounds.top !== this.state.modalBounds.top ||
             prevState.modalBounds.bottom !== this.state.modalBounds.bottom) {
             const newInputBounds = this.updateInputBounds();
-            this.updateLocation(newInputBounds);
+            this.updatePosition(newInputBounds);
 
             if (this.container.current) {
                 const modalBodyRect = getClosestParent(this.container.current, '.modal-body').getBoundingClientRect();
@@ -110,7 +110,7 @@ export default class ModalSuggestionList extends React.PureComponent {
         return inputBounds;
     }
 
-    updateLocation = (newInputBounds) => {
+    updatePosition = (newInputBounds) => {
         let inputBounds = newInputBounds;
         if (!newInputBounds) {
             inputBounds = this.state.inputBounds;
@@ -122,16 +122,16 @@ export default class ModalSuggestionList extends React.PureComponent {
 
         this.latestHeight = this.getChildHeight();
 
-        let newLocation = this.props.location;
+        let newPosition = this.props.position;
         if (window.innerHeight < inputBounds.bottom + this.latestHeight) {
-            newLocation = 'top';
+            newPosition = 'top';
         }
         if (inputBounds.top - this.latestHeight < 0) {
-            newLocation = 'bottom';
+            newPosition = 'bottom';
         }
 
-        if (this.state.location !== newLocation) {
-            this.setState({location: newLocation});
+        if (this.state.position !== newPosition) {
+            this.setState({position: newPosition});
         }
     }
 
@@ -156,7 +156,7 @@ export default class ModalSuggestionList extends React.PureComponent {
         Reflect.deleteProperty(props, 'onLoseVisibility');
 
         let position = {};
-        if (this.state.location === 'top') {
+        if (this.state.position === 'top') {
             position = {bottom: this.state.modalBounds.bottom - this.state.inputBounds.top};
         } else {
             position = {top: this.state.inputBounds.bottom - this.state.modalBounds.top};
@@ -169,7 +169,7 @@ export default class ModalSuggestionList extends React.PureComponent {
             >
                 <SuggestionList
                     {...props}
-                    location={this.state.location}
+                    position={this.state.position}
                     ref={this.suggestionList}
                 />
             </div>

@@ -1,12 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-/* eslint-disable react/no-string-refs */
 
+import deepEqual from 'fast-deep-equal';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
-import Chart, {ChartData} from 'chart.js';
-
-import * as Utils from 'utils/utils.jsx';
+import Chart from 'chart.js/auto';
+import {ChartData} from 'chart.js';
 
 type Props = {
     title: React.ReactNode;
@@ -25,7 +24,7 @@ export default class DoughnutChart extends React.PureComponent<Props> {
     }
 
     public componentDidUpdate(prevProps: Props): void {
-        if (!Utils.areObjectsEqual(prevProps.data, this.props.data)) {
+        if (!deepEqual(prevProps.data, this.props.data)) {
             this.initChart(true);
         }
     }
@@ -37,20 +36,27 @@ export default class DoughnutChart extends React.PureComponent<Props> {
     }
 
     public initChart = (update?: boolean): void => {
+        if (typeof this.props.data === 'undefined') {
+            return;
+        }
+
         if (!this.canvasRef.current) {
             return;
         }
+
         const ctx = this.canvasRef.current.getContext('2d') as CanvasRenderingContext2D;
         const dataCopy = JSON.parse(JSON.stringify(this.props.data));
-        this.chart = new Chart(ctx, {type: 'doughnut', data: dataCopy, options: {}});
-        if (update && this.chart) {
-            this.chart.update();
+
+        if (update) {
+            this.chart?.update();
+        } else {
+            this.chart = new Chart(ctx, {type: 'doughnut', data: dataCopy, options: {}});
         }
     }
 
     public render(): JSX.Element {
         let content;
-        if (this.props.data == null) {
+        if (typeof this.props.data === 'undefined') {
             content = (
                 <FormattedMessage
                     id='analytics.chart.loading'

@@ -5,10 +5,13 @@ import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import {Channel} from 'mattermost-redux/types/channels';
+import {Channel} from '@mattermost/types/channels';
 
 import MemberListChannel from 'components/member_list_channel';
 import ChannelInviteModal from 'components/channel_invite_modal';
+
+import {ModalData} from 'types/actions';
+
 import {ModalIdentifiers} from 'utils/constants';
 
 type Props = {
@@ -24,16 +27,12 @@ type Props = {
     channel: Channel;
 
     /**
-     * Function that is called when modal is hidden
+     * Function that is called after the modal is hidden
      */
-    onHide: () => void;
+    onExited: () => void;
 
     actions: {
-        openModal: (modalData: {
-            modalId: string;
-            dialogProps: {[key: string]: any};
-            dialogType: (props: any) => React.ReactElement | null;
-        }) => Promise<{data: boolean}>;
+        openModal: <P>(modalData: ModalData<P>) => void;
     };
 }
 
@@ -54,10 +53,6 @@ export default class ChannelMembersModal extends React.PureComponent<Props, Stat
         this.setState({show: false});
     }
 
-    handleExit = () => {
-        this.props.onHide();
-    }
-
     onAddNewMembersButton = () => {
         const {channel, actions} = this.props;
 
@@ -67,7 +62,7 @@ export default class ChannelMembersModal extends React.PureComponent<Props, Stat
             dialogProps: {channel},
         });
 
-        this.handleExit();
+        this.handleHide();
     }
 
     render() {
@@ -78,7 +73,7 @@ export default class ChannelMembersModal extends React.PureComponent<Props, Stat
                     dialogClassName='a11y__modal more-modal more-modal--action'
                     show={this.state.show}
                     onHide={this.handleHide}
-                    onExited={this.handleExit}
+                    onExited={this.props.onExited}
                     role='dialog'
                     aria-labelledby='channelMembersModalLabel'
                     id='channelMembersModal'

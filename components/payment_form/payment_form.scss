@@ -27,7 +27,7 @@
 
     .section-title {
         margin-bottom: 24px;
-        color: var(--center-channel-text);
+        color: rgba(var(--center-channel-color-rgb), 0.72);
         font-size: 16px;
         font-weight: 600;
         text-align: left;
@@ -41,6 +41,16 @@
 
         .DropDown__control {
             min-height: 0;
+            background-color: var(--center-channel-bg) !important;
+
+            .DropDown__value-container > div {
+                color: var(--center-channel-color) !important;
+            }
+        }
+
+        .DropDown__menu {
+            background-color: var(--center-channel-bg) !important;
+            box-shadow: 0 0 0 1px var(--center-channel-color), 0 4px 11px var(--center-channel-color) !important;
         }
     }
 
@@ -50,6 +60,14 @@
 
     input {
         font-size: 14px;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px var(--center-channel-bg) inset !important;
+        -webkit-text-fill-color: var(--center-channel-color) !important;
     }
 
     .Input_fieldset {
@@ -87,6 +105,7 @@
 
         .Input {
             height: 32px;
+            background: inherit;
 
             &::placeholder {
                 color: var(--center-channel-color);
@@ -108,7 +127,7 @@
 
     .PaymentForm-saved-title {
         margin-bottom: 16px;
-        color: #22406d;
+        color: var(--secondary-blue);
         font-family: Metropolis;
         font-size: 14px;
         font-weight: 600;
@@ -121,7 +140,7 @@
     .PaymentForm-saved-card {
         padding-bottom: 16px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-        color: #22406d;
+        color: var(--secondary-blue);
         font-family: Source Sans Pro;
         font-size: 16px;
         line-height: 24px;
@@ -130,7 +149,7 @@
     .PaymentForm-saved-address {
         margin-top: 16px;
         margin-bottom: 16px;
-        color: #22406d;
+        color: var(--secondary-blue);
         font-family: Source Sans Pro;
         font-size: 16px;
         line-height: 24px;
@@ -143,11 +162,4 @@
         font-weight: 600;
         line-height: 20px;
     }
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px var(--center-channel-bg) inset !important;
 }

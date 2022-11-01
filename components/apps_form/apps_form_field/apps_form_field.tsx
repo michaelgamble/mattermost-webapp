@@ -3,14 +3,15 @@
 
 import React from 'react';
 
-import {AppField, AppSelectOption} from 'mattermost-redux/types/apps';
-import {Channel} from 'mattermost-redux/types/channels';
-import {UserProfile} from 'mattermost-redux/types/users';
+import {AppField, AppSelectOption} from '@mattermost/types/apps';
+import {Channel} from '@mattermost/types/channels';
+import {UserProfile} from '@mattermost/types/users';
+import {UserAutocomplete} from '@mattermost/types/autocomplete';
 
 import {AppFieldTypes} from 'mattermost-redux/constants/apps';
 import {displayUsername} from 'mattermost-redux/utils/user_utils';
 
-import GenericUserProvider from 'components/suggestion/generic_user_provider.jsx';
+import GenericUserProvider from 'components/suggestion/generic_user_provider';
 import GenericChannelProvider from 'components/suggestion/generic_channel_provider.jsx';
 
 import TextSetting, {InputTypes} from 'components/widgets/settings/text_setting';
@@ -26,7 +27,7 @@ import AppsFormSelectField from './apps_form_select_field';
 const TEXT_DEFAULT_MAX_LENGTH = 150;
 const TEXTAREA_DEFAULT_MAX_LENGTH = 3000;
 
-export type Props = {
+export interface Props {
     field: AppField;
     name: string;
     errorText?: React.ReactNode;
@@ -35,11 +36,11 @@ export type Props = {
     value: AppSelectOption | string | boolean | number | null;
     onChange: (name: string, value: any) => void;
     autoFocus?: boolean;
-    listComponent?: React.ComponentClass;
+    listComponent?: React.ComponentProps<typeof AutocompleteSelector>['listComponent'];
     performLookup: (name: string, userInput: string) => Promise<AppSelectOption[]>;
     actions: {
         autocompleteChannels: (term: string, success: (channels: Channel[]) => void, error: () => void) => (dispatch: any, getState: any) => Promise<void>;
-        autocompleteUsers: (search: string) => Promise<UserProfile[]>;
+        autocompleteUsers: (search: string) => Promise<UserAutocomplete>;
     };
 }
 
@@ -103,14 +104,16 @@ export default class AppsFormField extends React.PureComponent<Props> {
 
         const displayName = (field.modal_label || field.label) as string;
         let displayNameContent: React.ReactNode = (field.modal_label || field.label) as string;
-        if (field.is_required) {
-            displayNameContent = (
-                <React.Fragment>
-                    {displayName}
-                    <span className='error-text'>{' *'}</span>
-                </React.Fragment>
-            );
-        }
+        displayNameContent = (
+            <React.Fragment>
+                {displayName}
+                {!field.is_required && (
+                    <span className='light'>
+                        {' (optional)'}
+                    </span>
+                )}
+            </React.Fragment>
+        );
 
         const helpText = field.description;
         let helpTextContent: React.ReactNode = <Markdown message={helpText}/>;

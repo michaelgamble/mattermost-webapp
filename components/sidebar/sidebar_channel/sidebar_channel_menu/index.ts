@@ -12,7 +12,7 @@ import {getCategoryInTeamWithChannel} from 'mattermost-redux/selectors/entities/
 import {haveIChannelPermission} from 'mattermost-redux/selectors/entities/roles';
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 import {Action} from 'mattermost-redux/types/actions';
-import {Channel} from 'mattermost-redux/types/channels';
+import {Channel} from '@mattermost/types/channels';
 import {isChannelMuted} from 'mattermost-redux/utils/channel_utils';
 
 import {unmuteChannel, muteChannel} from 'actions/channel_actions';
@@ -21,6 +21,7 @@ import {openModal} from 'actions/views/modals';
 
 import {getCategoriesForCurrentTeam, getDisplayedChannels} from 'selectors/views/channel_sidebar';
 
+import {ModalData} from 'types/actions';
 import {GlobalState} from 'types/store';
 
 import {getSiteURL} from 'utils/url';
@@ -70,7 +71,7 @@ type Actions = {
     unfavoriteChannel: (channelId: string) => void;
     muteChannel: (userId: string, channelId: string) => void;
     unmuteChannel: (userId: string, channelId: string) => void;
-    openModal: (modalData: any) => void;
+    openModal: <P>(modalData: ModalData<P>) => void;
     addChannelsInSidebar: (categoryId: string, channelId: string) => void;
 };
 

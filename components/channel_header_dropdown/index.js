@@ -18,7 +18,6 @@ import {
     isCurrentChannelFavorite,
     isCurrentChannelMuted,
     isCurrentChannelArchived,
-    isCurrentChannelReadOnly,
     getRedirectChannelNameForTeam,
 } from 'mattermost-redux/selectors/entities/channels';
 
@@ -26,6 +25,8 @@ import {getPenultimateViewedChannelName} from 'selectors/local_storage';
 
 import {Constants} from 'utils/constants';
 import * as Utils from 'utils/utils';
+
+import {getChannelHeaderMenuPluginComponents} from 'selectors/plugins';
 
 import Desktop from './channel_header_dropdown';
 import Items from './channel_header_dropdown_items';
@@ -63,10 +64,10 @@ const mapStateToProps = (state) => ({
     isDefault: isCurrentChannelDefault(state),
     isFavorite: isCurrentChannelFavorite(state),
     isMuted: isCurrentChannelMuted(state),
-    isReadonly: isCurrentChannelReadOnly(state),
+    isReadonly: false,
     isArchived: isCurrentChannelArchived(state),
     penultimateViewedChannelName: getPenultimateViewedChannelName(state) || getRedirectChannelNameForTeam(state, getCurrentTeamId(state)),
-    pluginMenuItems: state.plugins.components.ChannelHeader || [],
+    pluginMenuItems: getChannelHeaderMenuPluginComponents(state),
     isLicensedForLDAPGroups: state.entities.general.license.LDAPGroups === 'true',
 });
 

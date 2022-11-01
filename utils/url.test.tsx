@@ -3,7 +3,13 @@
 
 import assert from 'assert';
 
-import {getSiteURLFromWindowObject, getRelativeChannelURL, validateChannelUrl} from 'utils/url';
+import {
+    getRelativeChannelURL,
+    getSiteURL,
+    getSiteURLFromWindowObject,
+    isPermalinkURL,
+    validateChannelUrl,
+} from 'utils/url';
 
 describe('Utils.URL', () => {
     test('getRelativeChannelURL', () => {
@@ -57,8 +63,8 @@ describe('Utils.URL', () => {
     describe('validateChannelUrl', () => {
         const testCases = [
             {
-                description: 'Called with a 1 character url',
-                url: 'a',
+                description: 'Called with an empty string',
+                url: '',
                 expectedErrors: ['change_url.longer'],
             },
             {
@@ -109,11 +115,25 @@ describe('Utils.URL', () => {
         ];
 
         testCases.forEach((testCase) => it(testCase.description, () => {
-            const returnedErrors = validateChannelUrl(testCase.url).map((component) => component.key);
+            const returnedErrors = validateChannelUrl(testCase.url).map((error) => (typeof error === 'string' ? error : error.key));
             assert.deepEqual(
                 returnedErrors.sort(),
                 testCase.expectedErrors.sort(),
             );
         }));
+    });
+
+    describe('isPermalinkURL', () => {
+        const siteURL = getSiteURL();
+        test.each([
+            ['/teamname-1/pl/affe2344234', true],
+            [`${siteURL}/teamname-1/pl/affe2344234`, true],
+            [siteURL, false],
+            ['/teamname-1/channel/post', false],
+            ['https://example.com', false],
+            ['https://example.com/teamname-1/pl/affe2344234', false],
+        ])('is permalink for %s should return %s', (url, expected) => {
+            expect(isPermalinkURL(url)).toBe(expected);
+        });
     });
 });

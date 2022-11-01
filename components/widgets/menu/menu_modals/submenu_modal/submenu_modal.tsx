@@ -8,13 +8,13 @@ import MenuWrapper from '../../menu_wrapper';
 import Menu from '../../menu';
 import SubMenuItem from '../../menu_items/submenu_item';
 
-import * as Utils from 'utils/utils.jsx';
+import * as Utils from 'utils/utils';
 
 import './submenu_modal.scss';
 
 type Props = {
     elements?: Array<React.ComponentProps<typeof SubMenuItem>>;
-    onHide: () => void;
+    onExited: () => void;
 }
 
 type State = {
@@ -55,7 +55,7 @@ export default class SubMenuModal extends React.PureComponent<Props, State> {
                 dialogClassName={'SubMenuModal a11y__modal mobile-sub-menu'}
                 show={this.state.show}
                 onHide={this.onHide}
-                onExited={this.props.onHide}
+                onExited={this.props.onExited}
                 enforceFocus={false}
                 id='submenuModal'
                 role='dialog'

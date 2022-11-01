@@ -4,11 +4,10 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
+import {Post, PostType} from '@mattermost/types/posts';
+
 import {Posts} from 'mattermost-redux/constants';
-
-import {Post, PostType} from 'mattermost-redux/types/posts';
-
-import {Theme} from 'mattermost-redux/types/preferences';
+import {Theme} from 'mattermost-redux/selectors/entities/preferences';
 
 import PostMessageView from 'components/post_view/post_message_view/post_message_view';
 
@@ -62,10 +61,8 @@ describe('components/post_view/PostAttachment', () => {
     test('should match snapshot, on edited post', () => {
         const props = {...baseProps, post: {...post, edit_at: 1}};
         const wrapper = shallow(<PostMessageView {...props}/>);
-        const instance = wrapper.instance() as PostMessageView;
 
         expect(wrapper).toMatchSnapshot();
-        expect(instance.renderEditedIndicator()).toMatchSnapshot();
     });
 
     test('should match snapshot, on ephemeral post', () => {

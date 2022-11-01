@@ -2,42 +2,47 @@
 // See LICENSE.txt for license information.
 
 import PropTypes from 'prop-types';
-import React from 'react';
-import {FormattedMessage, injectIntl} from 'react-intl';
-import {Tooltip} from 'react-bootstrap';
+import React, {createRef} from 'react';
+import {FormattedMessage} from 'react-intl';
+import classNames from 'classnames';
 
-import {Posts} from 'mattermost-redux/constants';
+import {Posts, Preferences} from 'mattermost-redux/constants';
 import * as ReduxPostUtils from 'mattermost-redux/utils/post_utils';
 
-import Constants, {Locations} from 'utils/constants';
-import * as PostUtils from 'utils/post_utils.jsx';
-import {intlShape} from 'utils/react_intl';
-import * as Utils from 'utils/utils.jsx';
+import Constants, {Locations, A11yCustomEventTypes, AppEvents} from 'utils/constants';
+import * as PostUtils from 'utils/post_utils';
+import * as Utils from 'utils/utils';
+import ActionsMenu from 'components/actions_menu';
 import DotMenu from 'components/dot_menu';
 import FileAttachmentListContainer from 'components/file_attachment_list';
 import OverlayTrigger from 'components/overlay_trigger';
+import Tooltip from 'components/tooltip';
 import PostProfilePicture from 'components/post_profile_picture';
+import PostAriaLabelDiv from 'components/post_view/post_aria_label_div';
 import PostFlagIcon from 'components/post_view/post_flag_icon';
 import ReactionList from 'components/post_view/reaction_list';
 import PostTime from 'components/post_view/post_time';
+import PostRecentReactions from 'components/post_view/post_recent_reactions';
 import PostReaction from 'components/post_view/post_reaction';
 import MessageWithAdditionalContent from 'components/message_with_additional_content';
 import BotBadge from 'components/widgets/badges/bot_badge';
 import InfoSmallIcon from 'components/widgets/icons/info_small_icon';
+import PriorityLabel from 'components/post_priority/post_priority_label';
 
 import UserProfile from 'components/user_profile';
 import PostPreHeader from 'components/post_view/post_pre_header';
 import CustomStatusEmoji from 'components/custom_status/custom_status_emoji';
+import EditPost from 'components/edit_post';
+import AutoHeightSwitcher, {AutoHeightSlots} from 'components/common/auto_height_switcher';
 
-class RhsRootPost extends React.PureComponent {
+export default class RhsRootPost extends React.PureComponent {
     static propTypes = {
         post: PropTypes.object.isRequired,
         teamId: PropTypes.string.isRequired,
         currentUserId: PropTypes.string.isRequired,
         compactDisplay: PropTypes.bool,
+        colorizeUsernames: PropTypes.bool,
         commentCount: PropTypes.number.isRequired,
-        author: PropTypes.string,
-        reactions: PropTypes.object,
         isFlagged: PropTypes.bool.isRequired,
         previewCollapsed: PropTypes.string,
         previewEnabled: PropTypes.bool,
@@ -48,6 +53,7 @@ class RhsRootPost extends React.PureComponent {
         isReadOnly: PropTypes.bool.isRequired,
         pluginPostTypes: PropTypes.object,
         channelIsArchived: PropTypes.bool.isRequired,
+        isPostPriorityEnabled: PropTypes.bool.isRequired,
         handleCardClick: PropTypes.func.isRequired,
 
         /**
@@ -59,7 +65,6 @@ class RhsRootPost extends React.PureComponent {
          * To check if the state of emoji for last message and from where it was emitted
          */
         shortcutReactToLastPostEmittedFrom: PropTypes.string,
-        intl: intlShape.isRequired,
         actions: PropTypes.shape({
             markPostAsUnread: PropTypes.func.isRequired,
 
@@ -67,11 +72,33 @@ class RhsRootPost extends React.PureComponent {
              * Function to set or unset emoji picker for last message
              */
             emitShortcutReactToLastPostFrom: PropTypes.func,
+
+            /**
+             * Function to set viewed Actions Menu for first time
+             */
+            setActionsMenuInitialisationState: PropTypes.func,
         }),
-        emojiMap: PropTypes.object.isRequired,
         timestampProps: PropTypes.object,
         isBot: PropTypes.bool,
         collapsedThreadsEnabled: PropTypes.bool,
+        shouldShowActionsMenu: PropTypes.bool,
+
+        /**
+        * true when want to show the Actions Menu with pulsating dot for tutorial
+         */
+        showActionsMenuPulsatingDot: PropTypes.bool,
+        oneClickReactionsEnabled: PropTypes.bool,
+
+        // e.g. import {Emoji} from '@mattermost/types/emojis';
+        recentEmojis: PropTypes.arrayOf(PropTypes.object),
+
+        isExpanded: PropTypes.bool,
+
+        /**
+         * check if the current post is being edited at the moment
+         */
+        isPostBeingEdited: PropTypes.bool,
+        isMobileView: PropTypes.bool.isRequired,
     };
 
     static defaultProps = {
@@ -83,21 +110,32 @@ class RhsRootPost extends React.PureComponent {
 
         this.state = {
             alt: false,
+            showActionsMenu: false,
+            showActionTip: false,
+            showDotMenu: false,
             showEmojiPicker: false,
             testStateObj: true,
-            dropdownOpened: false,
             fileDropdownOpened: false,
-            currentAriaLabel: '',
+            hover: false,
+            a11yActive: false,
         };
 
-        this.postHeaderRef = React.createRef();
-        this.dotMenuRef = React.createRef();
+        this.postHeaderRef = createRef();
+        this.dotMenuRef = createRef();
+        this.postRef = createRef();
     }
 
     handleShortcutReactToLastPost = (isLastPost) => {
         if (isLastPost) {
-            const {post, enableEmojiPicker, channelIsArchived,
-                actions: {emitShortcutReactToLastPostFrom}} = this.props;
+            const {
+                channelIsArchived,
+                enableEmojiPicker,
+                isMobileView,
+                post,
+                actions: {
+                    emitShortcutReactToLastPostFrom,
+                },
+            } = this.props;
 
             // Setting the last message emoji action to empty to clean up the redux state
             emitShortcutReactToLastPostFrom(Locations.NO_WHERE);
@@ -115,7 +153,7 @@ class RhsRootPost extends React.PureComponent {
                 boundingRectOfPostInfo.bottom < (window.innerHeight);
 
             if (isPostHeaderVisibleToUser) {
-                if (!isEphemeralPost && !isSystemMessage && !isDeletedPost && !isFailedPost && !Utils.isMobile() &&
+                if (!isEphemeralPost && !isSystemMessage && !isDeletedPost && !isFailedPost && !isMobileView &&
                     !channelIsArchived && !isPostsFakeParentDeleted && enableEmojiPicker) {
                     // As per issue in #2 of mattermost-webapp/pull/4478#pullrequestreview-339313236
                     // We are not not handling focus condition as we did for rhs_comment as the dot menu is already in dom and not visible
@@ -126,17 +164,28 @@ class RhsRootPost extends React.PureComponent {
     }
 
     componentDidMount() {
-        document.addEventListener('keydown', this.handleAlt);
-        document.addEventListener('keyup', this.handleAlt);
+        if (this.postRef.current) {
+            this.postRef.current.addEventListener(A11yCustomEventTypes.ACTIVATE, this.handleA11yActivateEvent);
+            this.postRef.current.addEventListener(A11yCustomEventTypes.DEACTIVATE, this.handleA11yDeactivateEvent);
+        }
     }
-
     componentWillUnmount() {
-        document.removeEventListener('keydown', this.handleAlt);
-        document.removeEventListener('keyup', this.handleAlt);
+        if (this.state.show) {
+            this.removeKeyboardListeners();
+        }
+
+        if (this.postRef.current) {
+            this.postRef.current.removeEventListener(A11yCustomEventTypes.ACTIVATE, this.handleA11yActivateEvent);
+            this.postRef.current.removeEventListener(A11yCustomEventTypes.DEACTIVATE, this.handleA11yDeactivateEvent);
+        }
     }
 
     componentDidUpdate(prevProps) {
         const {shortcutReactToLastPostEmittedFrom, isLastPost} = this.props;
+
+        if (this.state.a11yActive) {
+            this.postRef.current.dispatchEvent(new Event(A11yCustomEventTypes.UPDATE));
+        }
 
         const shortcutReactToLastPostEmittedFromRHS = prevProps.shortcutReactToLastPostEmittedFrom !== shortcutReactToLastPostEmittedFrom &&
             shortcutReactToLastPostEmittedFrom === Locations.RHS_ROOT;
@@ -167,18 +216,31 @@ class RhsRootPost extends React.PureComponent {
         );
     };
 
-    toggleEmojiPicker = () => {
-        const showEmojiPicker = !this.state.showEmojiPicker;
+    toggleEmojiPicker = (e) => {
+        if (e && e.stopPropagation) {
+            e.stopPropagation();
+        }
 
-        this.setState({
-            showEmojiPicker,
-        });
+        const showEmojiPicker = !this.state.showEmojiPicker;
+        this.setState({showEmojiPicker});
     };
+
+    handleA11yActivateEvent = () => {
+        this.setState({a11yActive: true});
+    }
+
+    handleA11yDeactivateEvent = () => {
+        this.setState({a11yActive: false});
+    }
 
     getClassName = (post, isSystemMessage, isMeMessage) => {
         let className = 'post post--root post--thread';
         if (this.props.currentUserId === post.user_id) {
             className += ' current--user';
+        }
+
+        if (this.props.isPostBeingEdited) {
+            className += ' post--editing';
         }
 
         if (isSystemMessage || isMeMessage) {
@@ -189,7 +251,11 @@ class RhsRootPost extends React.PureComponent {
             className += ' post--compact';
         }
 
-        if (this.state.dropdownOpened || this.state.fileDropdownOpened || this.state.showEmojiPicker) {
+        if (this.state.showDotMenu ||
+            this.state.showActionsMenu ||
+            this.state.showActionTip ||
+            this.state.fileDropdownOpened ||
+            this.state.showEmojiPicker) {
             className += ' post--hovered';
         }
 
@@ -200,22 +266,67 @@ class RhsRootPost extends React.PureComponent {
         return className;
     };
 
+    setHover = (e) => {
+        this.setState({
+            hover: true,
+            alt: e.altKey,
+        });
+
+        this.addKeyboardListeners();
+    }
+
+    unsetHover = () => {
+        this.setState({
+            hover: false,
+            alt: false,
+        });
+
+        this.removeKeyboardListeners();
+    }
+
+    addKeyboardListeners = () => {
+        document.addEventListener('keydown', this.handleAlt);
+        document.addEventListener('keyup', this.handleAlt);
+    }
+
+    removeKeyboardListeners = () => {
+        document.removeEventListener('keydown', this.handleAlt);
+        document.removeEventListener('keyup', this.handleAlt);
+    }
+
     handleAlt = (e) => {
         if (this.state.alt !== e.altKey) {
             this.setState({alt: e.altKey});
         }
     }
 
-    handleDropdownOpened = (isOpened) => {
-        this.setState({
-            dropdownOpened: isOpened,
-        });
+    handleActionsMenuOpened = (open) => {
+        if (this.props.showActionsMenuPulsatingDot) {
+            this.setState({showActionTip: true});
+            return;
+        }
+        this.setState({showActionsMenu: open});
     };
 
-    handleFileDropdownOpened = (isOpened) => {
-        this.setState({
-            fileDropdownOpened: isOpened,
-        });
+    handleDotMenuOpened = (open) => {
+        this.setState({showDotMenu: open});
+    };
+
+    handleActionsMenuTipOpened = () => {
+        this.setState({showActionTip: true});
+    };
+
+    handleActionsMenuGotItClick = () => {
+        this.props.actions.setActionsMenuInitialisationState?.(({[Preferences.ACTIONS_MENU_VIEWED]: true}));
+        this.setState({showActionTip: false});
+    };
+
+    handleTipDismissed = () => {
+        this.setState({showActionTip: false});
+    };
+
+    handleFileDropdownOpened = (open) => {
+        this.setState({fileDropdownOpened: open});
     };
 
     handlePostClick = (e) => {
@@ -228,22 +339,42 @@ class RhsRootPost extends React.PureComponent {
         }
     }
 
-    handlePostFocus = () => {
-        const {post, author, reactions, isFlagged, emojiMap} = this.props;
-        this.setState({currentAriaLabel: PostUtils.createAriaLabelForPost(post, author, isFlagged, reactions, this.props.intl, emojiMap)});
-    }
-
     getDotMenuRef = () => {
         return this.dotMenuRef.current;
     };
 
     render() {
-        const {post, isReadOnly, teamId, channelIsArchived, collapsedThreadsEnabled, isBot} = this.props;
+        const {
+            channelIsArchived,
+            collapsedThreadsEnabled,
+            isBot,
+            isMobileView,
+            isReadOnly,
+            post,
+            teamId,
+            isPostBeingEdited,
+        } = this.props;
 
         const isPostDeleted = post && post.state === Posts.POST_DELETED;
         const isEphemeral = Utils.isPostEphemeral(post);
         const isSystemMessage = PostUtils.isSystemMessage(post);
         const isMeMessage = ReduxPostUtils.isMeMessage(post);
+        const colorize = this.props.compactDisplay && this.props.colorizeUsernames;
+
+        const showRecentlyUsedReactions = (!isReadOnly && !isEphemeral && !post.failed && !isSystemMessage && !channelIsArchived && this.props.oneClickReactionsEnabled && this.props.enableEmojiPicker);
+        let showRecentReacions;
+        if (showRecentlyUsedReactions) {
+            showRecentReacions = (
+                <PostRecentReactions
+                    channelId={post.channel_id}
+                    postId={post.id}
+                    teamId={this.props.teamId}
+                    emojis={this.props.recentEmojis}
+                    getDotMenuRef={this.getDotMenuRef}
+                    size={this.props.isExpanded ? 3 : 1}
+                />
+            );
+        }
 
         let postReaction;
         if (!isReadOnly && !isEphemeral && !post.failed && !isSystemMessage && this.props.enableEmojiPicker && !channelIsArchived) {
@@ -284,9 +415,10 @@ class RhsRootPost extends React.PureComponent {
                     }
                     overwriteImage={Constants.SYSTEM_MESSAGE_PROFILE_IMAGE}
                     disablePopover={true}
+                    colorize={colorize}
                 />
             );
-        } else if (post.props && post.props.from_webhook) {
+        } else if (PostUtils.isFromWebhook(post)) {
             if (post.props.override_username && this.props.enablePostUsernameOverride) {
                 userProfile = (
                     <UserProfile
@@ -295,6 +427,7 @@ class RhsRootPost extends React.PureComponent {
                         hideStatus={true}
                         overwriteName={post.props.override_username}
                         disablePopover={true}
+                        colorize={colorize}
                     />
                 );
             } else {
@@ -304,6 +437,7 @@ class RhsRootPost extends React.PureComponent {
                         userId={post.user_id}
                         hideStatus={true}
                         disablePopover={true}
+                        colorize={colorize}
                     />
                 );
             }
@@ -317,31 +451,43 @@ class RhsRootPost extends React.PureComponent {
                     isBusy={this.props.isBusy}
                     isRHS={true}
                     hasMention={true}
+                    colorize={colorize}
                 />
             );
         }
 
-        let postClass = '';
-        if (PostUtils.isEdited(this.props.post)) {
-            postClass += ' post--edited';
-        }
+        const postClass = classNames('post__body--transition', {'post--edited': PostUtils.isEdited(this.props.post)});
+
+        const actionsMenu = (
+            <ActionsMenu
+                post={this.props.post}
+                location={Locations.RHS_ROOT}
+                handleDropdownOpened={this.handleActionsMenuOpened}
+                isMenuOpen={this.state.showActionsMenu}
+                showPulsatingDot={this.props.showActionsMenuPulsatingDot}
+                showTutorialTip={this.state.showActionTip}
+                handleOpenTip={this.handleActionsMenuTipOpened}
+                handleNextTip={this.handleActionsMenuGotItClick}
+                handleDismissTip={this.handleTipDismissed}
+            />
+        );
 
         const dotMenu = (
             <DotMenu
                 post={this.props.post}
                 location={Locations.RHS_ROOT}
                 isFlagged={this.props.isFlagged}
-                handleDropdownOpened={this.handleDropdownOpened}
+                handleDropdownOpened={this.handleDotMenuOpened}
                 handleAddReactionClick={this.toggleEmojiPicker}
                 commentCount={this.props.commentCount}
-                isMenuOpen={this.state.dropdownOpened}
+                isMenuOpen={this.state.showDotMenu}
                 isReadOnly={isReadOnly || channelIsArchived}
                 enableEmojiPicker={this.props.enableEmojiPicker}
             />
         );
 
         let postFlagIcon;
-        const showFlagIcon = !isEphemeral && !post.failed && !isSystemMessage && !Utils.isMobile();
+        const showFlagIcon = !isEphemeral && !post.failed && !isSystemMessage && !isMobileView;
         if (showFlagIcon) {
             postFlagIcon = (
                 <PostFlagIcon
@@ -359,10 +505,12 @@ class RhsRootPost extends React.PureComponent {
                     ref={this.dotMenuRef}
                     className='col post-menu'
                 >
-                    {!collapsedThreadsEnabled && dotMenu}
+                    {!collapsedThreadsEnabled && !showRecentlyUsedReactions && dotMenu}
+                    {showRecentReacions}
                     {postReaction}
                     {postFlagIcon}
-                    {collapsedThreadsEnabled && dotMenu}
+                    {actionsMenu}
+                    {(collapsedThreadsEnabled || showRecentlyUsedReactions) && dotMenu}
                 </div>
             );
         }
@@ -412,15 +560,34 @@ class RhsRootPost extends React.PureComponent {
             );
         }
 
+        let priority;
+        if (post.props?.priority && this.props.isPostPriorityEnabled) {
+            priority = <span className='d-flex mr-2 ml-1'><PriorityLabel priority={post.props.priority}/></span>;
+        }
+
+        const message = (
+            <MessageWithAdditionalContent
+                post={post}
+                previewCollapsed={this.props.previewCollapsed}
+                previewEnabled={this.props.previewEnabled}
+                isEmbedVisible={this.props.isEmbedVisible}
+                pluginPostTypes={this.props.pluginPostTypes}
+            />
+        );
+
+        const showSlot = isPostBeingEdited ? AutoHeightSlots.SLOT2 : AutoHeightSlots.SLOT1;
+
         return (
-            <div
+            <PostAriaLabelDiv
+                ref={this.postRef}
                 role='listitem'
                 id={'rhsPost_' + post.id}
                 tabIndex='-1'
+                post={post}
                 className={`thread__root a11y__section ${this.getClassName(post, isSystemMessage, isMeMessage)}`}
-                aria-label={this.state.currentAriaLabel}
                 onClick={this.handlePostClick}
-                onFocus={this.handlePostFocus}
+                onMouseOver={this.setHover}
+                onMouseLeave={this.unsetHover}
                 data-a11y-sort-order='0'
             >
                 <PostPreHeader
@@ -452,33 +619,31 @@ class RhsRootPost extends React.PureComponent {
                                 {botIndicator}
                                 {customStatus}
                             </div>
-                            <div className='col'>
+                            <div className='col d-flex align-items-center'>
                                 {this.renderPostTime(isEphemeral)}
+                                {priority}
                                 {postInfoIcon}
                             </div>
-                            {dotMenuContainer}
+                            {!isPostBeingEdited && dotMenuContainer}
                         </div>
                         <div className='post__body'>
                             <div className={postClass}>
-                                <MessageWithAdditionalContent
-                                    post={post}
-                                    previewCollapsed={this.props.previewCollapsed}
-                                    previewEnabled={this.props.previewEnabled}
-                                    isEmbedVisible={this.props.isEmbedVisible}
-                                    pluginPostTypes={this.props.pluginPostTypes}
+                                <AutoHeightSwitcher
+                                    showSlot={showSlot}
+                                    shouldScrollIntoView={isPostBeingEdited}
+                                    slot1={message}
+                                    slot2={<EditPost/>}
+                                    onTransitionEnd={() => document.dispatchEvent(new Event(AppEvents.FOCUS_EDIT_TEXTBOX))}
                                 />
                             </div>
                             {fileAttachment}
                             <ReactionList
                                 post={post}
-                                isReadOnly={isReadOnly || channelIsArchived}
                             />
                         </div>
                     </div>
                 </div>
-            </div>
+            </PostAriaLabelDiv>
         );
     }
 }
-
-export default injectIntl(RhsRootPost);

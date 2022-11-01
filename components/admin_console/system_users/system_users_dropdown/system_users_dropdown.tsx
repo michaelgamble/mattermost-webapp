@@ -6,16 +6,16 @@ import {FormattedMessage} from 'react-intl';
 
 import * as UserUtils from 'mattermost-redux/utils/user_utils';
 import {Permissions} from 'mattermost-redux/constants';
-import {AdminConfig} from 'mattermost-redux/types/config';
-import {UserProfile} from 'mattermost-redux/types/users';
-import {ServerError} from 'mattermost-redux/types/errors';
-import {Dictionary} from 'mattermost-redux/types/utilities';
-import {Bot} from 'mattermost-redux/types/bots';
+import {AdminConfig} from '@mattermost/types/config';
+import {UserProfile} from '@mattermost/types/users';
+import {ServerError} from '@mattermost/types/errors';
+import {Bot} from '@mattermost/types/bots';
+import {DeepPartial} from '@mattermost/types/utilities';
 
 import {adminResetMfa} from 'actions/admin_actions.jsx';
-import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
+import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 import {Constants} from 'utils/constants';
-import * as Utils from 'utils/utils.jsx';
+import * as Utils from 'utils/utils';
 import {t} from 'utils/i18n';
 import {getSiteURL} from 'utils/url';
 import {emitUserLoggedOutEvent} from 'actions/global_actions';
@@ -37,7 +37,7 @@ export type Props = {
     index: number;
     totalUsers: number;
     config: DeepPartial<AdminConfig>;
-    bots: Dictionary<Bot>;
+    bots: Record<string, Bot>;
     isLicensed: boolean;
     isDisabled: boolean;
     actions: {
@@ -192,19 +192,57 @@ export default class SystemUsersDropdown extends React.PureComponent<Props, Stat
             for (const bot of Object.values(this.props.bots)) {
                 if ((bot.owner_id === user.id) && this.state.showDeactivateMemberModal && (bot.delete_at === 0)) {
                     messageForUsersWithBotAccounts = (
-                        <FormattedMarkdownMessage
-                            id='deactivate_member_modal.desc.for_users_with_bot_accounts'
-                            defaultMessage='This action deactivates {username}.\n \n * They will be logged out and not have access to any teams or channels on this system.\n * Bot accounts they manage will be disabled along with their integrations. To enable them again, go to [Integrations > Bot Accounts]({siteURL}/_redirect/integrations/bots). [Learn more about bot accounts](!https://mattermost.com/pl/default-bot-accounts).\n \n \n'
-                            values={{
-                                username: user.username,
-                                siteURL: getSiteURL(),
-                            }}
-                        />);
+                        <>
+                            <ul>
+                                <li>
+                                    <FormattedMessage
+                                        id='deactivate_member_modal.desc.for_users_with_bot_accounts1'
+                                        defaultMessage='This action deactivates {username}<p>'
+                                        values={{
+                                            username: user.username,
+                                        }}
+                                    />
+                                </li>
+                                <li>
+                                    <FormattedMessage
+                                        id='deactivate_member_modal.desc.for_users_with_bot_accounts2'
+                                        defaultMessage='They will be logged out and not have access to any teams or channels on this system.'
+                                    />
+                                </li>
+                                <li>
+                                    <FormattedMessage
+                                        id='deactivate_member_modal.desc.for_users_with_bot_accounts3'
+                                        defaultMessage='Bot accounts they manage will be disabled along with their integrations. To enable them again, go to <linkBots>Integrations > Bot Accounts</linkBots>. <linkDocumentation>Learn more about bot accounts</linkDocumentation>.'
+                                        values={{
+                                            siteURL: getSiteURL(),
+                                            linkBots: (msg: React.ReactNode) => (
+                                                <a
+                                                    href={`${getSiteURL()}/_redirect/integrations/bots`}
+                                                >
+                                                    {msg}
+                                                </a>
+                                            ),
+                                            linkDocumentation: (msg: React.ReactNode) => (
+                                                <a
+                                                    href='https://mattermost.com/pl/default-bot-accounts'
+                                                    target='_blank'
+                                                    rel='noreferrer'
+                                                >
+                                                    {msg}
+                                                </a>
+                                            ),
+                                        }}
+                                    />
+                                </li>
+                            </ul>
+                            <p/>
+                            <p/>
+                        </>
+                    );
                     break;
                 }
             }
         }
-
         const message = (
             <div>
                 {messageForUsersWithBotAccounts || defaultMessage}
@@ -457,7 +495,7 @@ export default class SystemUsersDropdown extends React.PureComponent<Props, Stat
 
     render() {
         const {currentUser, user, isLicensed, config} = this.props;
-        const isGuest = Utils.isGuest(user);
+        const isGuest = UserUtils.isGuest(user.roles);
         if (!user) {
             return <div/>;
         }
@@ -478,7 +516,7 @@ export default class SystemUsersDropdown extends React.PureComponent<Props, Stat
             );
         }
 
-        if (user.roles.length > 0 && Utils.isSystemAdmin(user.roles)) {
+        if (user.roles.length > 0 && UserUtils.isSystemAdmin(user.roles)) {
             currentRoles = (
                 <FormattedMessage
                     id='team_members_dropdown.systemAdmin'
@@ -488,11 +526,11 @@ export default class SystemUsersDropdown extends React.PureComponent<Props, Stat
         }
 
         let showMakeActive = false;
-        let showMakeNotActive = !Utils.isSystemAdmin(user.roles);
+        let showMakeNotActive = !UserUtils.isSystemAdmin(user.roles);
         let showManageTeams = true;
         let showRevokeSessions = true;
         const showMfaReset = this.props.mfaEnabled && Boolean(user.mfa_active);
-        const showManageRoles = Utils.isSystemAdmin(currentUser.roles);
+        const showManageRoles = UserUtils.isSystemAdmin(currentUser.roles);
 
         if (user.delete_at > 0) {
             currentRoles = (

@@ -4,11 +4,11 @@
 import React from 'react';
 import {Provider} from 'react-redux';
 import {shallow} from 'enzyme';
-import configureStore from 'redux-mock-store';
 
 import {Modal} from 'react-bootstrap';
 
 import {mountWithIntl} from 'tests/helpers/intl-test-helper';
+import mockStore from 'tests/test_store';
 
 import {AppCallResponseTypes} from 'mattermost-redux/constants/apps';
 
@@ -19,7 +19,7 @@ import {AppsForm, Props} from './apps_form_component';
 describe('AppsFormComponent', () => {
     const baseProps: Props = {
         intl: {} as any,
-        onHide: jest.fn(),
+        onExited: jest.fn(),
         isEmbedded: false,
         actions: {
             performLookupCall: jest.fn(),
@@ -35,7 +35,7 @@ describe('AppsFormComponent', () => {
             footer: 'Footer',
             header: 'Header',
             icon: 'Icon',
-            call: {
+            submit: {
                 path: '/create',
             },
             fields: [
@@ -138,7 +138,7 @@ describe('AppsFormComponent', () => {
                 actions: {
                     ...baseProps.actions,
                     submit: jest.fn().mockResolvedValue({
-                        error: {error: 'This is an error.', type: AppCallResponseTypes.ERROR},
+                        error: {text: 'This is an error.', type: AppCallResponseTypes.ERROR},
                     }),
                 },
             };
@@ -158,13 +158,11 @@ describe('AppsFormComponent', () => {
             const wrapper = shallow<AppsForm>(<AppsForm {...baseProps}/>);
             await wrapper.instance().handleSubmit({preventDefault: jest.fn()} as any);
 
-            expect(wrapper.find(Modal.Footer).exists('.error-text')).toBe(false);
+            expect(wrapper.find(Modal.Footer).find('.error-text').exists()).toBeFalsy();
         });
     });
 
     describe('default select element', () => {
-        const mockStore = configureStore();
-
         test('should be enabled by default', () => {
             const selectField = {
                 type: 'static_select',
@@ -187,7 +185,7 @@ describe('AppsFormComponent', () => {
             const fields = [selectField];
             const props = {
                 ...baseProps,
-                call: {},
+                context: {},
                 form: {
                     fields,
                 },
@@ -206,7 +204,7 @@ describe('AppsFormComponent', () => {
                         profiles: {},
                     },
                     groups: {
-                        myGroups: {},
+                        myGroups: [],
                     },
                     emojis: {},
                     preferences: {

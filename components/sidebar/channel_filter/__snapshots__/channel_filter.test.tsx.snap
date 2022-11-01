@@ -9,12 +9,26 @@ exports[`components/sidebar/channel_filter should match snapshot 1`] = `
     delayShow={500}
     overlay={
       <Tooltip
-        bsClass="tooltip"
         className="hidden-xs"
         id="new-group-tooltip"
-        placement="right"
       >
         Filter by unread
+        <Memo(KeyboardShortcutSequence)
+          hideDescription={true}
+          isInsideTooltip={true}
+          shortcut={
+            Object {
+              "default": Object {
+                "defaultMessage": "Toggle unread/all channels:	Ctrl|Shift|U",
+                "id": "shortcuts.nav.toggle_unreads",
+              },
+              "mac": Object {
+                "defaultMessage": "Toggle unread/all channels:	⌘|Shift|U",
+                "id": "shortcuts.nav.toggle_unreads.mac",
+              },
+            }
+          }
+        />
       </Tooltip>
     }
     placement="right"
@@ -48,12 +62,26 @@ exports[`components/sidebar/channel_filter should match snapshot if the unread f
     delayShow={500}
     overlay={
       <Tooltip
-        bsClass="tooltip"
         className="hidden-xs"
         id="new-group-tooltip"
-        placement="right"
       >
         Show all channels
+        <Memo(KeyboardShortcutSequence)
+          hideDescription={true}
+          isInsideTooltip={true}
+          shortcut={
+            Object {
+              "default": Object {
+                "defaultMessage": "Toggle unread/all channels:	Ctrl|Shift|U",
+                "id": "shortcuts.nav.toggle_unreads",
+              },
+              "mac": Object {
+                "defaultMessage": "Toggle unread/all channels:	⌘|Shift|U",
+                "id": "shortcuts.nav.toggle_unreads.mac",
+              },
+            }
+          }
+        />
       </Tooltip>
     }
     placement="right"

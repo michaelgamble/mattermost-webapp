@@ -6,9 +6,9 @@ import {shallow} from 'enzyme';
 import {MovementMode, DropResult} from 'react-beautiful-dnd';
 
 import {CategoryTypes} from 'mattermost-redux/constants/channel_categories';
-import {CategorySorting} from 'mattermost-redux/types/channel_categories';
-import {ChannelType} from 'mattermost-redux/types/channels';
-import {TeamType} from 'mattermost-redux/types/teams';
+import {CategorySorting} from '@mattermost/types/channel_categories';
+import {ChannelType} from '@mattermost/types/channels';
+import {TeamType} from '@mattermost/types/teams';
 
 import {TestHelper} from 'utils/test_helper';
 
@@ -29,9 +29,7 @@ describe('SidebarChannelList', () => {
         header: '',
         purpose: '',
         last_post_at: 0,
-        total_msg_count: 0,
-        total_msg_count_root: 0,
-        extra_update_at: 0,
+        last_root_post_at: 0,
         creator_id: '',
         scheme_id: '',
         group_constrained: false,
@@ -49,9 +47,7 @@ describe('SidebarChannelList', () => {
         header: '',
         purpose: '',
         last_post_at: 0,
-        total_msg_count: 0,
-        total_msg_count_root: 0,
-        extra_update_at: 0,
+        last_root_post_at: 0,
         creator_id: '',
         scheme_id: '',
         group_constrained: false,

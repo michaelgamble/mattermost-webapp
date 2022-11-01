@@ -1,19 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import * as Utils from 'utils/utils.jsx';
+import * as Utils from 'utils/utils';
 const SettingsSidebar = React.lazy(() => import('components/settings_sidebar'));
 
 import TeamSettings from 'components/team_settings';
 
 type Props = {
-    onHide: () => void;
+    onExited: () => void;
     isCloud?: boolean;
 }
 
@@ -51,7 +50,8 @@ export default class TeamSettingsModal extends React.PureComponent<Props, State>
 
     collapseModal = () => {
         const el = ReactDOM.findDOMNode(this.modalBodyRef.current) as HTMLDivElement;
-        $(el).closest('.modal-dialog').removeClass('display--content'); // eslint-disable-line jquery/no-closest, jquery/no-class
+        const modalDialog = el.closest('.modal-dialog');
+        modalDialog?.classList.remove('display--content');
 
         this.setState({
             activeTab: '',
@@ -69,15 +69,12 @@ export default class TeamSettingsModal extends React.PureComponent<Props, State>
             activeTab: 'general',
             activeSection: '',
         });
-        this.props.onHide();
+        this.props.onExited();
     }
 
     render() {
         const tabs = [];
         tabs.push({name: 'general', uiName: Utils.localizeMessage('team_settings_modal.generalTab', 'General'), icon: 'icon fa fa-cog', iconTitle: Utils.localizeMessage('generic_icons.settings', 'Settings Icon')});
-        if (!this.props.isCloud) {
-            tabs.push({name: 'import', uiName: Utils.localizeMessage('team_settings_modal.importTab', 'Import'), icon: 'icon fa fa-upload', iconTitle: Utils.localizeMessage('generic_icons.upload', 'Upload Icon')});
-        }
 
         return (
             <Modal

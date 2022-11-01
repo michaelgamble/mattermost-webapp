@@ -1,9 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
-
 import {
     removeReaction,
     addMessageIntoHistory,
@@ -22,25 +19,20 @@ import {
     makeOnEditLatestPost,
 } from 'actions/views/create_comment';
 import {setGlobalItem, actionOnGlobalItemsWithPrefix} from 'actions/storage';
-import * as PostActions from 'actions/post_actions.jsx';
+import * as PostActions from 'actions/post_actions';
 import {executeCommand} from 'actions/command';
 import * as HookActions from 'actions/hooks';
 import {StoragePrefixes} from 'utils/constants';
 
-/* eslint-disable global-require */
+import mockStore from 'tests/test_store';
 
-const mockStore = configureStore([thunk]);
+/* eslint-disable global-require */
 
 jest.mock('mattermost-redux/actions/posts', () => ({
     removeReaction: (...args) => ({type: 'MOCK_REMOVE_REACTION', args}),
     addMessageIntoHistory: (...args) => ({type: 'MOCK_ADD_MESSAGE_INTO_HISTORY', args}),
     moveHistoryIndexBack: (...args) => ({type: 'MOCK_MOVE_MESSAGE_HISTORY_BACK', args}),
     moveHistoryIndexForward: (...args) => ({type: 'MOCK_MOVE_MESSAGE_HISTORY_FORWARD', args}),
-}));
-
-jest.mock('dispatcher/app_dispatcher.jsx', () => ({
-    handleViewAction: jest.fn(),
-    register: jest.fn(),
 }));
 
 jest.mock('actions/command', () => ({
@@ -56,7 +48,7 @@ jest.mock('actions/hooks', () => ({
     runSlashCommandWillBePostedHooks: jest.fn((message, args) => () => ({data: {message, args}})),
 }));
 
-jest.mock('actions/post_actions.jsx', () => ({
+jest.mock('actions/post_actions', () => ({
     addReaction: (...args) => ({type: 'MOCK_ADD_REACTION', args}),
     createPost: jest.fn(() => ({type: 'MOCK_CREATE_POST'})),
     setEditingPost: (...args) => ({type: 'MOCK_SET_EDITING_POST', args}),
@@ -236,7 +228,6 @@ describe('rhs view actions', () => {
             message: draft.message,
             channel_id: channelId,
             root_id: rootId,
-            parent_id: rootId,
             user_id: currentUserId,
         };
 
@@ -287,7 +278,6 @@ describe('rhs view actions', () => {
             channel_id: channelId,
             team_id: teamId,
             root_id: rootId,
-            parent_id: rootId,
         };
 
         const draft = {message: '/test msg'};
@@ -315,7 +305,7 @@ describe('rhs view actions', () => {
         });
 
         test('it calls submitPost on error.sendMessage', async () => {
-            jest.mock('actions/channel_actions.jsx', () => ({
+            jest.mock('actions/channel_actions', () => ({
                 executeCommand: jest.fn((message, _args, resolve, reject) => reject({sendMessage: 'test'})),
             }));
 
@@ -325,7 +315,7 @@ describe('rhs view actions', () => {
 
             await store.dispatch(remockedSubmitCommand(channelId, rootId, draft));
 
-            const expectedActions = [{args: ['/test msg', {channel_id: '4j5j4k3k34j4', parent_id: 'fc234c34c23', root_id: 'fc234c34c23', team_id: '4j5nmn4j3'}], type: 'MOCK_ACTIONS_COMMAND_EXECUTE'}];
+            const expectedActions = [{args: ['/test msg', {channel_id: '4j5j4k3k34j4', root_id: 'fc234c34c23', team_id: '4j5nmn4j3'}], type: 'MOCK_ACTIONS_COMMAND_EXECUTE'}];
             expect(store.getActions()).toEqual(expectedActions);
         });
     });
@@ -385,7 +375,7 @@ describe('rhs view actions', () => {
             const testStore = mockStore(initialState);
             testStore.dispatch(submitCommand(channelId, rootId, {message: '/away', fileInfos: [], uploadsInProgress: []}));
 
-            const commandActions = [{args: ['/away', {channel_id: '4j5j4k3k34j4', parent_id: 'fc234c34c23', root_id: 'fc234c34c23', team_id: '4j5nmn4j3'}], type: 'MOCK_ACTIONS_COMMAND_EXECUTE'}];
+            const commandActions = [{args: ['/away', {channel_id: '4j5j4k3k34j4', root_id: 'fc234c34c23', team_id: '4j5nmn4j3'}], type: 'MOCK_ACTIONS_COMMAND_EXECUTE'}];
             expect(store.getActions()).toEqual(
                 expect.arrayContaining(testStore.getActions()),
                 expect.arrayContaining(commandActions),

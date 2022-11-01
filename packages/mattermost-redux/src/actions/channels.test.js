@@ -2,23 +2,22 @@
 // See LICENSE.txt for license information.
 
 import assert from 'assert';
+
 import nock from 'nock';
 
 import * as Actions from 'mattermost-redux/actions/channels';
 import {addUserToTeam} from 'mattermost-redux/actions/teams';
-import {getProfilesByIds, login} from 'mattermost-redux/actions/users';
+import {getProfilesByIds, loadMeREST} from 'mattermost-redux/actions/users';
 import {createIncomingHook, createOutgoingHook} from 'mattermost-redux/actions/integrations';
-
 import {Client4} from 'mattermost-redux/client';
+import {UserTypes} from 'mattermost-redux/action_types';
+import TestHelper from 'mattermost-redux/test/test_helper';
+import configureStore from 'mattermost-redux/test/test_store';
+import {getPreferenceKey} from 'mattermost-redux/utils/preference_utils';
 
 import {General, RequestStatus, Preferences, Permissions} from '../constants';
 import {CategoryTypes} from '../constants/channel_categories';
 import {MarkUnread} from '../constants/channels';
-
-import TestHelper from 'mattermost-redux/test/test_helper';
-import configureStore from 'mattermost-redux/test/test_store';
-
-import {getPreferenceKey} from 'mattermost-redux/utils/preference_utils';
 
 const OK_RESPONSE = {status: 'OK'};
 
@@ -163,7 +162,10 @@ describe('Actions.Channels', () => {
         );
 
         TestHelper.mockLogin();
-        await store.dispatch(login(TestHelper.basicUser.email, TestHelper.basicUser.password));
+        store.dispatch({
+            type: UserTypes.LOGIN_SUCCESS,
+        });
+        await store.dispatch(loadMeREST());
 
         nock(Client4.getBaseRoute()).
             post('/users/ids').
@@ -275,28 +277,6 @@ describe('Actions.Channels', () => {
         assert.equal(channels[channelId].type, General.PRIVATE_CHANNEL);
     });
 
-    it('convertChannelToPrivate', async () => {
-        const publicChannel = TestHelper.basicChannel;
-        nock(Client4.getChannelRoute(publicChannel.id)).
-            post('/convert').
-            reply(200, {...TestHelper.basicChannel, type: General.PRIVATE_CHANNEL});
-
-        assert.equal(TestHelper.basicChannel.type, General.OPEN_CHANNEL);
-
-        await store.dispatch(Actions.convertChannelToPrivate(TestHelper.basicChannel.id));
-
-        const updateRequest = store.getState().requests.channels.updateChannel;
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
-
-        const {channels} = store.getState().entities.channels;
-        const channelId = Object.keys(channels)[0];
-        assert.ok(channelId);
-        assert.ok(channels[channelId]);
-        assert.equal(channels[channelId].type, General.PRIVATE_CHANNEL);
-    });
-
     it('getChannel', async () => {
         nock(Client4.getBaseRoute()).
             get(`/channels/${TestHelper.basicChannel.id}`).
@@ -335,7 +315,7 @@ describe('Actions.Channels', () => {
         assert.ok(myMembers[TestHelper.basicChannel.id]);
     });
 
-    it('fetchMyChannelsAndMembers', async () => {
+    it('fetchMyChannelsAndMembersREST', async () => {
         nock(Client4.getBaseRoute()).
             post('/users').
             query(true).
@@ -363,7 +343,7 @@ describe('Actions.Channels', () => {
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: directChannel.id}, TestHelper.basicChannelMember]);
 
-        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
+        await store.dispatch(Actions.fetchMyChannelsAndMembersREST(TestHelper.basicTeam.id));
 
         const {channels, channelsInTeam, myMembers} = store.getState().entities.channels;
         assert.ok(channels);
@@ -389,7 +369,7 @@ describe('Actions.Channels', () => {
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [TestHelper.basicChannelMember]);
 
-        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
+        await store.dispatch(Actions.fetchMyChannelsAndMembersREST(TestHelper.basicTeam.id));
 
         nock(Client4.getBaseRoute()).
             put(`/channels/${TestHelper.basicChannel.id}/members/${TestHelper.basicUser.id}/notify_props`).
@@ -452,7 +432,7 @@ describe('Actions.Channels', () => {
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: secondChannel.id}, TestHelper.basicChannelMember]);
 
-        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
+        await store.dispatch(Actions.fetchMyChannelsAndMembersREST(TestHelper.basicTeam.id));
 
         nock(Client4.getBaseRoute()).
             post('/hooks/incoming').
@@ -552,7 +532,7 @@ describe('Actions.Channels', () => {
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: secondChannel.id}, TestHelper.basicChannelMember]);
 
-        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
+        await store.dispatch(Actions.fetchMyChannelsAndMembersREST(TestHelper.basicTeam.id));
 
         nock(Client4.getBaseRoute()).
             post('/hooks/incoming').
@@ -750,7 +730,7 @@ describe('Actions.Channels', () => {
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: userChannel.id}, TestHelper.basicChannelMember]);
 
-        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
+        await store.dispatch(Actions.fetchMyChannelsAndMembersREST(TestHelper.basicTeam.id));
 
         const timestamp = Date.now();
         let members = store.getState().entities.channels.myMembers;
@@ -778,7 +758,10 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10},
+                            [channelId]: {team_id: teamId},
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 10},
                         },
                         myMembers: {
                             [channelId]: {msg_count: 10, mention_count: 0},
@@ -798,7 +781,7 @@ describe('Actions.Channels', () => {
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()], false));
 
             const state = store.getState();
-            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.messageCounts[channelId].total, 11);
             assert.equal(state.entities.channels.myMembers[channelId].msg_count, 10);
             assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
             assert.equal(state.entities.teams.myMembers[teamId].msg_count, 1);
@@ -814,7 +797,10 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10},
+                            [channelId]: {team_id: teamId},
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 10},
                         },
                         myMembers: {
                             [channelId]: {msg_count: 10, mention_count: 0},
@@ -834,7 +820,7 @@ describe('Actions.Channels', () => {
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId], false));
 
             const state = store.getState();
-            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.messageCounts[channelId].total, 11);
             assert.equal(state.entities.channels.myMembers[channelId].msg_count, 10);
             assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);
             assert.equal(state.entities.teams.myMembers[teamId].msg_count, 1);
@@ -850,7 +836,10 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10},
+                            [channelId]: {team_id: teamId},
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 10},
                         },
                         myMembers: {
                             [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: MarkUnread.MENTION}},
@@ -870,7 +859,7 @@ describe('Actions.Channels', () => {
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()], false));
 
             const state = store.getState();
-            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.messageCounts[channelId].total, 11);
             assert.equal(state.entities.channels.myMembers[channelId].msg_count, 11);
             assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
             assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
@@ -886,7 +875,10 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10},
+                            [channelId]: {team_id: teamId},
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 10},
                         },
                         myMembers: {
                             [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: MarkUnread.MENTION}},
@@ -906,7 +898,7 @@ describe('Actions.Channels', () => {
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId], false));
 
             const state = store.getState();
-            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.messageCounts[channelId].total, 11);
             assert.equal(state.entities.channels.myMembers[channelId].msg_count, 11);
             assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);
             assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
@@ -922,7 +914,10 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 8},
+                            [channelId]: {team_id: teamId},
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 8},
                         },
                         myMembers: {
                             [channelId]: {msg_count: 5, mention_count: 2},
@@ -942,7 +937,7 @@ describe('Actions.Channels', () => {
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId], true));
 
             const state = store.getState();
-            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 8);
+            assert.equal(state.entities.channels.messageCounts[channelId].total, 8);
             assert.equal(state.entities.channels.myMembers[channelId].msg_count, 5);
             assert.equal(state.entities.channels.myMembers[channelId].mention_count, 2);
             assert.equal(state.entities.teams.myMembers[teamId].msg_count, 3);
@@ -962,14 +957,17 @@ describe('Actions.Channels', () => {
                             [channelId]: {
                                 id: channelId,
                                 team_id: teamId,
-                                total_msg_count: 10,
                             },
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 10},
                         },
                         myMembers: {
                             [channelId]: {
                                 channel_id: channelId,
                                 mention_count: 0,
                                 msg_count: 10,
+                                last_viewed_at: 1000,
                             },
                         },
                     },
@@ -989,11 +987,12 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId].msg_count, state.entities.channels.channels[channelId].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId].msg_count).toBe(state.entities.channels.messageCounts[channelId].total);
+            expect(state.entities.channels.myMembers[channelId].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId].msg_count).toBe(0);
         });
 
         it('one unread channel', async () => {
@@ -1007,14 +1006,17 @@ describe('Actions.Channels', () => {
                             [channelId]: {
                                 id: channelId,
                                 team_id: teamId,
-                                total_msg_count: 10,
                             },
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 10},
                         },
                         myMembers: {
                             [channelId]: {
                                 channel_id: channelId,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                         },
                     },
@@ -1034,11 +1036,12 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId].msg_count, state.entities.channels.channels[channelId].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId].msg_count).toBe(state.entities.channels.messageCounts[channelId].total);
+            expect(state.entities.channels.myMembers[channelId].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId].msg_count).toBe(0);
         });
 
         it('one unread DM channel', async () => {
@@ -1051,14 +1054,17 @@ describe('Actions.Channels', () => {
                             [channelId]: {
                                 id: channelId,
                                 team_id: '',
-                                total_msg_count: 10,
                             },
+                        },
+                        messageCounts: {
+                            [channelId]: {total: 10},
                         },
                         myMembers: {
                             [channelId]: {
                                 channel_id: channelId,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                         },
                     },
@@ -1073,8 +1079,9 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId].msg_count, state.entities.channels.channels[channelId].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId].msg_count).toBe(state.entities.channels.messageCounts[channelId].total);
+            expect(state.entities.channels.myMembers[channelId].last_viewed_at).toBeGreaterThan(1000);
         });
 
         it('two unread channels, same team, reading one', async () => {
@@ -1089,24 +1096,28 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId,
-                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId,
-                                total_msg_count: 12,
                             },
+                        },
+                        messageCounts: {
+                            [channelId1]: {total: 10},
+                            [channelId2]: {total: 12},
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
                                 msg_count: 9,
+                                last_viewed_at: 2000,
                             },
                         },
                     },
@@ -1126,14 +1137,16 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId1].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId1].msg_count).toBe(state.entities.channels.messageCounts[channelId1].total);
+            expect(state.entities.channels.myMembers[channelId1].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 4);
-            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, 9);
+            expect(state.entities.channels.myMembers[channelId2].mention_count).toBe(4);
+            expect(state.entities.channels.myMembers[channelId2].msg_count).toBe(9);
+            expect(state.entities.channels.myMembers[channelId2].last_viewed_at).toBe(2000);
 
-            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 4);
-            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 3);
+            expect(state.entities.teams.myMembers[teamId].mention_count).toBe(4);
+            expect(state.entities.teams.myMembers[teamId].msg_count).toBe(3);
         });
 
         it('two unread channels, same team, reading both', async () => {
@@ -1148,24 +1161,28 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId,
-                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId,
-                                total_msg_count: 12,
                             },
+                        },
+                        messageCounts: {
+                            [channelId1]: {total: 10},
+                            [channelId2]: {total: 12},
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
                                 msg_count: 9,
+                                last_viewed_at: 2000,
                             },
                         },
                     },
@@ -1185,14 +1202,16 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId1].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId1].msg_count).toBe(state.entities.channels.messageCounts[channelId1].total);
+            expect(state.entities.channels.myMembers[channelId1].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId2].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId2].msg_count).toBe(state.entities.channels.messageCounts[channelId2].total);
+            expect(state.entities.channels.myMembers[channelId2].last_viewed_at).toBeGreaterThan(2000);
 
-            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId].msg_count).toBe(0);
         });
 
         it('two unread channels, same team, reading both (opposite order)', async () => {
@@ -1207,24 +1226,28 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId,
-                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId,
-                                total_msg_count: 12,
                             },
+                        },
+                        messageCounts: {
+                            [channelId1]: {total: 10},
+                            [channelId2]: {total: 12},
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
                                 msg_count: 9,
+                                last_viewed_at: 1000,
                             },
                         },
                     },
@@ -1244,14 +1267,16 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId1].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId1].msg_count).toBe(state.entities.channels.messageCounts[channelId1].total);
+            expect(state.entities.channels.myMembers[channelId1].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId2].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId2].msg_count).toBe(state.entities.channels.messageCounts[channelId2].total);
+            expect(state.entities.channels.myMembers[channelId2].last_viewed_at).toBeGreaterThan(2000);
 
-            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId].msg_count).toBe(0);
         });
 
         it('two unread channels, different teams, reading one', async () => {
@@ -1267,24 +1292,28 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId1,
-                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId2,
-                                total_msg_count: 12,
                             },
+                        },
+                        messageCounts: {
+                            [channelId1]: {total: 10},
+                            [channelId2]: {total: 12},
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
                                 msg_count: 9,
+                                last_viewed_at: 2000,
                             },
                         },
                     },
@@ -1309,17 +1338,19 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId1].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId1].msg_count).toBe(state.entities.channels.messageCounts[channelId1].total);
+            expect(state.entities.channels.myMembers[channelId1].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 4);
-            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, 9);
+            expect(state.entities.channels.myMembers[channelId2].mention_count).toBe(4);
+            expect(state.entities.channels.myMembers[channelId2].msg_count).toBe(9);
+            expect(state.entities.channels.myMembers[channelId2].last_viewed_at).toBe(2000);
 
-            assert.equal(state.entities.teams.myMembers[teamId1].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId1].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId1].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId1].msg_count).toBe(0);
 
-            assert.equal(state.entities.teams.myMembers[teamId2].mention_count, 4);
-            assert.equal(state.entities.teams.myMembers[teamId2].msg_count, 3);
+            expect(state.entities.teams.myMembers[teamId2].mention_count).toBe(4);
+            expect(state.entities.teams.myMembers[teamId2].msg_count).toBe(3);
         });
 
         it('two unread channels, different teams, reading both', async () => {
@@ -1335,24 +1366,28 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId1,
-                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId2,
-                                total_msg_count: 12,
                             },
+                        },
+                        messageCounts: {
+                            [channelId1]: {total: 10},
+                            [channelId2]: {total: 12},
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
                                 msg_count: 9,
+                                last_viewed_at: 2000,
                             },
                         },
                     },
@@ -1377,17 +1412,19 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId1].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId1].msg_count).toBe(state.entities.channels.messageCounts[channelId1].total);
+            expect(state.entities.channels.myMembers[channelId1].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId2].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId2].msg_count).toBe(state.entities.channels.messageCounts[channelId2].total);
+            expect(state.entities.channels.myMembers[channelId2].last_viewed_at).toBeGreaterThan(2000);
 
-            assert.equal(state.entities.teams.myMembers[teamId1].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId1].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId1].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId1].msg_count).toBe(0);
 
-            assert.equal(state.entities.teams.myMembers[teamId2].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId2].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId2].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId2].msg_count).toBe(0);
         });
 
         it('two unread channels, different teams, reading both (opposite order)', async () => {
@@ -1403,24 +1440,28 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId1,
-                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId2,
-                                total_msg_count: 12,
                             },
+                        },
+                        messageCounts: {
+                            [channelId1]: {total: 10},
+                            [channelId2]: {total: 12},
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
                                 msg_count: 5,
+                                last_viewed_at: 1000,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
                                 msg_count: 9,
+                                last_viewed_at: 2000,
                             },
                         },
                     },
@@ -1445,17 +1486,19 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId1].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId1].msg_count).toBe(state.entities.channels.messageCounts[channelId1].total);
+            expect(state.entities.channels.myMembers[channelId1].last_viewed_at).toBeGreaterThan(1000);
 
-            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
-            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+            expect(state.entities.channels.myMembers[channelId2].mention_count).toBe(0);
+            expect(state.entities.channels.myMembers[channelId2].msg_count).toBe(state.entities.channels.messageCounts[channelId2].total);
+            expect(state.entities.channels.myMembers[channelId2].last_viewed_at).toBeGreaterThan(2000);
 
-            assert.equal(state.entities.teams.myMembers[teamId1].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId1].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId1].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId1].msg_count).toBe(0);
 
-            assert.equal(state.entities.teams.myMembers[teamId2].mention_count, 0);
-            assert.equal(state.entities.teams.myMembers[teamId2].msg_count, 0);
+            expect(state.entities.teams.myMembers[teamId2].mention_count).toBe(0);
+            expect(state.entities.teams.myMembers[teamId2].msg_count).toBe(0);
         });
     });
 
@@ -2066,7 +2109,7 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            expect(state.entities.channels.channels[channel.id]).toBeDefined();
+            expect(state.entities.channels.channels[channel.id]).not.toBeDefined();
             expect(state.entities.channels.myMembers[channel.id]).not.toBeDefined();
         });
 
@@ -2137,7 +2180,7 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            expect(state.entities.channels.channels[channel.id]).toBeDefined();
+            expect(state.entities.channels.channels[channel.id]).not.toBeDefined();
             expect(state.entities.channels.myMembers[channel.id]).not.toBeDefined();
             expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([]);
         });
@@ -2278,7 +2321,7 @@ describe('Actions.Channels', () => {
         expect(state.entities.channelCategories.byId[channelsCategory.id].channel_ids).toEqual([channel.id]);
     });
 
-    test('favoriteChannel with new sidebar', async () => {
+    test('favoriteChannel', async () => {
         const channel = TestHelper.basicChannel;
         const team = TestHelper.basicTeam;
         const currentUserId = TestHelper.generateId();
@@ -2322,56 +2365,15 @@ describe('Actions.Channels', () => {
 
         const state = store.getState();
 
-        // Should favorite the channel in preferences
-        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
-        expect(state.entities.preferences.myPreferences[prefKey]).toMatchObject({value: 'true'});
-
-        // And in channel categories
+        // Should favorite the channel in channel categories
         expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([channel.id]);
         expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([]);
     });
 
-    test('favoriteChannel with old sidebar enabled', async () => {
-        const channel = TestHelper.basicChannel;
-        const currentUserId = TestHelper.generateId();
-
-        store = configureStore({
-            entities: {
-                channels: {
-                    channels: {
-                        [channel.id]: channel,
-                    },
-                },
-                general: {
-                    config: {
-                        EnableLegacySidebar: 'true',
-                    },
-                },
-                users: {
-                    currentUserId,
-                },
-            },
-        });
-
-        nock(Client4.getBaseRoute()).
-            put(`/users/${currentUserId}/preferences`).
-            reply(200, OK_RESPONSE);
-
-        await store.dispatch(Actions.favoriteChannel(channel.id));
-
-        const state = store.getState();
-
-        // Should favorite the channel in preferences
-        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
-        expect(state.entities.preferences.myPreferences[prefKey]).toMatchObject({value: 'true'});
-    });
-
-    it('unfavoriteChannel with new sidebar enabled', async () => {
+    it('unfavoriteChannel', async () => {
         const channel = TestHelper.basicChannel;
         const team = TestHelper.basicTeam;
         const currentUserId = TestHelper.generateId();
-
-        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
 
         const favoritesCategory = {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: [channel.id]};
         const channelsCategory = {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: []};
@@ -2392,11 +2394,6 @@ describe('Actions.Channels', () => {
                         [team.id]: ['favoritesCategory', 'channelsCategory'],
                     },
                 },
-                preferences: {
-                    myPreferences: {
-                        [prefKey]: {value: 'true'},
-                    },
-                },
                 users: {
                     currentUserId,
                 },
@@ -2414,53 +2411,9 @@ describe('Actions.Channels', () => {
 
         const state = store.getState();
 
-        // Should unfavorite the channel in preferences
-        expect(state.entities.preferences.myPreferences[prefKey]).toBeUndefined();
-
-        // And in channel categories
+        // Should unfavorite the channel in channel categories
         expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([]);
         expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([channel.id]);
-    });
-
-    test('unfavoriteChannel with old sidebar', async () => {
-        const channel = TestHelper.basicChannel;
-        const currentUserId = TestHelper.generateId();
-
-        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
-
-        store = configureStore({
-            entities: {
-                channels: {
-                    channels: {
-                        [channel.id]: channel,
-                    },
-                },
-                general: {
-                    config: {
-                        EnableLegacySidebar: 'true',
-                    },
-                },
-                preferences: {
-                    myPreferences: {
-                        [prefKey]: {value: 'true'},
-                    },
-                },
-                users: {
-                    currentUserId,
-                },
-            },
-        });
-
-        nock(Client4.getBaseRoute()).
-            put(`/users/${TestHelper.basicUser.id}/preferences`).
-            reply(200, OK_RESPONSE);
-
-        await store.dispatch(Actions.unfavoriteChannel(channel.id));
-
-        const state = store.getState();
-
-        // Should unfavorite the channel in preferences
-        expect(state.entities.preferences.myPreferences[prefKey]).toBeUndefined();
     });
 
     it('autocompleteChannels', async () => {
@@ -2497,7 +2450,10 @@ describe('Actions.Channels', () => {
 
     it('updateChannelScheme', async () => {
         TestHelper.mockLogin();
-        await store.dispatch(login(TestHelper.basicChannelMember.email, 'password1'));
+        store.dispatch({
+            type: UserTypes.LOGIN_SUCCESS,
+        });
+        await store.dispatch(loadMeREST());
 
         nock(Client4.getBaseRoute()).
             post('/channels').
@@ -2527,7 +2483,10 @@ describe('Actions.Channels', () => {
 
     it('updateChannelMemberSchemeRoles', async () => {
         TestHelper.mockLogin();
-        await store.dispatch(login(TestHelper.basicChannelMember.email, 'password1'));
+        store.dispatch({
+            type: UserTypes.LOGIN_SUCCESS,
+        });
+        await store.dispatch(loadMeREST());
 
         nock(Client4.getBaseRoute()).
             post('/channels').
